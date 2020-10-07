@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": "http://localhost:4000",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
