@@ -69,17 +69,15 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-// import SocialSign from './components/SocialSignin'
 import { login } from '@/api/user'
-
+import { setToken } from '@/utils/auth' // get token from cookie
 export default {
   name: 'Login',
   // components: { SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+      if (value.length <= 0) {
+        callback(new Error('Please enter your user name'))
       } else {
         callback()
       }
@@ -162,12 +160,15 @@ export default {
         }
         const _this = this
         login(data).then((res) => {
-          _this.$router.push({
-            path: this.redirect || '/',
-            query: this.otherQuery
-          })
-          _this.loading = false
-          console.log(res)
+          if (res.data.message.roleName === 'Manager') {
+            setToken(res.data.token)
+            _this.$router.push({
+              path: this.redirect || '/',
+              query: this.otherQuery
+            })
+            _this.loading = false
+            console.log(res)
+          }
         })
 
         // this.$store.dispatch('user/login', this.loginForm)
@@ -193,24 +194,6 @@ export default {
         return acc
       }, {})
     }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
