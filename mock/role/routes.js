@@ -45,18 +45,18 @@ const constantRoutes = [
       }
     ]
   },
-  {
-    path: '/documentation',
-    component: 'layout/Layout',
-    children: [
-      {
-        path: 'index',
-        component: 'views/documentation/index',
-        name: 'Documentation',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
-      }
-    ]
-  },
+  // {
+  //   path: '/documentation',
+  //   component: 'layout/Layout',
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: 'views/documentation/index',
+  //       name: 'Documentation',
+  //       meta: { title: 'Documentation', icon: 'documentation', affix: true }
+  //     }
+  //   ]
+  // },
   {
     path: '/guide',
     component: 'layout/Layout',
@@ -515,7 +515,7 @@ const asyncRoutes = [
     component: 'layout/Layout',
     children: [
       {
-        path: 'https://github.com/PanJiaChen/vue-element-admin',
+        path: 'https://github.com/hieuliemfe/esms-webapp',
         meta: { title: 'External Link', icon: 'link' }
       }
     ]

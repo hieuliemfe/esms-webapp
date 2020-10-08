@@ -31,9 +31,9 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { employeeCode, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ employeeCode: employeeCode.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -82,7 +82,7 @@ const actions = {
         resetRouter()
 
         // reset visited views and cached views
-        // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
+        // to fixed https://github.com/hieuliemfe/esms-webapp/issues/2485
         dispatch('tagsView/delAllViews', null, { root: true })
 
         resolve()

@@ -12,15 +12,15 @@
         <h3 class="title">Login Form</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="employeeCode">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="employeeCode"
+          v-model="loginForm.employeeCode"
+          placeholder="Employee Code"
+          name="employeeCode"
           type="text"
           tabindex="1"
           autocomplete="on"
@@ -75,7 +75,7 @@ export default {
   name: 'Login',
   // components: { SocialSign },
   data() {
-    const validateUsername = (rule, value, callback) => {
+    const validateEmployeeCode = (rule, value, callback) => {
       if (value.length <= 0) {
         callback(new Error('Please enter your user name'))
       } else {
@@ -91,12 +91,12 @@ export default {
     }
     return {
       loginForm: {
-        username: '',
+        employeeCode: '',
         password: ''
       },
       loginRules: {
-        username: [
-          { required: true, trigger: 'blur', validator: validateUsername }
+        employeeCode: [
+          { required: true, trigger: 'blur', validator: validateEmployeeCode }
         ],
         password: [
           { required: true, trigger: 'blur', validator: validatePassword }
@@ -126,8 +126,8 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
+    if (this.loginForm.employeeCode === '') {
+      this.$refs.employeeCode.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
@@ -155,7 +155,7 @@ export default {
         // if (valid) {
         this.loading = true
         const data = {
-          username: this.loginForm.username,
+          employeeCode: this.loginForm.employeeCode,
           password: this.loginForm.password
         }
         const _this = this
@@ -200,7 +200,7 @@ export default {
 
 <style lang="scss">
 /* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
+/* Detail see https://github.com/hieuliemfe/esms-webapp/pull/927 */
 
 $bg: #283443;
 $light_gray: #fff;
