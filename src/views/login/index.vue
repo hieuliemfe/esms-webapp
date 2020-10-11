@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { login } from '@/api/user'
+import { login } from '@/api/root'
 import { setToken } from '@/utils/auth' // get token from cookie
 export default {
   name: 'Login',
@@ -160,15 +160,16 @@ export default {
         }
         const _this = this
         login(data).then((res) => {
-          if (res.data.message.roleName === 'Manager') {
-            setToken(res.data.token)
-            _this.$router.push({
-              path: this.redirect || '/',
-              query: this.otherQuery
-            })
-            _this.loading = false
-            console.log(res)
-          }
+          // if (res.data.message.roleName === 'Manager') {
+          setToken(res.data.token)
+          this.$store.dispatch('user/setRoles', [res.data.message.roleName])
+          _this.$router.push({
+            path: this.redirect || '/',
+            query: this.otherQuery
+          })
+          _this.loading = false
+          console.log(res)
+          // }
         })
 
         // this.$store.dispatch('user/login', this.loginForm)
