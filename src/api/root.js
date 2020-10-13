@@ -8,10 +8,17 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function getProfile() {
   return request({
-    url: '/vue-element-admin/user/info',
-    method: 'get',
-    params: { token }
+    url: '/profile',
+    method: 'get'
+  })
+}
+
+export function register(data, token) {
+  return request({
+    url: '/register',
+    method: 'post',
+    params: { data, token }
   })
 }

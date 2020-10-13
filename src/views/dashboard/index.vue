@@ -24,7 +24,7 @@ export default {
   },
   created() {
     if (!this.roles.includes('Manager')) {
-      // this.currentRole = 'editorDashboard'
+      this.currentRole = 'editorDashboard'
     }
   }
 }

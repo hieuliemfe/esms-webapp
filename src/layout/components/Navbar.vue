@@ -47,7 +47,6 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
-import { removeToken } from '@/utils/auth' // get token from cookie
 export default {
   components: {
     Breadcrumb,
@@ -69,7 +68,7 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      removeToken()
+      this.$store.dispatch('root/resetToken')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }

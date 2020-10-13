@@ -1,109 +1,88 @@
 <template>
-  <div class="login-container">
+  <div class="register-container">
     <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
+      ref="registerForm"
+      :model="registerForm"
+      :rules="registerRules"
+      class="register-form"
       autocomplete="on"
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">Register Form</h3>
       </div>
-
-      <el-form-item prop="employeeCode">
+      <!-- name -->
+      <el-form-item prop="name">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="employeeCode"
-          v-model="loginForm.employeeCode"
-          placeholder="Employee Code"
-          name="employeeCode"
+          ref="name"
+          v-model="registerForm.employeeCode"
+          placeholder="Employee Name"
+          name="name"
           type="text"
           tabindex="1"
           autocomplete="on"
         />
       </el-form-item>
+      <!-- role -->
+      <el-form-item prop="role">
+        <el-select class="form-control" @change="changeRoleTitle($event)">
+          <el-option value="" selected disabled>Choose</el-option>
+          <el-option
+            v-for="roleTitle in jobTitles"
+            :key="roleTitle.id"
+            :value="roleTitle.id"
+          >
+            {{ roleTitle.name }}
+          </el-option>
+        </el-select>
+      </el-form-item>
 
-      <el-tooltip
-        v-model="capsTooltip"
-        content="Caps lock is On"
-        placement="right"
-        manual
-      >
-        <el-form-item prop="password">
-          <span class="svg-container">
-            <svg-icon icon-class="password" />
-          </span>
-          <el-input
-            :key="passwordType"
-            ref="password"
-            v-model="loginForm.password"
-            :type="passwordType"
-            placeholder="Password"
-            name="password"
-            tabindex="2"
-            autocomplete="on"
-            @keyup.native="checkCapslock"
-            @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
-          />
-          <span class="show-pwd" @click="showPwd">
-            <svg-icon
-              :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-            />
-          </span>
-        </el-form-item>
-      </el-tooltip>
-
+      <!-- button -->
       <el-button
         :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px"
-        @click.native.prevent="handleLogin"
-      >Login</el-button>
+        @click.native.prevent="handleRegister"
+      >Register</el-button>
     </el-form>
   </div>
 </template>
-
 <script>
-import { login } from '@/api/root'
-import { setToken } from '@/utils/auth' // get token from cookie
+import { register } from '@/api/root'
+import { setToken } from '@/utils/auth'
 export default {
-  name: 'Login',
-  // components: { SocialSign },
+  name: 'Register',
   data() {
-    const validateEmployeeCode = (rule, value, callback) => {
+    const validateName = (rule, value, callback) => {
       if (value.length <= 0) {
-        callback(new Error('Please enter your user name'))
+        callback(new Error('Please enter your name'))
       } else {
         callback()
       }
     }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+    const validateRole = (rule, value, callback) => {
+      if (value < 1) {
+        callback(new Error('Please choose your role'))
       } else {
         callback()
       }
     }
     return {
-      loginForm: {
-        employeeCode: 'ThuCao',
-        password: 'password'
-      },
-      loginRules: {
-        employeeCode: [
-          { required: true, trigger: 'blur', validator: validateEmployeeCode }
+    //   registerForm: {
+    //     employeeCode: '',
+    //     password: ''
+    //   },
+      registerRules: {
+        name: [
+          { required: true, trigger: 'blur', validator: validateName }
         ],
-        password: [
-          { required: true, trigger: 'blur', validator: validatePassword }
+        role: [
+          { required: true, trigger: 'blur', validator: validateRole }
         ]
       },
-      passwordType: 'password',
-      capsTooltip: false,
       loading: false,
       showDialog: false,
       redirect: undefined,
@@ -126,41 +105,26 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.employeeCode === '') {
-      this.$refs.employeeCode.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
+    if (this.registerForm.name === '') {
+      this.$refs.name.focus()
+    } else if (this.registerForm.role < 1) {
+      this.$refs.role.focus()
     }
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
-    checkCapslock(e) {
-      const { key } = e
-      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
-    },
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
+    handleRegister() {
+      this.$refs.registerForm.validate((valid) => {
         this.loading = true
         const data = {
-          employeeCode: this.loginForm.employeeCode,
-          password: this.loginForm.password
+          name: this.registerForm.name,
+          role: this.registerForm.role
         }
         const _this = this
-        login(data).then((res) => {
+        register(data).then((res) => {
           setToken(res.data.token)
-          this.$store.dispatch('root/login', [res.data.message.roleName])
           _this.$router.push({
             path: this.redirect || '/',
             query: this.otherQuery
@@ -180,6 +144,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style lang="scss">
@@ -191,13 +156,13 @@ $light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
+  .register-container .el-input input {
     color: $cursor;
   }
 }
 
 /* reset element-ui css */
-.login-container {
+.register-container {
   .el-input {
     display: inline-block;
     height: 47px;
@@ -219,7 +184,9 @@ $cursor: #fff;
       }
     }
   }
-
+    .el-input[type=text] {
+        text-transform: capitalize;
+    }
   .el-form-item {
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.1);
@@ -234,13 +201,13 @@ $bg: #2d3a4b;
 $dark_gray: #889aa4;
 $light_gray: #eee;
 
-.login-container {
+.register-container {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
 
-  .login-form {
+  .register-form {
     position: relative;
     width: 520px;
     max-width: 100%;
