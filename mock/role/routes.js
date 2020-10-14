@@ -113,18 +113,18 @@ const asyncRoutes = [
     ]
   },
 
-  {
-    path: '/icon',
-    component: 'layout/Layout',
-    children: [
-      {
-        path: 'index',
-        component: 'views/icons/index',
-        name: 'Icons',
-        meta: { title: 'Icons', icon: 'icon', noCache: true }
-      }
-    ]
-  },
+  // {
+  //   path: '/icon',
+  //   component: 'layout/Layout',
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: 'views/icons/index',
+  //       name: 'Icons',
+  //       meta: { title: 'Icons', icon: 'icon', noCache: true }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/components',
