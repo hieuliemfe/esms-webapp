@@ -1,5 +1,5 @@
 /**
- * Created by PanJiaChen on 16/11/18.
+ * Created by ESMS on 16/11/18.
  */
 
 /**
@@ -14,10 +14,10 @@ export function isExternal(path) {
  * @param {string} str
  * @returns {Boolean}
  */
-export function validUsername(str) {
-  const valid_map = ['admin', 'editor']
-  return valid_map.indexOf(str.trim()) >= 0
-}
+// export function validemployeeCode(str) {
+//   const valid_map = ['Manager', 'editor']
+//   return valid_map.indexOf(str.trim()) >= 0
+// }
 
 /**
  * @param {string} url

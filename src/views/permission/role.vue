@@ -61,8 +61,8 @@
 
 <script>
 import path from 'path'
-import { deepClone } from '@/utils'
-import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
+// import { deepClone } from '@/utils'
+import { getRoutes, getRoles } from '@/api/roles'
 
 const defaultRole = {
   key: '',
@@ -148,42 +148,42 @@ export default {
       })
       return data
     },
-    handleAddRole() {
-      this.role = Object.assign({}, defaultRole)
-      if (this.$refs.tree) {
-        this.$refs.tree.setCheckedNodes([])
-      }
-      this.dialogType = 'new'
-      this.dialogVisible = true
-    },
-    handleEdit(scope) {
-      this.dialogType = 'edit'
-      this.dialogVisible = true
-      this.checkStrictly = true
-      this.role = deepClone(scope.row)
-      this.$nextTick(() => {
-        const routes = this.generateRoutes(this.role.routes)
-        this.$refs.tree.setCheckedNodes(this.generateArr(routes))
-        // set checked state of a node not affects its father and child nodes
-        this.checkStrictly = false
-      })
-    },
-    handleDelete({ $index, row }) {
-      this.$confirm('Confirm to remove the role?', 'Warning', {
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      })
-        .then(async() => {
-          await deleteRole(row.key)
-          this.rolesList.splice($index, 1)
-          this.$message({
-            type: 'success',
-            message: 'Delete succed!'
-          })
-        })
-        .catch(err => { console.error(err) })
-    },
+    // handleAddRole() {
+    //   this.role = Object.assign({}, defaultRole)
+    //   if (this.$refs.tree) {
+    //     this.$refs.tree.setCheckedNodes([])
+    //   }
+    //   this.dialogType = 'new'
+    //   this.dialogVisible = true
+    // },
+    // handleEdit(scope) {
+    //   this.dialogType = 'edit'
+    //   this.dialogVisible = true
+    //   this.checkStrictly = true
+    //   this.role = deepClone(scope.row)
+    //   this.$nextTick(() => {
+    //     const routes = this.generateRoutes(this.role.routes)
+    //     this.$refs.tree.setCheckedNodes(this.generateArr(routes))
+    //     // set checked state of a node not affects its father and child nodes
+    //     this.checkStrictly = false
+    //   })
+    // },
+    // handleDelete({ $index, row }) {
+    //   this.$confirm('Confirm to remove the role?', 'Warning', {
+    //     confirmButtonText: 'Confirm',
+    //     cancelButtonText: 'Cancel',
+    //     type: 'warning'
+    //   })
+    //     .then(async() => {
+    //       await deleteRole(row.key)
+    //       this.rolesList.splice($index, 1)
+    //       this.$message({
+    //         type: 'success',
+    //         message: 'Delete succed!'
+    //       })
+    //     })
+    //     .catch(err => { console.error(err) })
+    // },
     generateTree(routes, basePath = '/', checkedKeys) {
       const res = []
 
@@ -201,39 +201,39 @@ export default {
       }
       return res
     },
-    async confirmRole() {
-      const isEdit = this.dialogType === 'edit'
+    // async confirmRole() {
+    //   const isEdit = this.dialogType === 'edit'
 
-      const checkedKeys = this.$refs.tree.getCheckedKeys()
-      this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
+    //   const checkedKeys = this.$refs.tree.getCheckedKeys()
+    //   this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
 
-      if (isEdit) {
-        await updateRole(this.role.key, this.role)
-        for (let index = 0; index < this.rolesList.length; index++) {
-          if (this.rolesList[index].key === this.role.key) {
-            this.rolesList.splice(index, 1, Object.assign({}, this.role))
-            break
-          }
-        }
-      } else {
-        const { data } = await addRole(this.role)
-        this.role.key = data.key
-        this.rolesList.push(this.role)
-      }
+    //   if (isEdit) {
+    //     await updateRole(this.role.key, this.role)
+    //     for (let index = 0; index < this.rolesList.length; index++) {
+    //       if (this.rolesList[index].key === this.role.key) {
+    //         this.rolesList.splice(index, 1, Object.assign({}, this.role))
+    //         break
+    //       }
+    //     }
+    //   } else {
+    //     const { data } = await addRole(this.role)
+    //     this.role.key = data.key
+    //     this.rolesList.push(this.role)
+    //   }
 
-      const { description, key, name } = this.role
-      this.dialogVisible = false
-      this.$notify({
-        title: 'Success',
-        dangerouslyUseHTMLString: true,
-        message: `
-            <div>Role Key: ${key}</div>
-            <div>Role Name: ${name}</div>
-            <div>Description: ${description}</div>
-          `,
-        type: 'success'
-      })
-    },
+    //   const { description, key, name } = this.role
+    //   this.dialogVisible = false
+    //   this.$notify({
+    //     title: 'Success',
+    //     dangerouslyUseHTMLString: true,
+    //     message: `
+    //         <div>Role Key: ${key}</div>
+    //         <div>Role Name: ${name}</div>
+    //         <div>Description: ${description}</div>
+    //       `,
+    //     type: 'success'
+    //   })
+    // },
     // reference: src/view/layout/components/Sidebar/SidebarItem.vue
     onlyOneShowingChild(children = [], parent) {
       let onlyOneChild = null

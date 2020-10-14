@@ -5,6 +5,7 @@ const state = {
     opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true,
     withoutAnimation: false
   },
+  user: null,
   device: 'desktop',
   size: Cookies.get('size') || 'medium'
 }
@@ -30,10 +31,16 @@ const mutations = {
   SET_SIZE: (state, size) => {
     state.size = size
     Cookies.set('size', size)
+  },
+  SET_USER: (state, user) => {
+    state.user = user
   }
 }
 
 const actions = {
+  setUser({ commit }, user) {
+    commit('SET_USER', user)
+  },
   toggleSideBar({ commit }) {
     commit('TOGGLE_SIDEBAR')
   },
@@ -49,7 +56,7 @@ const actions = {
 }
 
 export default {
-  namespaced: true,
+  namespaced: true, // 'app/'
   state,
   mutations,
   actions
