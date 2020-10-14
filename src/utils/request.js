@@ -18,11 +18,11 @@ service.interceptors.request.use(
     // debugger
     if (store.getters.token) {
       // let each request carry token
-      // ['X-Token'] is a custom headers key
+      // ['Authorization'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['Authorization'] = 'Bearer ' + getToken()
     }
-    config.baseURL = 'http://localhost:4000'
+    config.baseURL = 'http://127.0.0.1:4000'
     return config
   },
   (error) => {
@@ -48,7 +48,7 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (response.status !== 200000) {
+    if (response.status !== 200) {
       Message({
         message: response.statusText || 'Error',
         type: 'error',
@@ -68,7 +68,7 @@ service.interceptors.response.use(
           })
         })
       }
-      return Promise.reject(new Error(response.statusText || 'Error')) //
+      return Promise.reject(new Error(response.statusText || 'Error'))
     } else {
       return res
     }

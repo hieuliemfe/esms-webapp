@@ -18,14 +18,14 @@ const mutations = {
   SET_EMAIL: (state, email) => {
     state.email = email
   },
-  SET_NAME: (state, name) => {
-    state.name = name
+  SET_NAME: (state, fullname) => {
+    state.fullname = fullname
   },
   SET_EMPLOYYEECODE: (state, employeeCode) => {
     state.employeeCode = employeeCode
   },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+  SET_AVATAR: (state, avatarUrl) => {
+    state.avatarUrl = avatarUrl
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
@@ -40,10 +40,10 @@ const actions = {
   login({ commit }, userInfo) {
     const { employeeCode, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ employeeCode: employeeCode.trim(), password: password }).then(response => {
-        const { data } = response
+      login({ employeeCode: employeeCode, password: password }).then(response => {
+        const data = response
         commit('SET_TOKEN', data.token)
-        commit('SET_ROLES', data.message.roleName)
+        commit('SET_ROLES', [data.message.roleName])
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -54,12 +54,11 @@ const actions = {
 
   // post register
   register({ commit }) {
-    const { name, roles } = data
+    const { fullname, roles } = data
     return new Promise((resolve, reject) => {
       register({ name: name, roles: roles }).then(response => {
         const { data } = response
-        commit('NAME', name)
-        commit('SET_ROLES', roles)
+        commit('NAME', fullname)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -71,28 +70,27 @@ const actions = {
   getProfile({ commit, state }) {
     return new Promise((resolve, reject) => {
       getProfile(state.token).then(response => {
-        const { data } = response
+        const data = response.message
 
         if (!data) {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, name, avatar, email } = data
+        // const { roleName, fullname, avatarUrl, email } = data
 
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
+        if (!data.Role.roleName || data.Role.roleName.length <= 0) {
           reject('getProfile: roles must be a non-null array!')
         }
-
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_EMAIL', email)
+        commit('SET_NAME', data.fullname)
+        commit('SET_ROLES', data.Role.roleName)
+        commit('SET_AVATAR', data.avatarUrl)
+        commit('SET_EMAIL', data.email)
+        console.log('getProfile role ' + data.Role.roleName)
         resolve(data)
       }).catch(error => {
         reject(error)
       })
-      commit('SET_ROLES', ['Manager'])
     })
   },
 
