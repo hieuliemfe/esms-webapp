@@ -30,7 +30,7 @@ const actions = {
       getRoles(state.token).then(response => {
         const data = response.message
         commit('SET_ROLEID', [data.id])
-        commit('SET_ROLENAME', [data.Role.roleName])
+        commit('SET_ROLENAME', [data.roleName])
         resolve(data)
       }).catch(error => {
         reject(error)

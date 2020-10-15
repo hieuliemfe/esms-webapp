@@ -76,8 +76,6 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        // const { roleName, fullname, avatarUrl, email } = data
-
         // roles must be a non-empty array
         if (!data.Role.roleName || data.Role.roleName.length <= 0) {
           reject('getProfile: roles must be a non-null array!')

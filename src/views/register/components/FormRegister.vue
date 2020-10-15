@@ -1,6 +1,6 @@
 <template>
   <div class="createEmployee-container">
-    <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
+    <el-form ref="registerForm" :model="registerForm" :rules="rules" class="form-container">
       <div class="createEmployee-main-container">
         <!-- avatar -->
         <el-row>
@@ -21,11 +21,20 @@
             @crop-upload-success="cropSuccess"
           />
         </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item style="margin-bottom: 40px;" prop="avatarUrl">
+              <MDinput v-model="registerForm.phoneNumber" :maxlength="100" name="avatarUrl" required type="url">
+                avatarUrl
+              </MDinput>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <!-- fullname -->
         <el-row>
           <el-col :span="10">
             <el-form-item style="margin-bottom: 40px;" prop="fullname">
-              <MDinput v-model="postForm.fullname" :maxlength="100" name="fullname" required type="text">
+              <MDinput v-model="registerForm.fullname" :maxlength="100" name="fullname" required type="text">
                 Full Name
               </MDinput>
             </el-form-item>
@@ -35,7 +44,7 @@
         <el-row>
           <el-col :span="10">
             <el-form-item style="margin-bottom: 40px;" prop="phoneNumber">
-              <MDinput v-model="postForm.phoneNumber" :maxlength="100" name="phoneNumber" required type="tel">
+              <MDinput v-model="registerForm.phoneNumber" :maxlength="100" name="phoneNumber" required type="tel">
                 Phone Number
               </MDinput>
             </el-form-item>
@@ -43,30 +52,18 @@
         </el-row>
         <!-- role -->
         <el-row>
-          <el-col :span="10">
-            <CommentDropdown v-model="postForm.comment_disabled" />
+          <el-col :span="16">
+            <RoleDropdown v-model="registerForm.comment_disabled" />
           </el-col>
         </el-row>
-
-        <!-- <el-form-item style="margin-bottom: 40px;" label-width="70px" label="Summary:">
-          <el-col :span="8">
-            <el-input v-model="postForm.content_short" :rows="1" type="textarea" class="article-textarea" autosize placeholder="Please enter the content" />
-          </el-col>
-          <span v-show="contentShortLength" class="word-counter">{{ contentShortLength }}words</span>
-        </el-form-item>
-
-        <el-form-item prop="content" style="margin-bottom: 30px;">
-          <Tinymce ref="editor" v-model="postForm.content" :height="400" />
-        </el-form-item> -->
       </div>
 
-      <sticky :z-index="10" :class-name="'sub-navbar '+postForm.status">
-        <CommentDropdown v-model="postForm.comment_disabled" />
+      <sticky :z-index="10" :class-name="'sub-navbar '+registerForm.status">
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
-          Publish
+          Active
         </el-button>
         <el-button v-loading="loading" type="warning" @click="draftForm">
-          Draft
+          Deactive
         </el-button>
       </sticky>
     </el-form>
@@ -79,27 +76,19 @@ import Sticky from '@/components/Sticky' // 粘性header组件
 import { validURL } from '@/utils/validate'
 import { fetchArticle } from '@/api/article'
 import { searchUser } from '@/api/remote-search'
-import { CommentDropdown } from './Dropdown'
+import { RoleDropdown } from './Dropdown'
 import ImageCropper from '@/components/ImageCropper'
-import PanThumb from '@/components/PanThumb'
 
 const defaultForm = {
   status: 'draft',
-  fullname: '', // 文章题目
-  content: '', // 文章内容
-  content_short: '', // 文章摘要
-  source_uri: '', // 文章外链
-  image_uri: '', // 文章图片
-  display_time: undefined, // 前台展示时间
-  id: undefined,
-  platforms: ['a-platform'],
-  comment_disabled: false,
-  importance: 0
+  fullname: '',
+  phoneNumber: '',
+  avatarUrl: ''
 }
 
 export default {
   name: 'FormRegister',
-  components: { MDinput, Sticky, CommentDropdown, ImageCropper, PanThumb },
+  components: { MDinput, Sticky, RoleDropdown, ImageCropper },
   props: {
     isEdit: {
       type: Boolean,
@@ -134,7 +123,7 @@ export default {
       }
     }
     return {
-      postForm: Object.assign({}, defaultForm),
+      registerForm: Object.assign({}, defaultForm),
       loading: false,
       userListOptions: [],
       rules: {
@@ -151,7 +140,7 @@ export default {
   },
   computed: {
     contentShortLength() {
-      return this.postForm.content_short.length
+      return this.registerForm.content_short.length
     },
     displayTime: {
       // set and get is useful when the data
@@ -159,10 +148,10 @@ export default {
       // back end return => "2013-06-25 06:59:25"
       // front end need timestamp => 1372114765000
       get() {
-        return (+new Date(this.postForm.display_time))
+        return (+new Date(this.registerForm.display_time))
       },
       set(val) {
-        this.postForm.display_time = new Date(val)
+        this.registerForm.display_time = new Date(val)
       }
     },
     formSurnameCapital: {
@@ -190,11 +179,11 @@ export default {
   methods: {
     fetchData(id) {
       fetchArticle(id).then(response => {
-        this.postForm = response.data
+        this.registerForm = response.data
 
         // just for test
-        this.postForm.fullname += `   Article Id:${this.postForm.id}`
-        this.postForm.content_short += `   Article Id:${this.postForm.id}`
+        this.registerForm.fullname += `   Article Id:${this.registerForm.id}`
+        this.registerForm.content_short += `   Article Id:${this.registerForm.id}`
 
         // set tagsview fullname
         this.setTagsViewFullname()
@@ -207,16 +196,16 @@ export default {
     },
     setTagsViewFullname() {
       const fullname = 'Edit Article'
-      const route = Object.assign({}, this.tempRoute, { fullname: `${fullname}-${this.postForm.id}` })
+      const route = Object.assign({}, this.tempRoute, { fullname: `${fullname}-${this.registerForm.id}` })
       this.$store.dispatch('tagsView/updateVisitedView', route)
     },
     setPageFullname() {
       const fullname = 'Edit Article'
-      document.fullname = `${fullname} - ${this.postForm.id}`
+      document.fullname = `${fullname} - ${this.registerForm.id}`
     },
     submitForm() {
-      console.log(this.postForm)
-      this.$refs.postForm.validate(valid => {
+      console.log(this.registerForm)
+      this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
           this.$notify({
@@ -225,7 +214,7 @@ export default {
             type: 'success',
             duration: 2000
           })
-          this.postForm.status = 'published'
+          this.registerForm.status = 'published'
           this.loading = false
         } else {
           console.log('error submit!!')
@@ -234,7 +223,7 @@ export default {
       })
     },
     draftForm() {
-      if (this.postForm.content.length === 0 || this.postForm.fullname.length === 0) {
+      if (this.registerForm.content.length === 0 || this.registerForm.fullname.length === 0) {
         this.$message({
           message: 'Please fill in the necessary title and content',
           type: 'warning'
@@ -247,7 +236,7 @@ export default {
         showClose: true,
         duration: 1000
       })
-      this.postForm.status = 'draft'
+      this.registerForm.status = 'draft'
     },
     getRemoteUserList(query) {
       searchUser(query).then(response => {
