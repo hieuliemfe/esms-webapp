@@ -138,7 +138,7 @@ export const asyncRoutes = [
         component: () => import('@/views/register/index'),
         name: 'Register',
         meta: {
-          title: 'Register',
+          title: 'Create New Employees',
           icon: 'form',
           roles: ['Manager'] // you can set roles in root nav
         }

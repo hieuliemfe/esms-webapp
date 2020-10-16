@@ -1,30 +1,34 @@
 <template>
-  <div class="createEmployee-container">
+  <div class="createEmployee-container" :title="textMap[dialogStatus]">
     <el-form ref="registerForm" :model="registerForm" :rules="rules" class="form-container">
       <div class="createEmployee-main-container">
         <!-- avatar -->
         <el-row>
-          <pan-thumb :image="image" />
-
-          <el-button type="primary" icon="el-icon-upload" style="position: absolute;bottom: 15px;margin-left: 40px;" @click="imagecropperShow=true">
-            Change Avatar
-          </el-button>
-
-          <image-cropper
-            v-show="imagecropperShow"
-            :key="imagecropperKey"
-            :width="300"
-            :height="300"
-            url="https://httpbin.org/post"
-            lang-type="en"
-            @close="close"
-            @crop-upload-success="cropSuccess"
-          />
+          <el-col>
+            <pan-thumb :image="image" />
+          </el-col>
+        </el-row>
+        <el-row style="margin-top: 60px">
+          <el-col>
+            <el-button type="primary" icon="el-icon-upload" style="position: absolute;bottom: 15px;" @click="imagecropperShow=true">
+              Change Avatar
+            </el-button>
+            <image-cropper
+              v-show="imagecropperShow"
+              :key="imagecropperKey"
+              :width="300"
+              :height="300"
+              url="https://httpbin.org/post"
+              lang-type="en"
+              @close="close"
+              @crop-upload-success="cropSuccess"
+            />
+          </el-col>
         </el-row>
         <el-row>
-          <el-col :span="10">
-            <el-form-item style="margin-bottom: 40px;" prop="avatarUrl">
-              <MDinput v-model="registerForm.phoneNumber" :maxlength="100" name="avatarUrl" required type="url">
+          <el-col>
+            <el-form-item class="register" prop="avatarUrl">
+              <MDinput v-model="registerForm.avatarUrl" :maxlength="100" name="avatarUrl" required type="url">
                 avatarUrl
               </MDinput>
             </el-form-item>
@@ -32,8 +36,8 @@
         </el-row>
         <!-- fullname -->
         <el-row>
-          <el-col :span="10">
-            <el-form-item style="margin-bottom: 40px;" prop="fullname">
+          <el-col>
+            <el-form-item class="register" prop="fullname">
               <MDinput v-model="registerForm.fullname" :maxlength="100" name="fullname" required type="text">
                 Full Name
               </MDinput>
@@ -42,8 +46,8 @@
         </el-row>
         <!-- phoneNumber -->
         <el-row>
-          <el-col :span="10">
-            <el-form-item style="margin-bottom: 40px;" prop="phoneNumber">
+          <el-col>
+            <el-form-item class="register" prop="phoneNumber">
               <MDinput v-model="registerForm.phoneNumber" :maxlength="100" name="phoneNumber" required type="tel">
                 Phone Number
               </MDinput>
@@ -52,43 +56,42 @@
         </el-row>
         <!-- role -->
         <el-row>
-          <el-col :span="16">
-            <RoleDropdown v-model="registerForm.comment_disabled" />
+          <el-col>
+            <el-form-item class="register" prop="roleId">
+              <MDinput v-model="registerForm.roleId" :maxlength="100" name="roleId" required type="text" :disabled="true" :hidden="true" />
+            </el-form-item>
           </el-col>
         </el-row>
-      </div>
 
-      <sticky :z-index="10" :class-name="'sub-navbar '+registerForm.status">
-        <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
-          Active
-        </el-button>
-        <el-button v-loading="loading" type="warning" @click="draftForm">
-          Deactive
-        </el-button>
-      </sticky>
-    </el-form>
+        <sticky :z-index="0">
+          <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
+            Active
+          </el-button>
+          <el-button v-loading="loading" type="warning" @click="clearForm">
+            Clear
+          </el-button>
+        </sticky>
+      </div></el-form>
   </div>
 </template>
 
 <script>
 import MDinput from '@/components/MDinput'
-import Sticky from '@/components/Sticky' // 粘性header组件
-import { validURL } from '@/utils/validate'
-import { fetchArticle } from '@/api/article'
-import { searchUser } from '@/api/remote-search'
-import { RoleDropdown } from './Dropdown'
+import Sticky from '@/components/Sticky'
+import { validURL, validTel } from '@/utils/validate'
 import ImageCropper from '@/components/ImageCropper'
-
+import PanThumb from '@/components/PanThumb'
 const defaultForm = {
-  status: 'draft',
   fullname: '',
   phoneNumber: '',
-  avatarUrl: ''
+  avatarUrl: '',
+  roleId: 3,
+  roleName: 'Employee'
 }
 
 export default {
   name: 'FormRegister',
-  components: { MDinput, Sticky, RoleDropdown, ImageCropper },
+  components: { MDinput, Sticky, ImageCropper, PanThumb },
   props: {
     isEdit: {
       type: Boolean,
@@ -105,6 +108,25 @@ export default {
         callback(new Error(rule.field + ' is required'))
       } else {
         callback()
+      }
+    }
+    const validateTel = (rule, value, callback) => {
+      if (value === '') {
+        this.$message({
+          message: rule.field + ' is required',
+          type: 'error'
+        })
+        callback(new Error(rule.field + ' is required'))
+      } else {
+        if (validTel(value)) {
+          callback()
+        } else {
+          this.$message({
+            message: 'Phone number is number',
+            type: 'error'
+          })
+          callback(new Error('Phone number is number'))
+        }
       }
     }
     const validateSourceUri = (rule, value, callback) => {
@@ -127,10 +149,14 @@ export default {
       loading: false,
       userListOptions: [],
       rules: {
-        image_uri: [{ validator: validateRequire }],
         fullname: [{ validator: validateRequire }],
-        content: [{ validator: validateRequire }],
-        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
+        phoneNumber: [{ validator: validateTel }],
+        avatarUrl: [{ validator: validateSourceUri, trigger: 'blur' }]
+      },
+      dialogStatus: '',
+      textMap: {
+        update: 'Update Employee',
+        create: 'Create New Employee'
       },
       tempRoute: {},
       imagecropperShow: false,
@@ -177,32 +203,6 @@ export default {
     this.tempRoute = Object.assign({}, this.$route)
   },
   methods: {
-    fetchData(id) {
-      fetchArticle(id).then(response => {
-        this.registerForm = response.data
-
-        // just for test
-        this.registerForm.fullname += `   Article Id:${this.registerForm.id}`
-        this.registerForm.content_short += `   Article Id:${this.registerForm.id}`
-
-        // set tagsview fullname
-        this.setTagsViewFullname()
-
-        // set page fullname
-        this.setPagefullname()
-      }).catch(err => {
-        console.log(err)
-      })
-    },
-    setTagsViewFullname() {
-      const fullname = 'Edit Article'
-      const route = Object.assign({}, this.tempRoute, { fullname: `${fullname}-${this.registerForm.id}` })
-      this.$store.dispatch('tagsView/updateVisitedView', route)
-    },
-    setPageFullname() {
-      const fullname = 'Edit Article'
-      document.fullname = `${fullname} - ${this.registerForm.id}`
-    },
     submitForm() {
       console.log(this.registerForm)
       this.$refs.registerForm.validate(valid => {
@@ -214,35 +214,25 @@ export default {
             type: 'success',
             duration: 2000
           })
-          this.registerForm.status = 'published'
-          this.loading = false
+          this.$store.dispatch('root/register', this.registerForm)
+            .then(() => {
+              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+              this.loading = false
+            })
+            .catch(() => {
+              this.loading = false
+            })
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    draftForm() {
-      if (this.registerForm.content.length === 0 || this.registerForm.fullname.length === 0) {
-        this.$message({
-          message: 'Please fill in the necessary title and content',
-          type: 'warning'
-        })
-        return
-      }
-      this.$message({
-        message: 'Successfully saved',
-        type: 'success',
-        showClose: true,
-        duration: 1000
-      })
-      this.registerForm.status = 'draft'
-    },
-    getRemoteUserList(query) {
-      searchUser(query).then(response => {
-        if (!response.data.items) return
-        this.userListOptions = response.data.items.map(v => v.name)
-      })
+    clearForm() {
+      this.registerForm.roleId = 3
+      this.registerForm.avatarUrl = ''
+      this.registerForm.fullname = ''
+      this.registerForm.phoneNumber = ''
     },
     cropSuccess(resData) {
       this.imagecropperShow = false
@@ -258,22 +248,17 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/styles/mixin.scss";
-
+.el-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .createEmployee-container {
-  position: relative;
-
+  position: auto;
+  margin: auto;
+  text-align: center;
   .createEmployee-main-container {
     padding: 40px 45px 20px 50px;
-
-    .postInfo-container {
-      position: relative;
-      @include clearfix;
-      margin-bottom: 10px;
-
-      .postInfo-container-item {
-        float: left;
-      }
-    }
   }
 
   .word-counter {
@@ -298,4 +283,8 @@ export default {
     height: 200px;
     border-radius: 50%;
   }
+.register{
+  margin-bottom: 30px;
+  width: 40%;
+}
 </style>

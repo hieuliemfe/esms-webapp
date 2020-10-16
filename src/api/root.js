@@ -15,10 +15,10 @@ export function getProfile() {
   })
 }
 
-export function register(data, token) {
+export function register(data) {
   return request({
     url: '/register',
     method: 'post',
-    params: { data, token }
+    data
   })
 }
