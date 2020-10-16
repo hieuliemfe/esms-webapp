@@ -1,7 +1,7 @@
 import { login, getProfile, register } from '@/api/root'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { data } from 'autoprefixer'
+// import { data } from 'autoprefixer'
 
 const state = {
   token: getToken(),
@@ -43,7 +43,6 @@ const actions = {
       login({ employeeCode: employeeCode, password: password }).then(response => {
         const data = response
         commit('SET_TOKEN', data.token)
-        commit('SET_ROLES', [data.message.roleName])
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -53,12 +52,13 @@ const actions = {
   },
 
   // post register
-  register({ commit }) {
-    const { fullname, roles } = data
+  register({ commit }, dataRegister) {
+    const { fullname, phoneNumber, avatarUrl, roleId } = dataRegister
     return new Promise((resolve, reject) => {
-      register({ name: name, roles: roles }).then(response => {
-        const { data } = response
-        commit('NAME', fullname)
+      register({ fullname: fullname, phoneNumber: phoneNumber, avatarUrl: avatarUrl, roleId: roleId }).then(response => {
+        const data = response.message
+        commit('SET_EMPLOYYEECODE', data.employeeCode)
+        commit('SET_PASSWORD', data.password)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -76,17 +76,14 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        // const { roleName, fullname, avatarUrl, email } = data
-
         // roles must be a non-empty array
         if (!data.Role.roleName || data.Role.roleName.length <= 0) {
           reject('getProfile: roles must be a non-null array!')
         }
         commit('SET_NAME', data.fullname)
-        commit('SET_ROLES', data.Role.roleName)
+        commit('SET_ROLES', [data.Role.roleName])
         commit('SET_AVATAR', data.avatarUrl)
         commit('SET_EMAIL', data.email)
-        console.log('getProfile role ' + data.Role.roleName)
         resolve(data)
       }).catch(error => {
         reject(error)
