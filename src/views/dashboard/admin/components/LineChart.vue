@@ -6,7 +6,6 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
-
 export default {
   mixins: [resize],
   props: {
@@ -61,10 +60,46 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons')
       this.setOptions(this.chartData)
     },
-    setOptions({ expectedData, actualData } = {}) {
+    setOptions({ angryData, disgustedData, fearfulData, happyData, neutralData, sadData, suprisedData, noFaceDetectedData } = {}) {
+      var emotions = ['angry', 'disgusted', 'fearful', 'happy', 'neutral', 'sad', 'suprised', 'no face']
+      var normalColors = ['#FF005A', '#33cc33', '#9933ff', '#ffcc00', '#996600', '#0099ff', '#33cccc', '#000000']
+      var lineStyleColors = ['#FF005A', '#33cc33', '#9933ff', '#ffcc00', '#996600', '#0099ff', '#33cccc', '#000000']
+      var areaStyleColors = ['#ffe6ee', '#ebfaeb', '#f2e6ff', '#fffae6', '#ffeecc', '#e6f5ff', '#ebfafa', '#f2f2f2']
+      var sequenceDatas = []
+      sequenceDatas.push(angryData)
+      sequenceDatas.push(disgustedData)
+      sequenceDatas.push(fearfulData)
+      sequenceDatas.push(happyData)
+      sequenceDatas.push(neutralData)
+      sequenceDatas.push(sadData)
+      sequenceDatas.push(suprisedData)
+      sequenceDatas.push(noFaceDetectedData)
+      var serieDatas = []
+      for (var i = 0; i < emotions.length; i++) {
+        serieDatas.push({
+          name: emotions[i],
+          smooth: true,
+          type: 'line',
+          itemStyle: {
+            normal: {
+              color: normalColors[i],
+              lineStyle: {
+                color: lineStyleColors[i],
+                width: 2
+              },
+              areaStyle: {
+                color: areaStyleColors[i]
+              }
+            }
+          },
+          data: sequenceDatas[i],
+          animationDuration: 2800,
+          animationEasing: 'quadraticOut'
+        })
+      }
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM'],
           boundaryGap: false,
           axisTick: {
             show: false
@@ -90,44 +125,9 @@ export default {
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: emotions
         },
-        series: [{
-          name: 'expected', itemStyle: {
-            normal: {
-              color: '#FF005A',
-              lineStyle: {
-                color: '#FF005A',
-                width: 2
-              }
-            }
-          },
-          smooth: true,
-          type: 'line',
-          data: expectedData,
-          animationDuration: 2800,
-          animationEasing: 'cubicInOut'
-        },
-        {
-          name: 'actual',
-          smooth: true,
-          type: 'line',
-          itemStyle: {
-            normal: {
-              color: '#3888fa',
-              lineStyle: {
-                color: '#3888fa',
-                width: 2
-              },
-              areaStyle: {
-                color: '#f3f8ff'
-              }
-            }
-          },
-          data: actualData,
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
-        }]
+        series: serieDatas
       })
     }
   }
