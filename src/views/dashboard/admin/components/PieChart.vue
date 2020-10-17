@@ -52,7 +52,7 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
+          data: ['Industries', 'Technology', 'Technology1', 'Forex', 'Gold', 'Forecasts']
         },
         series: [
           {
@@ -64,6 +64,7 @@ export default {
             data: [
               { value: 500, name: 'Industries' },
               { value: 100, name: 'Technology' },
+              { value: 100, name: 'Technology1' },
               { value: 300, name: 'Forex' },
               { value: 200, name: 'Gold' },
               { value: 400, name: 'Forecasts' }

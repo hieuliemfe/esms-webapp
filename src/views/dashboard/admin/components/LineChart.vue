@@ -127,6 +127,12 @@ export default {
         legend: {
           data: emotions
         },
+        toolbox: {
+          show: true,
+          feature: {
+            magicType: { show: true, type: ['stack', 'tiled'] }
+          }
+        },
         series: serieDatas
       })
     }

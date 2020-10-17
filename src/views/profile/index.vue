@@ -47,7 +47,7 @@ export default {
   computed: {
     ...mapGetters([
       'name',
-      'avatar',
+      'avatarUrl',
       'roles'
     ])
   },
@@ -60,7 +60,7 @@ export default {
         name: this.name,
         role: this.roles.join(' | '),
         email: 'admin@test.com',
-        avatar: this.avatar
+        avatarUrl: this.avatarUrl
       }
     }
   }

@@ -237,7 +237,7 @@ export default {
     cropSuccess(resData) {
       this.imagecropperShow = false
       this.imagecropperKey = this.imagecropperKey + 1
-      this.image = resData.files.avatar
+      this.image = resData.files.avatarUrl
     },
     close() {
       this.imagecropperShow = false
@@ -278,7 +278,7 @@ export default {
     border-bottom: 1px solid #bfcbd9;
   }
 }
-.avatar{
+.avatarUrl{
     width: 200px;
     height: 200px;
     border-radius: 50%;
