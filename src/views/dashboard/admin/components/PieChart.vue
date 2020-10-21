@@ -20,12 +20,24 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '350px'
+    },
+    chartData: {
+      type: Object,
+      required: true
     }
   },
   data() {
     return {
       chart: null
+    }
+  },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
     }
   },
   mounted() {
@@ -43,7 +55,26 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
+      this.setOptions(this.chartData)
+    },
+    setOptions({ valueEmo } = {}) {
+      var emotions = ['Angry', 'Disgusted', 'Fearful', 'Happy', 'Neutral', 'Sad', 'Suprised', 'No face']
+      var normalColors = ['#F94144', '#90BE6D', '#7400B8', '#F9C74F', '#B1A7A6', '#0077B6', '#3FC1C0', '#0F4C5C']
+      var value = []
+      value.push(valueEmo)
 
+      var serieDatas = []
+      for (var i = 0; i < emotions.length; i++) {
+        serieDatas.push({
+          name: emotions[i],
+          value: valueEmo[i],
+          itemStyle: {
+            normal: {
+              color: normalColors[i]
+            }
+          }
+        })
+      }
       this.chart.setOption({
         tooltip: {
           trigger: 'item',
@@ -52,25 +83,19 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: ['Industries', 'Technology', 'Technology1', 'Forex', 'Gold', 'Forecasts']
+          data: ['Angry', 'Disgusted', 'Fearful', 'Happy', 'Neutral', 'Sad', 'Suprised', 'No face']
         },
         series: [
           {
-            name: 'WEEKLY WRITE ARTICLES',
+            name: 'WEEKLY',
             type: 'pie',
-            roseType: 'radius',
             radius: [15, 95],
-            center: ['50%', '38%'],
-            data: [
-              { value: 500, name: 'Industries' },
-              { value: 100, name: 'Technology' },
-              { value: 100, name: 'Technology1' },
-              { value: 300, name: 'Forex' },
-              { value: 200, name: 'Gold' },
-              { value: 400, name: 'Forecasts' }
-            ],
+            // left: '50%',
+            bottom: 20,
+            top: 20,
+            data: serieDatas,
             animationEasing: 'cubicInOut',
-            animationDuration: 2600
+            animationDuration: 3000
           }
         ]
       })

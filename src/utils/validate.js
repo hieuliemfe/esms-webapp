@@ -37,6 +37,11 @@ export function validLowerCase(str) {
   return reg.test(str)
 }
 
+export function validFullname(str) {
+  const reg = /^[a-zA-Z ]*$/
+  return reg.test(str)
+}
+
 export function validTel(str) {
   const reg = /^[0-9]+$/
   return reg.test(str)

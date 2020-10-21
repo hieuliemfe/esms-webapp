@@ -21,18 +21,18 @@
     </el-row>
     <el-row>
       <el-card v-if="!isHidden" class="box-card">
-        <form-register :is-edit="false" />
+        <employee-table :is-edit="false" />
       </el-card>
     </el-row>
   </div>
 </template>
 <script>
 import Dropzone from '@/components/Dropzone'
-import FormRegister from './components/FormRegister'
+import EmployeeTable from './components/EmployeeTable'
 
 export default {
   name: 'Register',
-  components: { Dropzone, FormRegister },
+  components: { Dropzone, EmployeeTable },
   data: function() {
     return {
       isHidden: false

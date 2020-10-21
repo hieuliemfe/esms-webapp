@@ -6,3 +6,10 @@ export function bulkRegister(file) {
     method: 'post'
   })
 }
+
+export function getListEmployee() {
+  return request({
+    url: '/employees',
+    method: 'get'
+  })
+}

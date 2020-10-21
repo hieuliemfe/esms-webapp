@@ -328,6 +328,7 @@ export default {
       color: $color-black;
       text-indent: $index;
       border-bottom: 1px solid $color-grey-light;
+      text-transform: capitalize;
     }
     .material-label {
       color: $color-grey;
