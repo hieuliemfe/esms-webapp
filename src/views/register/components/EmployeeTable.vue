@@ -17,14 +17,14 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         New
-      </el-button>
+      </el-button> -->
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>
       <el-checkbox v-model="showAvatar" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
+        Show Avatar
       </el-checkbox>
     </div>
 
@@ -38,59 +38,53 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="No" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+      <el-table-column label="No" align="center" width="50">
+        <template>
+          <span>{{ total }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Employee Code" width="150px" align="center">
+      <!-- <el-table-column label="Employee Code">
         <template slot-scope="{row}">
-          <span class="link-employeeCode" @click="handleUpdate(row)">{{ row.employeeCode }}</span>
-          <el-tag>{{ row.employeeCode | typeFilter }}</el-tag>
+          <span>{{ row.employeeCode }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="Full Name" align="center" min-width="150px" prop="fullname" sortable="custom" :class-name="getSortClass('fullname')">
+        <template slot-scope="{row}">
+          <span class="link-fullname" @click="handleUpdate(row)">{{ row.fullname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Full Name" min-width="150px">
-        <template slot-scope="{row}">
-          <span>{{ row.fullname }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Phone Number" width="110px" align="center">
+      <el-table-column label="Phone Number" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.phoneNumber }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Email" width="80px">
+      <el-table-column label="Email" align="center" width="200px">
         <template slot-scope="{row}">
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showAvatar" label="Avatar" width="110px" align="center">
-        <template slot-scope="">
-          <span>row.avatarUrl</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Create At" align="center" width="95">
+      <el-table-column v-if="showAvatar" label="Avatar" width="220px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.createAt }}</span>
+          <img v-if="row.avatarUrl !== ''" class="avatar" :src="row.avatarUrl">
         </template>
       </el-table-column>
-      <el-table-column label="Active" class-name="status-col" width="100">
+      <el-table-column label="Deactivate" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
+            {{ row.isDeleted }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="Actions" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
-          </el-button>
-          <el-button v-if="row.status!='deactivate'" size="mini" type="success" @click="handleActivate(row,'deactivate')">
-            Deactive
-          </el-button>
-          <el-button v-if="row.status!='activate'" size="mini" @click="handleActivate(row,'activate')">
+          </el-button> -->
+          <el-button v-if="row.isDeleted!=false" size="mini" type="success" @click="handleActivate(row, false)">
             Activate
+          </el-button>
+          <el-button v-if="row.isDeleted!=true" size="mini" type="warning" @click="handleActivate(row, true)">
+            Deactive
           </el-button>
         </template>
       </el-table-column>
@@ -103,12 +97,12 @@
         <div class="createEmployee-main-container">
           <!-- avatar -->
           <el-row>
-            <el-col class=".avatarthumb">
+            <el-col>
               <pan-thumb :image="image" />
             </el-col>
           </el-row>
           <el-row style="margin-top: 60px">
-            <el-col class=".avatarthumb">
+            <el-col>
               <el-button type="primary" icon="el-icon-upload" style="position: absolute;bottom: 15px;" @click="imagecropperShow=true">
                 Change Avatar
               </el-button>
@@ -266,18 +260,19 @@ export default {
       roleId: '3'
     }
     return {
+      tableKey: 0,
+      count: 0,
       isHidden: false,
       registerForm: Object.assign({}, defaultForm),
       list: null,
       total: 0,
       listLoading: true,
       listQuery: {
-        date: undefined,
         page: 1,
         limit: 20,
-        importance: undefined,
+        fullname: undefined,
         employeeCode: undefined,
-        type: undefined,
+        isDeleted: undefined,
         sort: '+id'
       },
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
@@ -318,11 +313,10 @@ export default {
   },
   methods: {
     getList() {
-      this.listLoading = true
-      getListEmployee(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
+      this.listLoading = false
+      getListEmployee().then(response => {
+        this.list = response.message
+        this.total = this.list.length
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -333,24 +327,24 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    handleActivate(row, status) {
+    handleActivate(row, isDeleted) {
       this.$message({
         message: 'Update success',
         type: 'success'
       })
-      row.status = status
+      row.isDeleted = isDeleted
     },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'id') {
+      if (prop === 'fullname') {
         this.sortByID(order)
       }
     },
     sortByID(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = '+fullname'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = '-fullname'
       }
       this.handleFilter()
     },
@@ -374,23 +368,6 @@ export default {
       })
     },
     createData() {
-      // this.$refs['registerForm'].validate((valid) => {
-      //   if (valid) {
-      //     this.registerForm.id = parseInt(Math.random() * 100) + 1024 // mock a id
-      //     this.registerForm.author = 'vue-element-admin'
-      //     createArticle(this.registerForm).then(() => {
-      //       this.list.unshift(this.registerForm)
-      //       this.dialogFormVisible = false
-      //       this.$notify({
-      //         employeeCode: 'Success',
-      //         message: 'Created Successfully',
-      //         type: 'success',
-      //         duration: 2000
-      //       })
-      //     })
-      //   }
-      // }),
-      console.log(this.registerForm)
       this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -491,17 +468,7 @@ export default {
     padding: 40px 45px 20px 50px;
   }
 }
-
-.article-textarea ::v-deep {
-  textarea {
-    padding-right: 40px;
-    resize: none;
-    border: none;
-    border-radius: 0px;
-    border-bottom: 1px solid #bfcbd9;
-  }
-}
-.avatarUrl{
+.avatar{
     width: 200px;
     height: 200px;
     border-radius: 50%;

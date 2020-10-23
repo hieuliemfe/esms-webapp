@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-card class="box-card">
+      <!-- <el-card class="box-card">
         <div style="margin-bottom:50px;">
           <el-col :span="6" class="text-center">
             <router-link class="pan-btn blue-btn" to="/">
@@ -17,7 +17,7 @@
         <div v-if="isHidden" class="editor-container">
           <dropzone id="myVueDropzone" url="https://httpbin.org/post" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" />
         </div>
-      </el-card>
+      </el-card> -->
     </el-row>
     <el-row>
       <el-card v-if="!isHidden" class="box-card">
@@ -27,12 +27,12 @@
   </div>
 </template>
 <script>
-import Dropzone from '@/components/Dropzone'
+// import Dropzone from '@/components/Dropzone'
 import EmployeeTable from './components/EmployeeTable'
 
 export default {
   name: 'Register',
-  components: { Dropzone, EmployeeTable },
+  components: { EmployeeTable },
   data: function() {
     return {
       isHidden: false
