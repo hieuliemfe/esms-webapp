@@ -7,7 +7,7 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
+// import componentsRouter from './modules/components'
 // import chartsRouter from './modules/charts'
 // import nestedRouter from './modules/nested'
 
@@ -72,13 +72,13 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/session',
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+        path: 'session',
+        component: () => import('@/views/session/index'),
+        name: 'SessionManager',
+        meta: { title: 'Session', icon: 'list', affix: true }
       }
     ]
   },
@@ -119,18 +119,18 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/session',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/session/index'),
-        name: 'Session Done',
-        meta: { title: 'Session', icon: 'list', roles: ['Manager'] }
-      }
-    ]
-  },
+  // {
+  //   path: '/session',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/session/index'),
+  //       name: 'Session Done',
+  //       meta: { title: 'Session', icon: 'list', roles: ['Manager'] }
+  //     }
+  //   ]
+  // },
   // /** when your routing map is too long, you can split it into small modules **/
   // componentsRouter,
   // chartsRouter,

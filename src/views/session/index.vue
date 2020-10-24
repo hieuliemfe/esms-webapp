@@ -134,7 +134,7 @@
                   <i class="el-icon-error negative" />
                 </div>
                 <div class="statusSession">
-                  <span>Negative</span>
+                  <span>Positive</span>
                 </div>
               </el-col>
               <el-col :span="6">
@@ -239,18 +239,19 @@
         </div>
       </div>
       <div class="reportSession">
-        <div class="empReport">
+        <div class="empReport border-right">
           <div class="status">
             <div class="iconSession">
-              <i class="el-icon-error negative" />
+              <i class="el-icon-success positive" />
             </div>
             <div class="statusSession">
               <span>Negative</span>
             </div>
           </div>
           <div class="reportName">
-            <span>[201024-003] Mr.Hoang </span>
+            <span>[201024-003] Mr.Hoa </span>
           </div>
+          <span style="font-size:12px">2020-10-24 9:36:23 AM</span>
           <div class="reportName">
             <el-tooltip
               class="item"
@@ -294,11 +295,83 @@
               </el-button>
             </el-tooltip>
           </div>
-          <div class="task">
+          <!-- <div class="task">
             <span>TASK IN SESSION</span>
+          </div> -->
+          <div class="task">
+            <div class="chart-wrapper">
+              <pie-chart :chart-data="pieChartData" />
+            </div>
+          </div>
+          <div class="task">
+            <span>EMOTION STATICTIS</span>
+          </div>
+          <div class="info">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Emotions</th>
+                  <th scope="col">Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Angry</td>
+                  <td>8s</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Disgusted</td>
+                  <td>2s</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td>Happy</td>
+                  <td>6m</td>
+                </tr>
+                <tr>
+                  <th scope="row">4</th>
+                  <td>Neutral</td>
+                  <td>1m50s</td>
+                </tr>
+                <tr>
+                  <th scope="row">4</th>
+                  <td>Cannot detected</td>
+                  <td>40s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="task">
+            <span>WARNING STATICTIS</span>
+          </div>
+          <div class="info">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Warning</th>
+                  <th scope="col">Times</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Angry</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Leaving the working space</td>
+                  <td>1</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="empInfo border-left">
+        <div class="empInfo">
           <div class="info">
             <img class="avatar" :src="avatarUrl">
           </div>
@@ -312,6 +385,56 @@
           <div class="info">
             <span>Nguyen Hieu Liem</span>
           </div>
+          <div class="info">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Shift</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>Counter</td>
+                  <td>8</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="info">
+            <span><b>SESSION RESULT</b></span>
+          </div>
+          <div class="info">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Negative</td>
+                  <td>10s</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Neutral</td>
+                  <td>1m50s</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td>Positive</td>
+                  <td>6m40s</td>
+                </tr>
+                <tr>
+                  <td>Overview</td>
+                  <th colspan="2" style="color: green;">POSITIVE</th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
         </div>
       </div>
     </div>
@@ -319,16 +442,21 @@
 </template>
 
 <script>
+import PieChart from './components/PieChart'
 import { getListEmployee } from '@/api/employees'
 import waves from '@/directive/waves'
 import DragSelect from '@/components/DragSelect'
 import Pagination from '@/components/Pagination'
+const pieChartData = {
+  valueEmo: [8, 2, '-', 360, 110, '-', '-', 40]
+}
 export default {
-  name: 'EmployeeTable',
-  components: { DragSelect, Pagination },
+  name: 'SessionManager',
+  components: { PieChart, DragSelect, Pagination },
   directives: { waves },
   data() {
     return {
+      pieChartData: pieChartData,
       avatarUrl:
         'https://scontent.fvca1-1.fna.fbcdn.net/v/t1.0-9/104392339_961672564285741_3242929677651781360_o.jpg?_nc_cat=102&ccb=2&_nc_sid=09cbfe&_nc_ohc=u4VFPL3M_1QAX8nCC98&_nc_ht=scontent.fvca1-1.fna&oh=2df6761417eeab471389f3dee72b8e90&oe=5FB951DC',
       show: false,
@@ -463,7 +591,7 @@ export default {
 }
 .reportSession {
   padding: 10px;
-  border: 1px solid;
+  // border: 1px solid;
   border-radius: 5px;
   padding: 10px;
   width: auto;
@@ -502,7 +630,9 @@ export default {
     height: 100%;
     width: 30%;
     // background: rgb(247, 202, 202);
-    .info{
+  }
+}
+.info{
         margin-top: 5px;
         font-size: 14px;
         text-align: center;
@@ -520,8 +650,6 @@ width: 100%;
         font-size: 24px;
     }
     }
-  }
-}
 
 .iconSession {
   font-size: 20px;
