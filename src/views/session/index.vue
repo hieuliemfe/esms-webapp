@@ -13,8 +13,8 @@
         <el-option
           v-for="item in employeeListOptions"
           :key="item"
-          :label="item.label"
-          :value="item.value"
+          :label="item"
+          :value="item"
         />
       </el-select>
       <drag-select />
@@ -34,6 +34,7 @@
         multiple
         filterable
         allow-create
+        type="primary"
         class="filter-item"
         default-first-option
         style="width: 200px"
@@ -42,6 +43,7 @@
         <el-option
           v-for="item in shiftOptions"
           :key="item"
+          type="primary"
           :label="item"
           :value="item"
         />
@@ -65,7 +67,7 @@
       <el-button
         v-waves
         class="filter-item"
-        type="info"
+        type="primary"
         icon="el-icon-search"
         @click="handleFilter"
       >
@@ -79,12 +81,10 @@
             <el-button
               type="info"
               size="mini"
-              class="el-dropdown-link"
+              class="el-dropdown-link filter-list"
               style="border-radius: 5px"
             >
-              <span
-                style="color: #000000 !important"
-              >Sort by<i
+              <span>Sort by<i
                 class="el-icon-arrow-down el-icon--right"
               /></span>
             </el-button>
@@ -102,6 +102,7 @@
             placement="bottom"
           >
             <el-button
+              class="filter-list"
               type="info"
               size="mini"
               icon="el-icon-refresh"
@@ -115,6 +116,7 @@
             placement="bottom"
           >
             <el-button
+              class="filter-list"
               type="info"
               size="mini"
               icon="el-icon-sort"
@@ -245,7 +247,7 @@
               <i class="el-icon-success positive" />
             </div>
             <div class="statusSession">
-              <span>Negative</span>
+              <span>Positive</span>
             </div>
           </div>
           <div class="reportName">
@@ -260,6 +262,7 @@
               placement="bottom"
             >
               <el-button
+                class="filter-list"
                 type="info"
                 size="mini"
                 icon="el-icon-video-camera-solid"
@@ -273,6 +276,7 @@
               placement="bottom"
             >
               <el-button
+                class="filter-list"
                 type="info"
                 size="mini"
                 icon="el-icon-paperclip"
@@ -287,6 +291,7 @@
               placement="bottom"
             >
               <el-button
+                class="filter-list"
                 type="info"
                 size="mini"
                 icon="el-icon-timer"
@@ -445,14 +450,13 @@
 import PieChart from './components/PieChart'
 import { getListEmployee } from '@/api/employees'
 import waves from '@/directive/waves'
-import DragSelect from '@/components/DragSelect'
 import Pagination from '@/components/Pagination'
 const pieChartData = {
   valueEmo: [8, 2, '-', 360, 110, '-', '-', 40]
 }
 export default {
   name: 'SessionManager',
-  components: { PieChart, DragSelect, Pagination },
+  components: { PieChart, Pagination },
   directives: { waves },
   data() {
     return {
@@ -462,6 +466,7 @@ export default {
       show: false,
       shiftOptions: [1, 2, 3],
       statusOptions: ['All', 'Negative', 'Neutral', 'Positive', 'Poker Face'],
+      employeeListOptions: ['Nguyen Hieu Liem'],
       list: null,
       total: 0,
       listLoading: true,
@@ -519,15 +524,16 @@ export default {
   width: 100%;
   height: 600px;
 }
-.el-button {
-  color: black !important;
+.filter-list {
+  color: #42526e !important;
+  font-weight: bold;
     font-size: 14px;
 }
 .listSession {
   float: left;
   width: 270px;
   height: 100%;
-  background: #e6e8ea;
+  background: #f4f5f7;
   border-radius: 5px;
   margin-right: 20px;
   box-shadow: 2px 2px 1px 1px #bbbec2;
@@ -537,7 +543,7 @@ export default {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    background: #e6e8ea;
+    background: #f4f5f7;
   }
   .list {
     width: 90%;
@@ -679,5 +685,8 @@ width: 100%;
 .filter-item {
   margin: 5px;
   border-radius: 5px;
+  color: white !important;
+  font-weight: bold;
+    font-size: 14px;
 }
 </style>

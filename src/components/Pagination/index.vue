@@ -95,7 +95,7 @@ background: #909399;
 .pagination-container {
   width: 100%;
   margin: auto;
-  background: #E6E8EA;
+  background: #F4f5f7;
   border-radius: 5px;
 }
 .pagination-container.hidden {
