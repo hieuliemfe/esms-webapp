@@ -1,12 +1,10 @@
 import { getRoles } from '@/api/roles'
 import { getToken } from '@/utils/auth'
-// import router, { resetRouter } from '@/router'
-// import { data } from 'autoprefixer'
 
 const state = {
   token: getToken(),
   name: '',
-  avatar: '',
+  avatarUrl: '',
   introduction: '',
   roles: []
 }

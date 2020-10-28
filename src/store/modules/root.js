@@ -1,14 +1,14 @@
-import { login, getProfile, register } from '@/api/root'
+import { login, getProfile } from '@/api/root'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import router, { resetRouter } from '@/router'
-// import { data } from 'autoprefixer'
 
 const state = {
   token: getToken(),
-  name: '',
-  avatar: '',
-  introduction: '',
-  roles: []
+  fullname: '',
+  avatarUrl: '',
+  employeeCode: '',
+  roles: [],
+  password: '',
+  email: ''
 }
 
 const mutations = {
@@ -52,19 +52,19 @@ const actions = {
   },
 
   // post register
-  register({ commit }, dataRegister) {
-    const { fullname, phoneNumber, avatarUrl, roleId } = dataRegister
-    return new Promise((resolve, reject) => {
-      register({ fullname: fullname, phoneNumber: phoneNumber, avatarUrl: avatarUrl, roleId: roleId }).then(response => {
-        const data = response.message
-        commit('SET_EMPLOYYEECODE', data.employeeCode)
-        commit('SET_PASSWORD', data.password)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
+  // register({ commit }, dataRegister) {
+  //   const { fullname, phoneNumber, avatarUrl, roleId } = dataRegister
+  //   return new Promise((resolve, reject) => {
+  //     register({ fullname: fullname, phoneNumber: phoneNumber, avatarUrl: avatarUrl, roleId: roleId }).then(response => {
+  //       const data = response.message
+  //       commit('SET_EMPLOYYEECODE', data.employeeCode)
+  //       commit('SET_PASSWORD', data.password)
+  //       resolve(data)
+  //     }).catch(error => {
+  //       reject(error)
+  //     })
+  //   })
+  // },
 
   // get user info
   getProfile({ commit, state }) {
@@ -99,26 +99,6 @@ const actions = {
       removeToken()
       resolve()
     })
-  },
-
-  // dynamically modify permissions
-  async changeRoles({ commit, dispatch }, role) {
-    const token = role + '-token'
-
-    commit('SET_TOKEN', token)
-    setToken(token)
-
-    const { roles } = await dispatch('getProfile')
-
-    resetRouter()
-
-    // generate accessible routes map based on roles
-    const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
-    // dynamically add accessible routes
-    router.addRoutes(accessRoutes)
-
-    // reset visited views and cached views
-    dispatch('tagsView/delAllViews', null, { root: true })
   }
 }
 

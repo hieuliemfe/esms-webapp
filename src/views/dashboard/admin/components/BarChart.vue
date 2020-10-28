@@ -7,7 +7,7 @@ import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
 
-const animationDuration = 6000
+const animationDuration = 3000
 
 export default {
   mixins: [resize],
@@ -22,12 +22,24 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '385px'
+    },
+    chartData: {
+      type: Object,
+      required: true
     }
   },
   data() {
     return {
       chart: null
+    }
+  },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
     }
   },
   mounted() {
@@ -45,7 +57,37 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-
+      this.setOptions(this.chartData)
+    },
+    setOptions({ angryData, disgustedData, fearfulData, happyData, neutralData, sadData, suprisedData, noFaceDetectedData } = {}) {
+      var emotions = ['Angry', 'Disgusted', 'Fearful', 'Happy', 'Neutral', 'Sad', 'Suprised', 'No face']
+      var stackDayInWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+      var normalColors = ['#F94144', '#90BE6D', '#7400B8', '#F9C74F', '#B1A7A6', '#0077B6', '#3FC1C0', '#0F4C5C']
+      var sequenceDatas = []
+      sequenceDatas.push(angryData)
+      sequenceDatas.push(disgustedData)
+      sequenceDatas.push(fearfulData)
+      sequenceDatas.push(happyData)
+      sequenceDatas.push(neutralData)
+      sequenceDatas.push(sadData)
+      sequenceDatas.push(suprisedData)
+      sequenceDatas.push(noFaceDetectedData)
+      var serieDatas = []
+      for (var i = 0; i < sequenceDatas.length; i++) {
+        serieDatas.push({
+          name: emotions[i],
+          data: sequenceDatas[i],
+          type: 'bar',
+          stack: 'aaa',
+          barWidth: '50%',
+          animationDuration,
+          itemStyle: {
+            normal: {
+              color: normalColors[i]
+            }
+          }
+        })
+      }
       this.chart.setOption({
         tooltip: {
           trigger: 'axis',
@@ -54,15 +96,16 @@ export default {
           }
         },
         grid: {
-          top: 10,
+          top: 20,
           left: '2%',
           right: '2%',
-          bottom: '3%',
+          bottom: '20%',
           containLabel: true
         },
         xAxis: [{
+          name: 'Employees',
           type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: stackDayInWeek,
           axisTick: {
             alignWithLabel: true
           }
@@ -70,31 +113,15 @@ export default {
         yAxis: [{
           type: 'value',
           axisTick: {
-            show: false
+            show: true
           }
         }],
-        series: [{
-          name: 'pageA',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [79, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }, {
-          name: 'pageB',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [80, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }, {
-          name: 'pageC',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [30, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }]
+        legend: {
+          data: emotions,
+          left: 'center',
+          bottom: '10'
+        },
+        series: serieDatas
       })
     }
   }

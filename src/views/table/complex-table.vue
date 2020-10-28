@@ -100,7 +100,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <!-- <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="Type" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
             <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
@@ -123,6 +123,79 @@
         <el-form-item label="Remark">
           <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
+      </el-form> -->
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <div class="createEmployee-main-container">
+          <!-- avatar -->
+          <el-row>
+            <el-col>
+              <pan-thumb :image="image" />
+            </el-col>
+          </el-row>
+          <el-row style="margin-top: 60px">
+            <el-col>
+              <el-button type="primary" icon="el-icon-upload" style="position: absolute;bottom: 15px;" @click="imagecropperShow=true">
+                Change Avatar
+              </el-button>
+              <image-cropper
+                v-show="imagecropperShow"
+                :key="imagecropperKey"
+                :width="300"
+                :height="300"
+                url="https://httpbin.org/post"
+                lang-type="en"
+                @close="close"
+                @crop-upload-success="cropSuccess"
+              />
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col>
+              <el-form-item class="register" prop="avatarUrl">
+                <MDinput v-model="registerForm.avatarUrl" :maxlength="100" name="avatarUrl" required type="url">
+                  avatarUrl
+                </MDinput>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- fullname -->
+          <el-row>
+            <el-col>
+              <el-form-item class="register" prop="fullname">
+                <MDinput v-model="registerForm.fullname" :maxlength="100" name="fullname" required type="text">
+                  Full Name
+                </MDinput>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- phoneNumber -->
+          <el-row>
+            <el-col>
+              <el-form-item class="register" prop="phoneNumber">
+                <MDinput v-model="registerForm.phoneNumber" :maxlength="100" name="phoneNumber" required type="tel">
+                  Phone Number
+                </MDinput>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- role -->
+          <el-row>
+            <el-col>
+              <el-form-item class="register" prop="roleId">
+                <MDinput v-model="registerForm.roleId" :maxlength="100" name="roleId" required type="text" :disabled="true" :hidden="true" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <sticky :z-index="0">
+            <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
+              Active
+            </el-button>
+            <el-button v-loading="loading" type="warning" @click="clearForm">
+              Clear
+            </el-button>
+          </sticky>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">

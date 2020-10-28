@@ -73,7 +73,7 @@ export default {
     }
     return {
       loginForm: {
-        employeeCode: 'ThuCao',
+        employeeCode: 'MG0001',
         password: 'password'
       },
       loginRules: {
@@ -141,7 +141,7 @@ export default {
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          console.log('Login Error!!')
           return false
         }
       })
