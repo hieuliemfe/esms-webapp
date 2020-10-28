@@ -73,7 +73,7 @@ export default {
     }
     return {
       loginForm: {
-        employeeCode: 'ThuCao',
+        employeeCode: 'MG0001',
         password: 'password'
       },
       loginRules: {

@@ -22,7 +22,7 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       config.headers['Authorization'] = 'Bearer ' + getToken()
     }
-    config.baseURL = 'http://127.0.0.1:4000'
+    config.baseURL = 'http://api.esms-team.site:4000'
     return config
   },
   (error) => {

@@ -7,9 +7,11 @@ export function bulkRegister(file) {
   })
 }
 
-export function getListEmployee() {
+export function getListEmployee(query) {
   return request({
     url: '/employees',
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }
+

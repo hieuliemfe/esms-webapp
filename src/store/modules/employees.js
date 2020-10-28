@@ -9,9 +9,15 @@ const state = {
   fullname: '',
   phoneNumber: '',
   roleId: '',
-  isDeleted: '',
-  createdAt: '',
-  avatarUrl: ''
+  performanceStatus: '',
+  avatarUrl: '',
+  filterValue: {}
+}
+
+const getters = {
+  filterValue() {
+    return state.filterValue
+  }
 }
 
 const mutations = {
@@ -36,48 +42,45 @@ const mutations = {
   SET_ROLES: (state, roles) => {
     state.roles = roles
   },
-  SET_ACTIVE: (state, isDeleted) => {
-    state.isDeleted = isDeleted
-  },
-  SET_CREATE: (state, createdAt) => {
-    state.createdAt = createdAt
-  },
   SET_AVATAR: (state, avatarUrl) => {
     state.avatarUrl = avatarUrl
+  },
+  SET_FILTERVALUE: (state, filterValue) => {
+    // state.filterValue = {startDate: 'abc', endDate: 'xya'}
+    // filterValue = {startDate: 'mnp', fullname: 'QWERT'}
+    // => new => state.filterValue = {startDate: 'mnp', endDate: 'xya', fullname: 'QWERT'}
+    state.filterValue = { ...state.filterValue, ...filterValue }
+  },
+  SET_STATUS: (state, performanceStatus) => {
+    state.performanceStatus = performanceStatus
   }
 }
 
 const actions = {
   // get all employee
-  getListEmployee({ commit, state }) {
+  getListEmployee({ commit, state }, filterValue) {
     return new Promise((resolve, reject) => {
-      getListEmployee(state.token).then(response => {
+      getListEmployee(state.token, filterValue).then(response => {
         const data = response.message
-
-        if (!data) {
-          reject('Do not have any employee to show to. Add new!')
+        let filteredData
+        if (data && data.length > 0) {
+          filteredData = data.filter(e => e.performanceStatus === 'Warning')
         }
-
-        commit('SET_ID', data.row.fullname)
-        commit('SET_EMPLOYYEECODE', data.row.employeeCode)
-        commit('SET_EMAIL', data.row.email)
-        commit('SET_NAME', data.row.fullname)
-        commit('SET_PHONE', data.row.phoneNumber)
-        commit('SET_ROLES', data.row.roles)
-        commit('SET_ACTIVE', data.row.isDeleted)
-        commit('SET_CREATE', data.row.createdAt)
-        commit('SET_AVATAR', data.row.avatarUrl)
-        resolve(data)
+        resolve(filteredData)
       }).catch(error => {
         reject(error)
       })
     })
+  },
+  setFilterValue({ commit }, filterValue) {
+    commit('SET_FILTERVALUE', filterValue)
   }
 }
 
 export default {
   namespaced: true,
   state,
+  getters,
   mutations,
   actions
 }
