@@ -9,7 +9,6 @@
       style="width: 250px"
       @keyup.enter.native="handleFilter"
     />
-    <drag-select />
     <!-- Select date -->
     <el-date-picker
       v-model="listQuery.date"
@@ -200,8 +199,8 @@ export default {
   methods: {
     handleFilter() {
       this.$store.dispatch('employees/setFilterValue', {
-        startDate: this.listQuery.date[0].toJSON(),
-        endDate: this.listQuery.date[1].toJSON(),
+        startDate: this.listQuery.date && this.listQuery.date[0].toJSON(),
+        endDate: this.listQuery.date && this.listQuery.date[1].toJSON(),
         fullname: this.listQuery.fullname,
         status: this.listQuery.status
       })

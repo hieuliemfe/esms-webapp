@@ -1,16 +1,13 @@
-import { getWarningList } from '@/api/employees'
+import { getSessionList } from '@/api/sessions'
 import { getToken } from '@/utils/auth'
-
 const state = {
   token: getToken(),
   id: '',
-  employeeCode: '',
-  email: '',
-  fullname: '',
-  phoneNumber: '',
-  roleId: '',
-  performanceStatus: '',
+  employeeId: '',
+  createdAt: '',
   avatarUrl: '',
+  employeeFullname: '',
+  status: '',
   filterValue: {}
 }
 
@@ -27,20 +24,11 @@ const mutations = {
   SET_ID: (state, id) => {
     state.id = id
   },
-  SET_EMPLOYYEECODE: (state, employeeCode) => {
-    state.employeeCode = employeeCode
+  SET_EMPLOYYEECODE: (state, employeeId) => {
+    state.employeeId = employeeId
   },
-  SET_EMAIL: (state, email) => {
-    state.email = email
-  },
-  SET_NAME: (state, fullname) => {
-    state.fullname = fullname
-  },
-  SET_PHONE: (state, phoneNumber) => {
-    state.phoneNumber = phoneNumber
-  },
-  SET_ROLES: (state, roles) => {
-    state.roles = roles
+  SET_EMPLOYEENAME: (state, employeeFullname) => {
+    state.employeeFullname = employeeFullname
   },
   SET_AVATAR: (state, avatarUrl) => {
     state.avatarUrl = avatarUrl
@@ -53,20 +41,24 @@ const mutations = {
   },
   SET_STATUS: (state, performanceStatus) => {
     state.performanceStatus = performanceStatus
+  },
+  SET_CREATED: (state, createdAt) => {
+    state.createdAt = createdAt
   }
 }
 
 const actions = {
   // get all employee
-  getWarningList({ commit, state }, filterValue) {
+  getSessionList({ commit, state }, filterValue) {
     return new Promise((resolve, reject) => {
-      getWarningList(state.token, filterValue).then(response => {
+      getSessionList(state.token, filterValue).then(response => {
         const data = response.message
         let filteredData
         if (data && data.length > 0) {
-          filteredData = data.filter(e => e.performanceStatus === 'Warning')
+          // filteredData = data.filter(e => e.performanceStatus === 'Warning')
         }
         resolve(filteredData)
+        // resolve(data)
       }).catch(error => {
         reject(error)
       })

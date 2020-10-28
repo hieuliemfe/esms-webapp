@@ -17,7 +17,6 @@
       height="800"
       width="100%"
       highlight-current-row
-      @sort-change="sortChange"
     >
       <el-table-column width="30">
         <template>
@@ -87,14 +86,14 @@
 </template>
 
 <script>
-import { getListEmployee } from '@/api/employees'
+import { getWarningList } from '@/api/employees'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import FilterContainer from '@/components/Filter'
 import { mapState } from 'vuex'
 
 export default {
-  name: 'EmployeeTable',
+  name: 'WarningTable',
   components: { Pagination, FilterContainer },
   directives: { waves },
   data() {
@@ -121,7 +120,6 @@ export default {
   },
   watch: {
     filterValue: function(value) {
-      console.log('EmpTable filterValue', value)
       this.getList()
     }
   },
@@ -134,7 +132,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = false
-      getListEmployee(this.filterValue).then(response => {
+      getWarningList(this.filterValue).then(response => {
         this.list = response.message
         this.total = this.list.length
         // Just to simulate the time of the request

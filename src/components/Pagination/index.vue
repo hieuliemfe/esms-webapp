@@ -2,7 +2,6 @@
   <div :class="{'hidden':hidden}" class="pagination-container">
     <el-pagination
       :background="background"
-      :pager-count="pagerCount"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
       :layout="layout"
@@ -20,10 +19,6 @@ import { scrollTo } from '@/utils/scroll-to'
 export default {
   name: 'Pagination',
   props: {
-    pagerCount: {
-      type: Number,
-      default: 1
-    },
     total: {
       required: true,
       type: Number

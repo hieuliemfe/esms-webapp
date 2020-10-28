@@ -70,19 +70,6 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/',
-    component: Layout,
-    redirect: '/session',
-    children: [
-      {
-        path: 'session',
-        component: () => import('@/views/session/index'),
-        name: 'SessionManager',
-        meta: { title: 'Session', icon: 'list', affix: true }
-      }
-    ]
-  },
-  {
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',
@@ -95,6 +82,24 @@ export const constantRoutes = [
         meta: { title: 'Profile', icon: 'user', noCache: true }
       }
     ]
+  },
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/warning',
+    children: [
+      {
+        path: 'warning',
+        component: () => import('@/views/warning/index'),
+        name: 'Warning List',
+        meta: {
+          affix: true,
+          title: 'Warning List',
+          icon: 'el-icon-warning',
+          roles: ['Manager'] // you can set roles in root nav
+        }
+      }
+    ]
   }
 ]
 
@@ -104,18 +109,15 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/register',
+    path: '/session',
     component: Layout,
+    // redirect: '/session',
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/register/index'),
-        name: 'Employees List',
-        meta: {
-          title: 'Employees List',
-          icon: 'peoples',
-          roles: ['Manager'] // you can set roles in root nav
-        }
+        path: 'session',
+        component: () => import('@/views/session/index'),
+        name: 'Session',
+        meta: { title: 'Session', icon: 'el-icon-s-order', roles: ['Manager'] }
       }
     ]
   },

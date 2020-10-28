@@ -33,9 +33,6 @@ export default {
     }
   },
   computed: {
-    theme() {
-      return this.$store.state.settings.theme
-    }
   },
   watch: {
     show(value) {
