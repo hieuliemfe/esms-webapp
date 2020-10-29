@@ -111,10 +111,9 @@ export const asyncRoutes = [
   {
     path: '/session',
     component: Layout,
-    // redirect: '/session',
     children: [
       {
-        path: 'session',
+        path: 'index',
         component: () => import('@/views/session/index'),
         name: 'Session',
         meta: { title: 'Session', icon: 'el-icon-s-order', roles: ['Manager'] }

@@ -9,7 +9,7 @@ export function getSessionList(query) {
 }
 export function getSession(id) {
   return request({
-    url: '/sessions/${id}',
+    url: '/sessions/' + { id },
     method: 'get'
   })
 }

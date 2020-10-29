@@ -84,11 +84,15 @@ export default {
         fullname: undefined,
         employeeCode: undefined,
         shift: undefined,
-        status: 'Negative'
+        status: undefined
       },
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now()
+          const current = new Date()
+          const night = new Date(
+            current.toJSON().split('T')[0] + 'T23:59:59+07:00'
+          )
+          return time.getTime() > night
         },
         shortcuts: [
           {
@@ -194,11 +198,15 @@ export default {
       }
     }
   },
-  created() {},
-  mounted() {},
   methods: {
     handleFilter() {
       this.$store.dispatch('employees/setFilterValue', {
+        startDate: this.listQuery.date[0].toJSON(),
+        endDate: this.listQuery.date && this.listQuery.date[1].toJSON(),
+        fullname: this.listQuery.fullname,
+        status: this.listQuery.status
+      })
+      this.$store.dispatch('sessions/setFilterValue', {
         startDate: this.listQuery.date && this.listQuery.date[0].toJSON(),
         endDate: this.listQuery.date && this.listQuery.date[1].toJSON(),
         fullname: this.listQuery.fullname,

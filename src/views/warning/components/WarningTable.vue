@@ -20,7 +20,7 @@
     >
       <el-table-column width="30">
         <template>
-          <span>{{ total }}</span>
+          <span>{{ index }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -127,7 +127,6 @@ export default {
     this.getList()
   },
   mounted() {
-    console.log('warningForm', this.warningForm)
   },
   methods: {
     getList() {

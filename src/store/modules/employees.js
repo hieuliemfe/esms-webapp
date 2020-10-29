@@ -58,7 +58,7 @@ const mutations = {
 
 const actions = {
   // get all employee
-  getWarningList({ commit, state }, filterValue) {
+  getWarningList({ state }, filterValue) {
     return new Promise((resolve, reject) => {
       getWarningList(state.token, filterValue).then(response => {
         const data = response.message

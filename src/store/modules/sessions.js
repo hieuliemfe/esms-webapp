@@ -2,7 +2,7 @@ import { getSessionList } from '@/api/sessions'
 import { getToken } from '@/utils/auth'
 const state = {
   token: getToken(),
-  id: '',
+  idsession: '',
   employeeId: '',
   createdAt: '',
   avatarUrl: '',
@@ -14,6 +14,9 @@ const state = {
 const getters = {
   filterValue() {
     return state.filterValue
+  },
+  id() {
+    return state.id
   }
 }
 
@@ -21,8 +24,8 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_ID: (state, id) => {
-    state.id = id
+  SET_ID_SESSION: (state, id) => {
+    state.id = { ...state.filterValue, ...id }
   },
   SET_EMPLOYYEECODE: (state, employeeId) => {
     state.employeeId = employeeId
@@ -48,17 +51,11 @@ const mutations = {
 }
 
 const actions = {
-  // get all employee
-  getSessionList({ commit, state }, filterValue) {
+  getSessionList({ state }, filterValue) {
     return new Promise((resolve, reject) => {
       getSessionList(state.token, filterValue).then(response => {
         const data = response.message
-        let filteredData
-        if (data && data.length > 0) {
-          // filteredData = data.filter(e => e.performanceStatus === 'Warning')
-        }
-        resolve(filteredData)
-        // resolve(data)
+        resolve(data)
       }).catch(error => {
         reject(error)
       })
@@ -66,6 +63,10 @@ const actions = {
   },
   setFilterValue({ commit }, filterValue) {
     commit('SET_FILTERVALUE', filterValue)
+  },
+  setIdSession({ commit }, id) {
+    console.log('sessions id', id)
+    commit('SET_ID_SESSION', id)
   }
 }
 
