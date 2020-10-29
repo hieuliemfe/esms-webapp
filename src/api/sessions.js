@@ -7,9 +7,9 @@ export function getSessionList(query) {
     params: query
   })
 }
-export function getSession(id) {
+export function getSessionById(id) {
   return request({
-    url: '/sessions/' + { id },
+    url: '/sessions/' + id,
     method: 'get'
   })
 }

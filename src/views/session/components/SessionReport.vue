@@ -1,32 +1,41 @@
 <template>
-  <div class="reportSession">
+  <div v-if="data" class="reportSession">
     <div class="empReport">
       <div class="status">
-        <div class="iconSession">
+        <!-- icon -->
+        <div v-if="data.info.emotion_level < 0" class="iconSession">
+          <i class="el-icon-error negative" />
+        </div>
+        <div v-if="data.info.emotion_level > 0" class="iconSession">
           <i class="el-icon-success positive" />
         </div>
+        <div v-if="data.info.emotion_level === 0" class="iconSession">
+          <i class="el-icon-minus neutral" />
+        </div>
+        <!-- status -->
         <div class="statusSession">
-          <span>Positive</span>
+          <span>{{ severe }}</span>
         </div>
       </div>
+      <!-- id session -->
       <div class="reportName">
-        <span>[201024-003] Mr.Hoa </span>
+        <span> Session {{ data.id }} </span>
       </div>
-      <span style="font-size: 12px">2020-10-24 9:36:23 AM</span>
-      <div class="reportName">
+      <span style="font-size: 12px">{{ sessionStart }}</span>
+      <!-- <div class="reportName">
         <el-tooltip
           class="item"
           effect="dark"
-          content="Watch Video"
+          content="Watch Vsessionideo"
           placement="bottom"
         >
           <el-button
             class="filter-list"
             type="info"
             size="mini"
-            icon="el-icon-video-camera-solid"
+            icon="el-icon-vsessionideo-camera-solsessionid"
             style="float: left; border-radius: 5px"
-          >Video</el-button>
+          >Vsessionideo</el-button>
         </el-tooltip>
         <el-tooltip
           class="item"
@@ -58,7 +67,7 @@
           >8m40s
           </el-button>
         </el-tooltip>
-      </div>
+      </div> -->
       <!-- <div class="task">
             <span>TASK IN SESSION</span>
           </div> -->
@@ -68,14 +77,15 @@
         </div>
       </div>
       <div class="task">
-        <span>EMOTION STATICTIS</span>
+        <span style="color:red">WARNING STATISTIC</span>
       </div>
       <div class="info">
-        <table class="table">
-          <thead>
+        <table class="table table-bordered">
+          <thead class="thead-dark">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Emotions</th>
+              <th scope="col">Warning</th>
+              <th scope="col">Times</th>
               <th scope="col">Duration</th>
             </tr>
           </thead>
@@ -83,53 +93,55 @@
             <tr>
               <th scope="row">1</th>
               <td>Angry</td>
-              <td>8s</td>
+              <td>{{ data.info.angry_warning }}</td>
+              <td>{{ msToStr(data.info.angry_duration_warning_max) }}</td>
             </tr>
             <tr>
               <th scope="row">2</th>
-              <td>Disgusted</td>
-              <td>2s</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Happy</td>
-              <td>6m</td>
-            </tr>
-            <tr>
-              <th scope="row">4</th>
-              <td>Neutral</td>
-              <td>1m50s</td>
-            </tr>
-            <tr>
-              <th scope="row">4</th>
-              <td>Cannot detected</td>
-              <td>40s</td>
+              <td>Leaving the working space</td>
+              <td>{{ data.info.no_face_detected_warning }}</td>
+              <td>{{ msToStr(data.info.no_face_detected_duration_warning_max) }}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="task">
-        <span>WARNING STATICTIS</span>
+        <span style="color:#0052cc">EMOTION STATISTIC</span>
       </div>
       <div class="info">
-        <table class="table">
-          <thead>
+        <table class="table table-bordered table-striped">
+          <thead class="thead-dark">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Warning</th>
-              <th scope="col">Times</th>
+              <th scope="col">Emotions</th>
+              <th scope="col">Duration</th>
+              <th scope="col">Period</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row">1</th>
-              <td>Angry</td>
-              <td>0</td>
+              <td>Negative</td>
+              <td>{{ msToStr(data.info.negative_emotions_duration) }}</td>
+              <td>{{ data.info.negative_emotions_period_count }}</td>
             </tr>
             <tr>
               <th scope="row">2</th>
+              <td>Neutral</td>
+              <td>{{ msToStr(data.info.neutral_emotions_duration) }}</td>
+              <td>{{ data.info.neutral_emotion_period_count }}</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Positive</td>
+              <td>{{ msToStr(data.info.positive_emotions_duration) }}</td>
+              <td>{{ data.info.positive_emotions_period_count }}</td>
+            </tr>
+            <tr>
+              <th scope="row">4</th>
               <td>Leaving the working space</td>
-              <td>1</td>
+              <td>{{ msToStr(data.info.no_face_detected_duration) }}</td>
+              <td>{{ data.info.no_face_detected_period_count }}</td>
             </tr>
           </tbody>
         </table>
@@ -142,11 +154,11 @@
       <div class="info">
         <i
           class="el-icon-star-on"
-          style="width: 24px; height: 24px; color: gold"
+          style="wsessionidth: 24px; height: 24px; color: gold"
         />
         <i
           class="el-icon-star-on"
-          style="width: 24px; height: 24px; color: gold"
+          style="wsessionidth: 24px; height: 24px; color: gold"
         />
       </div>
       <div class="info">
@@ -155,7 +167,7 @@
       <div class="info">
         <span>Nguyen Hieu Liem</span>
       </div>
-      <div class="info">
+      <!-- <div class="info">
         <table class="table">
           <tbody>
             <tr>
@@ -203,17 +215,18 @@
             </tr>
           </tbody>
         </table>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 <script>
 import PieChart from './PieChart'
 import waves from '@/directive/waves'
+import { mapState } from 'vuex'
+import { getSessionById } from '@/api/sessions'
 const pieChartData = {
   valueEmo: [8, 2, '-', 360, 110, '-', '-', 40]
 }
-
 export default {
   name: 'SessionReport',
   components: { PieChart },
@@ -221,24 +234,85 @@ export default {
   data() {
     return {
       pieChartData: pieChartData,
-      avatarUrl:
-        'https://scontent.fvca1-1.fna.fbcdn.net/v/t1.0-9/104392339_961672564285741_3242929677651781360_o.jpg?_nc_cat=102&ccb=2&_nc_sid=09cbfe&_nc_ohc=u4VFPL3M_1QAX8nCC98&_nc_ht=scontent.fvca1-1.fna&oh=2df6761417eeab471389f3dee72b8e90&oe=5FB951DC',
-      listLoading: true,
-      listQuery: {
-        date: undefined,
-        page: 1,
-        limit: 20,
-        fullname: undefined,
-        employeeCode: undefined,
-        shift: undefined
+      avatarUrl: '',
+      reportLoading: true,
+      data: undefined
+    }
+  },
+  computed: {
+    ...mapState('sessions', ['sessionId']),
+    sessionStart() {
+      return this.data ? new Date(this.data.sessionStart) : null
+    },
+    severe() {
+      const emotion_level = this.data.info.emotion_level
+      if (emotion_level < 0) {
+        // neg
+        if (emotion_level < 0 && emotion_level > -0.25) {
+          return 'Lowly Negative'
+        } else if (emotion_level < -0.25 && emotion_level > -0.5) {
+          return 'Medium Negative'
+        } else if (emotion_level < -0.5 && emotion_level > -0.75) {
+          return 'Highly Negative'
+        } else {
+          return 'Extremely Negative'
+        }
+      } else if (emotion_level > 0) {
+        // pos
+        if (emotion_level > 0 && emotion_level < 0.25) {
+          return 'Lowly Positive'
+        } else if (emotion_level > 0.25 && emotion_level < 0.5) {
+          return 'Medium Positive'
+        } else if (emotion_level > 0.5 && emotion_level < 0.75) {
+          return 'Highly Positive'
+        } else {
+          return 'Extremely Positive'
+        }
+      } else {
+        return 'Neutral'
       }
     }
   },
+  watch: {
+    sessionId: function(value) {
+      this.getReport()
+    }
+  },
   created() {
+    this.getReport()
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
+    getReport() {
+      this.reportLoading = false
+      console.log('sessionId', this.sessionId)
+      getSessionById(this.sessionId).then((response) => {
+        this.data = response.message
+        this.pieChartData.valueEmo = this.data.info.emotions_duration
+        setTimeout(() => {
+          this.reportLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    msToStr(ms, _callCount = 1) {
+      if (ms < 1000) {
+        return ms + ' ms'
+      }
+      if (ms < 60000) {
+        const secs = Math.floor(ms / 1000)
+        _callCount += 1
+        return secs + ` sec${secs === 1 ? '' : 's'}`
+      }
+      if (ms < 3600000) {
+        const mins = Math.floor(ms / 60000)
+        _callCount += 1
+        return mins + ` min${mins === 1 ? '' : 's'}` + this.msToStr(ms % 60000, _callCount)
+      }
+      const hours = Math.floor(ms / 3600000)
+      _callCount += 1
+      return hours + ` hour${hours === 1 ? '' : 's'}` +
+      this.msToStr(ms % 3600000, _callCount)
+    }
   }
 }
 </script>
@@ -246,69 +320,4 @@ export default {
 @import "~@/styles/mixin.scss";
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "~@/styles/index.scss";
-.filter-list {
-  color: #42526e !important;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.reportSession {
-  padding: 10px;
-  border-radius: 5px;
-  padding: 10px;
-  width: auto;
-  height: 100%;
-  overflow-y: scroll;
-}
-.empReport {
-  padding: 0px 20px 0px 10px;
-  float: left;
-  height: 100%;
-  width: 70%;
-  .status {
-    width: 100%;
-    font-size: 20px;
-    height: 25px;
-    float: left;
-  }
-  .reportName {
-    float: left;
-    width: 100%;
-    padding: 10px 0px 10px 0px;
-    font-size: 24px;
-    font-weight: bold;
-  }
-  .task {
-    float: left;
-    width: 100%;
-    padding: 10px 0px 10px 0px;
-    font-weight: bold;
-    font-size: 14px;
-  }
-}
-.empInfo {
-  padding: 0px 10px 0px 20px;
-  float: left;
-  height: 100%;
-  width: 30%;
-  // background: rgb(247, 202, 202);
-}
-.info {
-  margin-top: 5px;
-  font-size: 14px;
-  text-align: center;
-  float: left;
-  width: 100%;
-  .avatar {
-    width: 200px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    height: 200px;
-    border-radius: 50%;
-  }
-  i {
-    font-size: 24px;
-  }
-}
 </style>

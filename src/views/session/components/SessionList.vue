@@ -64,8 +64,17 @@
           </el-row>
           <el-row :span="24">
             <el-col :span="18">
-              <div class="iconSession">
+              <div v-if="row.status==='Negative'" class="iconSession">
                 <i class="el-icon-error negative" />
+              </div>
+              <div v-if="row.status==='Positive'" class="iconSession">
+                <i class="el-icon-success positive" />
+              </div>
+              <div v-if="row.status==='Neutral'" class="iconSession">
+                <i class="el-icon-minus neutral" />
+              </div>
+              <div v-if="row.status==='Pocker Face'" class="iconSession">
+                <i class="el-icon-s-tools poker" />
               </div>
               <div class="statusSession">
                 <span>{{ row.status }}</span>
@@ -106,7 +115,6 @@ export default {
   directives: { waves },
   data() {
     return {
-      id: '',
       avatarUrl: '',
       show: false,
       list: null,
@@ -147,9 +155,8 @@ export default {
       this.getList()
     },
     getReport(id) {
-      this.$store.dispatch('/sessions/setIdSession', {
-        id: this.id
-      })
+      console.log('id', id)
+      this.$store.dispatch('sessions/setIdSession', id)
     }
   }
 }
@@ -158,9 +165,4 @@ export default {
 @import "~@/styles/mixin.scss";
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "~@/styles/index.scss";
-.filter-list {
-  color: #42526e !important;
-  font-weight: bold;
-  font-size: 14px;
-}
 </style>

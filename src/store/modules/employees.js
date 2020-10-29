@@ -14,11 +14,11 @@ const state = {
   filterValue: {}
 }
 
-const getters = {
-  filterValue() {
-    return state.filterValue
-  }
-}
+// const getters = {
+//   filterValue() {
+//     return state.filterValue
+//   }
+// }
 
 const mutations = {
   SET_TOKEN: (state, token) => {
@@ -80,7 +80,7 @@ const actions = {
 export default {
   namespaced: true,
   state,
-  getters,
+  // getters,
   mutations,
   actions
 }

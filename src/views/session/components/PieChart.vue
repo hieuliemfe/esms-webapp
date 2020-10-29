@@ -87,7 +87,7 @@ export default {
         },
         series: [
           {
-            name: 'WEEKLY',
+            name: 'Emotion',
             type: 'pie',
             radius: [15, 95],
             // left: '50%',

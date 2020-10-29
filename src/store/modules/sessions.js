@@ -1,8 +1,8 @@
-import { getSessionList } from '@/api/sessions'
+import { getSessionList, getSessionById } from '@/api/sessions'
 import { getToken } from '@/utils/auth'
 const state = {
   token: getToken(),
-  idsession: '',
+  sessionId: 0,
   employeeId: '',
   createdAt: '',
   avatarUrl: '',
@@ -11,21 +11,12 @@ const state = {
   filterValue: {}
 }
 
-const getters = {
-  filterValue() {
-    return state.filterValue
-  },
-  id() {
-    return state.id
-  }
-}
-
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
   SET_ID_SESSION: (state, id) => {
-    state.id = { ...state.filterValue, ...id }
+    state.sessionId = id
   },
   SET_EMPLOYYEECODE: (state, employeeId) => {
     state.employeeId = employeeId
@@ -61,11 +52,20 @@ const actions = {
       })
     })
   },
+  getSessionById({ state }, id) {
+    return new Promise((resolve, reject) => {
+      getSessionById(state.token, id).then(response => {
+        const data = response.message
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   setFilterValue({ commit }, filterValue) {
     commit('SET_FILTERVALUE', filterValue)
   },
   setIdSession({ commit }, id) {
-    console.log('sessions id', id)
     commit('SET_ID_SESSION', id)
   }
 }
@@ -73,7 +73,6 @@ const actions = {
 export default {
   namespaced: true,
   state,
-  getters,
   mutations,
   actions
 }
