@@ -13,18 +13,20 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
+      border
       :data="list"
       height="800"
-      width="100%"
+      width="300"
       highlight-current-row
     >
-      <el-table-column width="30">
+      <!-- <el-table-column width="30">
         <template>
           <span>{{ index }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         width="100px"
+        label="Photo"
         align="center"
       >
         <template slot-scope="{ row }">
@@ -145,6 +147,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "~@/styles/mixin.scss";
+@import "node_modules/bootstrap/scss/bootstrap.scss";
 .avatar {
   width: 50px;
   height: 50px;
