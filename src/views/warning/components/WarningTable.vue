@@ -57,7 +57,7 @@
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         label="Actions"
         align="center"
         min-width="150"
@@ -72,7 +72,7 @@
             View Session
           </el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <pagination

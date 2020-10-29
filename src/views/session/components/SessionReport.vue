@@ -151,7 +151,7 @@
       <div class="info">
         <img class="avatar" :src="avatarUrl">
       </div>
-      <div class="info">
+      <!-- <div class="info">
         <i
           class="el-icon-star-on"
           style="wsessionidth: 24px; height: 24px; color: gold"
@@ -160,12 +160,12 @@
           class="el-icon-star-on"
           style="wsessionidth: 24px; height: 24px; color: gold"
         />
-      </div>
+      </div> -->
       <div class="info">
         <span><b>Bank Teller</b></span>
       </div>
       <div class="info">
-        <span>Nguyen Hieu Liem</span>
+        <span>Le Nguyen An Khang</span>
       </div>
       <!-- <div class="info">
         <table class="table">
@@ -234,7 +234,7 @@ export default {
   data() {
     return {
       pieChartData: pieChartData,
-      avatarUrl: '',
+      avatarUrl: 'https://scontent.fsgn1-1.fna.fbcdn.net/v/t1.0-9/71288718_2518740211691156_145778560190119936_n.jpg?_nc_cat=109&ccb=2&_nc_sid=09cbfe&_nc_ohc=C8kNpWM0k_oAX8AG9Gk&_nc_ht=scontent.fsgn1-1.fna&oh=0360a8096ba2d73d6a6e2da7ae1c5cdc&oe=5FBFF578',
       reportLoading: true,
       data: undefined
     }

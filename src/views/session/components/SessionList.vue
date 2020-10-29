@@ -156,7 +156,7 @@ export default {
     },
     getReport(id) {
       console.log('id', id)
-      this.$store.dispatch('sessions/setIdSession', id)
+      this.$store.dispatch('sessions/', id)
     }
   }
 }
