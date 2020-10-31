@@ -1,48 +1,5 @@
 <template>
   <div class="listSession">
-    <div class="sortList">
-      <el-dropdown trigger="click">
-        <el-button
-          type="info"
-          size="mini"
-          class="el-dropdown-link filter-list"
-          style="border-radius: 5px"
-        >
-          <span>Sort by<i
-            class="el-icon-armessage-down el-icon--right"
-          /></span>
-        </el-button>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item disabled>ORDER SESSION BY</el-dropdown-item>
-          <el-dropdown-item>Name</el-dropdown-item>
-          <el-dropdown-item>Time</el-dropdown-item>
-          <el-dropdown-item>Status</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="Refresh"
-        placement="bottom"
-      >
-        <el-button
-          class="filter-list"
-          type="info"
-          size="mini"
-          icon="el-icon-refresh"
-          style="float: right; border-radius: 5px"
-        />
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="Sort" placement="bottom">
-        <el-button
-          class="filter-list"
-          type="info"
-          size="mini"
-          icon="el-icon-sort"
-          style="float: right; margin-right: 2px; border-radius: 5px"
-        />
-      </el-tooltip>
-    </div>
     <div
       v-loading="listLoading"
       class="list border-right border-left"
@@ -145,6 +102,11 @@ export default {
       getSessionList(this.filterValue).then(response => {
         this.list = response.message
         this.total = this.list.length
+        // console.log('IDDDD', this.list[0].id)
+
+        if (this.list[0]) {
+          this.$store.dispatch('sessions/setIdSession', this.list[0].id)
+        }
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -155,7 +117,6 @@ export default {
       this.getList()
     },
     getReport(id) {
-      console.log('id', id)
       this.$store.dispatch('sessions/setIdSession', id)
     }
   }

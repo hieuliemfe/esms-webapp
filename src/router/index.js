@@ -6,37 +6,6 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 
-/* Router Modules */
-// import componentsRouter from './modules/components'
-// import chartsRouter from './modules/charts'
-// import nestedRouter from './modules/nested'
-
-/**
- * Note: sub-menu only appear when route children.length >= 1
- * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
- *
- * hidden: true                   if set true, item will not show in the sidebar(default is false)
- * alwaysShow: true               if set true, will always show the root menu
- *                                if not set alwaysShow, when item has more than one children route,
- *                                it will becomes nested mode, otherwise not show the root menu
- * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
- * name:'router-name'             the name is used by <keep-alive> (must set!!!)
- * meta : {
-    roles: ['Manager','editor']    control the page roles (you can set multiple roles)
-    title: 'title'               the name show in sidebar and breadcrumb (recommend set)
-    icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
-    noCache: true                if set true, the page will no be cached(default is false)
-    affix: true                  if set true, the tag will affix in the tags-view
-    breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
-    activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
-  }
- */
-
-/**
- * constantRoutes
- * a base page that does not have permission requirements
- * all roles can be accessed
- */
 export const constantRoutes = [
   {
     path: '/redirect',
@@ -86,15 +55,15 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/warning',
+    redirect: '/take-care-employee',
     children: [
       {
-        path: 'warning',
-        component: () => import('@/views/warning/index'),
+        path: 'take-care-employee',
+        component: () => import('@/views/take-care-employee/index'),
         name: 'Warning List',
         meta: {
           affix: true,
-          title: 'Warning List',
+          title: 'take-care-employee',
           icon: 'el-icon-warning',
           roles: ['Manager'] // you can set roles in root nav
         }
@@ -108,18 +77,18 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  {
-    path: '/session',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/session/index'),
-        name: 'Session',
-        meta: { title: 'Session', icon: 'el-icon-s-order', roles: ['Manager'] }
-      }
-    ]
-  },
+//   {
+//     path: '/session',
+//     component: Layout,
+//     children: [
+//       {
+//         path: 'index',
+//         component: () => import('@/views/session/index'),
+//         name: 'Session',
+//         meta: { title: 'Session', icon: 'el-icon-s-order', roles: ['Manager'] }
+//       }
+//     ]
+//   },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

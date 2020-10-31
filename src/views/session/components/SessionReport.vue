@@ -22,55 +22,6 @@
         <span> Session {{ data.id }} </span>
       </div>
       <span style="font-size: 12px">{{ sessionStart }}</span>
-      <!-- <div class="reportName">
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="Watch Vsessionideo"
-          placement="bottom"
-        >
-          <el-button
-            class="filter-list"
-            type="info"
-            size="mini"
-            icon="el-icon-vsessionideo-camera-solsessionid"
-            style="float: left; border-radius: 5px"
-          >Vsessionideo</el-button>
-        </el-tooltip>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="Add attachment"
-          placement="bottom"
-        >
-          <el-button
-            class="filter-list"
-            type="info"
-            size="mini"
-            icon="el-icon-paperclip"
-            style="float: left; border-radius: 5px"
-          >Attach
-          </el-button>
-        </el-tooltip>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="Session Duration"
-          placement="bottom"
-        >
-          <el-button
-            class="filter-list"
-            type="info"
-            size="mini"
-            icon="el-icon-timer"
-            style="float: left; border-radius: 5px"
-          >8m40s
-          </el-button>
-        </el-tooltip>
-      </div> -->
-      <!-- <div class="task">
-            <span>TASK IN SESSION</span>
-          </div> -->
       <div class="task">
         <div class="chart-wrapper">
           <pie-chart :chart-data="pieChartData" />
@@ -151,71 +102,12 @@
       <div class="info">
         <img class="avatar" :src="avatarUrl">
       </div>
-      <!-- <div class="info">
-        <i
-          class="el-icon-star-on"
-          style="wsessionidth: 24px; height: 24px; color: gold"
-        />
-        <i
-          class="el-icon-star-on"
-          style="wsessionidth: 24px; height: 24px; color: gold"
-        />
-      </div> -->
       <div class="info">
         <span><b>Bank Teller</b></span>
       </div>
       <div class="info">
         <span>Le Nguyen An Khang</span>
       </div>
-      <!-- <div class="info">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Shift</td>
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>Counter</td>
-              <td>8</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="info">
-        <span><b>SESSION RESULT</b></span>
-      </div>
-      <div class="info">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Name</th>
-              <th scope="col">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Negative</td>
-              <td>10s</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Neutral</td>
-              <td>1m50s</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Positive</td>
-              <td>6m40s</td>
-            </tr>
-            <tr>
-              <td>Overview</td>
-              <th colspan="2" style="color: green">POSITIVE</th>
-            </tr>
-          </tbody>
-        </table>
-      </div> -->
     </div>
   </div>
 </template>
@@ -285,13 +177,12 @@ export default {
   methods: {
     getReport() {
       this.reportLoading = false
-      console.log('sessionId', this.sessionId)
       getSessionById(this.sessionId).then((response) => {
         this.data = response.message
         this.pieChartData.valueEmo = this.data.info.emotions_duration
         setTimeout(() => {
           this.reportLoading = false
-        }, 1.5 * 1000)
+        }, 5 * 1000)
       })
     },
     msToStr(ms, _callCount = 1) {

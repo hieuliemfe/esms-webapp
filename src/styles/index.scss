@@ -23,6 +23,7 @@ html {
 }
 
 #app {
+  overflow: hidden;
   height: 100%;
 }
 
@@ -121,7 +122,8 @@ aside {
 
 //main-container全局样式
 .app-container {
-  padding: 20px;
+  height: 90vh;
+  padding: 10px;
 }
 
 .components-container {
@@ -138,7 +140,7 @@ aside {
 }
 
 .sub-navbar {
-  height: 50px;
+  height: 10vh;
   line-height: 50px;
   position: relative;
   width: 100%;
@@ -193,33 +195,22 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
-.listSession {
-  float: left;
-  width: 270px;
-  height: 95%;
-  background: #f4f5f7;
-  border-radius: 5px;
-  margin-right: 20px;
-  .sortList {
-    border-radius: 5px;
-    margin-top: 10px;
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    background: #f4f5f7;
-  }
+
   .list {
-    width: 90%;
-    margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    height: 100%;
     overflow-y: scroll;
-    height: 80%;
     border-radius: 5px;
     background: white;
+    border-right: 1px solid;
+    border-image: linear-gradient(45deg, lightgray, gray) 1;
     .cardSession {
-      padding: 10px;
-      .el-row {
+      border-radius: 5px;
+      border-bottom: 1px solid;
+      border-image: linear-gradient(45deg, rgb(0,143,104), rgb(250,224,66)) 1;
+      padding: 5px;
+      margin: 5px;
+      .row {
         margin: 5px 0px 5px 0px;
 
         .avatar {
@@ -250,38 +241,33 @@ aside {
         border: 2px solid whitesmoke;
       }
     }
+    .iconSession {
+      font-size: 20px;
+      height: 25px;
+      float: left;
+      .negative {
+        color: red;
+      }
+      .positive {
+        color: green;
+      }
+      .poker {
+        color: #e06f1f;
+      }
+    }
+    .statusSession {
+      margin-left: 3px;
+      font-size: 14px;
+      float: left;
+      height: 25px;
+      padding-top: 5px;
+      font-weight: bold;
+      color: #8993a4;
+      text-transform: uppercase;
+    }
   }
-  .pages {
-    width: 90%;
-    // margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-.iconSession {
-  font-size: 20px;
-  height: 25px;
-  float: left;
-  .negative {
-    color: red;
-  }
-  .positive {
-    color: green;
-  }
-  .poker {
-    color: #e06f1f;
-  }
-}
-.statusSession {
-  margin-left: 3px;
-  font-size: 14px;
-  float: left;
-  height: 25px;
-  padding-top: 5px;
-  font-weight: bold;
-  color: #8993a4;
-  text-transform: uppercase;
-}
+  
+
 .warningList{
 height: 100%;
 width: 100%;
