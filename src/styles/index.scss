@@ -1,16 +1,17 @@
-@import './variables.scss';
-@import './mixin.scss';
-@import './transition.scss';
-@import './element-ui.scss';
-@import './sidebar.scss';
-@import './btn.scss';
+@import "./variables.scss";
+@import "./mixin.scss";
+@import "./transition.scss";
+@import "./element-ui.scss";
+@import "./sidebar.scss";
+@import "./btn.scss";
 
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, Arial, sans-serif;
 }
 
 label {
@@ -105,7 +106,8 @@ aside {
   display: block;
   line-height: 32px;
   font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   color: #2c3e50;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -122,7 +124,7 @@ aside {
 
 //main-container全局样式
 .app-container {
-  height: 90vh;
+  // height: 94vh;
   padding: 10px;
 }
 
@@ -136,7 +138,7 @@ aside {
 }
 
 .text-center {
-  text-align: center
+  text-align: center;
 }
 
 .sub-navbar {
@@ -147,7 +149,13 @@ aside {
   text-align: right;
   padding-right: 20px;
   transition: 600ms ease position;
-  background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(32, 182, 249, 1) 0%,
+    rgba(32, 182, 249, 1) 0%,
+    rgba(33, 120, 241, 1) 100%,
+    rgba(33, 120, 241, 1) 100%
+  );
 
   .subtitle {
     font-size: 20px;
@@ -196,82 +204,93 @@ aside {
   z-index: 1000 !important;
 }
 
-  .list {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
+.list {
+  float: left;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  background: white;
+  border-right: 1px solid;
+  border-image: linear-gradient(90deg, lightgray, gray) 1;
+  .cardSession {
+    height: 80px;
     border-radius: 5px;
-    background: white;
-    border-right: 1px solid;
-    border-image: linear-gradient(45deg, lightgray, gray) 1;
-    .cardSession {
-      border-radius: 5px;
-      border-bottom: 1px solid;
-      border-image: linear-gradient(45deg, rgb(0,143,104), rgb(250,224,66)) 1;
-      padding: 5px;
-      margin: 5px;
-      .row {
-        margin: 5px 0px 5px 0px;
+    border-bottom: 1px solid;
+    border-image: linear-gradient(30deg, rgb(0, 143, 104), red) 1;
+    padding: 5px;
+    margin: 5px;
+    .row {
+      margin: 5px 0px 5px 0px;
 
-        .avatar {
-          border: 1px solid black;
-          float: right;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-        }
-        .nameSession {
-          font-size: 16px;
-          color: #0052cc;
-          .span {
-            max-lines: 2;
-          }
-        }
-      }
-    }
-    .cardSession:hover {
-      background: #deebff;
-      .nameSession {
-        color: black;
-      }
-      .statusSession {
-        color: #0052cc;
-      }
       .avatar {
-        border: 2px solid whitesmoke;
+        border: 1px solid black;
+        float: right;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
       }
-    }
-    .iconSession {
-      font-size: 20px;
-      height: 25px;
-      float: left;
-      .negative {
-        color: red;
+      .nameSession {
+        font-size: 16px;
+        color: #0052cc;
+        .span {
+          max-lines: 2;
+        }
       }
-      .positive {
-        color: green;
-      }
-      .poker {
-        color: #e06f1f;
-      }
-    }
-    .statusSession {
-      margin-left: 3px;
-      font-size: 14px;
-      float: left;
-      height: 25px;
-      padding-top: 5px;
-      font-weight: bold;
-      color: #8993a4;
-      text-transform: uppercase;
     }
   }
-  
+  .cardSession:hover {
+    background: #deebff;
+    .nameSession {
+      color: black;
+    }
+    .statusSession {
+      color: #0052cc;
+    }
+    .avatar {
+      border: 2px solid whitesmoke;
+    }
+  }
+  .cardSession:active {
+    background: #deebff;
+    .nameSession {
+      color: black;
+    }
+    .statusSession {
+      color: #0052cc;
+    }
+    .avatar {
+      border: 2px solid whitesmoke;
+    }
+  }
+  .iconSession {
+    font-size: 20px;
+    height: 25px;
+    float: left;
+    .negative {
+      color: red;
+    }
+    .positive {
+      color: green;
+    }
+    .poker {
+      color: #e06f1f;
+    }
+  }
+  .statusSession {
+    margin-left: 3px;
+    font-size: 14px;
+    float: left;
+    height: 25px;
+    padding-top: 5px;
+    font-weight: bold;
+    color: #8993a4;
+    text-transform: uppercase;
+  }
+}
 
-.warningList{
-height: 100%;
-width: 100%;
-overflow-y: scroll;
+.warningList {
+  height: 100%;
+  width: 100%;
 }
 .filter-list {
   color: #42526e !important;
@@ -285,34 +304,29 @@ overflow-y: scroll;
   padding: 10px;
   width: auto;
   height: 100%;
-  overflow-y: scroll;
-}
-.empReport {
-  padding: 0px 20px 0px 10px;
   float: left;
-  height: 100%;
-  width: 70%;
-  .status {
-    width: 100%;
-    font-size: 20px;
-    height: 25px;
-    float: left;
-  }
-  .reportName {
-    float: left;
-    width: 100%;
-    padding: 10px 0px 10px 0px;
-    font-size: 24px;
-    font-weight: bold;
-  }
-  .task {
-    float: left;
-    width: 100%;
-    padding: 10px 0px 10px 0px;
-    font-weight: bold;
-    font-size: 14px;
-  }
 }
+.status {
+  width: 100%;
+  font-size: 20px;
+  height: 25px;
+  float: left;
+}
+.reportName {
+  float: left;
+  width: 100%;
+  padding: 10px 0px 10px 0px;
+  font-size: 24px;
+  font-weight: bold;
+}
+.task {
+  float: left;
+  width: 100%;
+  padding: 10px 0px 10px 0px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
 .empInfo {
   padding: 0px 10px 0px 20px;
   float: left;
@@ -333,9 +347,19 @@ overflow-y: scroll;
     margin-right: auto;
     height: 200px;
     border-radius: 50%;
-    border: 1px solid
+    border: 1px solid;
   }
   i {
     font-size: 24px;
   }
+}
+#please-scroll {
+  height: calc(100vh - 120px);
+  overflow-y: scroll;
+}
+.filter.row{
+  height: 60px;
+}
+.takecare.row{
+  min-height: calc(100vh - 110px);
 }
