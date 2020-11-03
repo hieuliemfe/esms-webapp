@@ -1,17 +1,19 @@
 <template>
   <div class="filter-container">
     <!-- Title -->
-    <el-input
+    <el-autocomplete
       v-model="listQuery.fullname"
       placeholder="Employee Name"
       clearable
       class="filter-item"
-      style="width: 250px"
-      @keyup.enter.native="handleFilter"
+      style="width: 30vh"
+      :fetch-suggestions="querySearch"
+      @select="handleSelect"
     />
     <!-- Select date -->
     <el-date-picker
       v-model="listQuery.date"
+      style="width: 30vh"
       type="daterange"
       class="filter-item"
       align="center"
@@ -26,13 +28,13 @@
     <el-select
       v-if="listQuery.date"
       v-model="listQuery.shift"
+      style="width: 25vh"
       multiple
       filterable
       allow-create
       type="primary"
       class="filter-item"
       default-first-option
-      style="width: 200px"
       placeholder="Shift"
     >
       <el-option
@@ -48,8 +50,8 @@
       v-model="listQuery.status"
       placeholder="Status"
       clearable
+      style="width: 15vh"
       class="filter-item"
-      style="width: 200px"
     >
       <el-option
         v-for="item in statusOptions"
@@ -62,6 +64,7 @@
     <el-button
       v-waves
       class="filter-item"
+      style="width: 15vh"
       type="primary"
       icon="el-icon-search"
       @click="handleFilter"
@@ -72,6 +75,7 @@
 </template>
 <script>
 import waves from '@/directive/waves'
+// import { getWarningList } from '@/api/employees'
 export default {
   name: 'FilterContainer',
   directives: { waves },
@@ -80,9 +84,10 @@ export default {
       shiftOptions: [1, 2, 3],
       statusOptions: ['Negative', 'Neutral', 'Positive', 'Poker Face'],
       listQuery: {
-        date: undefined,
         fullname: undefined,
         employeeCode: undefined,
+        employeeInfo: [],
+        date: undefined,
         shift: undefined,
         status: undefined
       },
@@ -213,6 +218,30 @@ export default {
         status: this.listQuery.status
       })
     }
+    // querySearch(queryString, cb) {
+    //   var employeeInfo = this.employeeInfo
+    //   var results = queryString ? employeeInfo.filter(this.createFilter(queryString)) : employeeInfo
+    //   // call callback function to return suggestions
+    //   cb(results)
+    // },
+    // createFilter(queryString) {
+    //   return (link) => {
+    //     return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+    //   }
+    // },
+    // getWarningList() {
+    //   getWarningList(this.filterValue).then((response) => {
+    //     this.list = response.message
+
+    //     if (this.list[0]) {
+    //       this.$store.dispatch('sessions/setIdSession', this.list[0].id)
+    //     }
+    //     this.employeeInfo = response
+    //   })
+    // },
+    // handleSelect(item) {
+    //   console.log(item)
+    // }
   }
 }
 </script>

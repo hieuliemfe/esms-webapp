@@ -4,14 +4,15 @@ import { getToken } from '@/utils/auth'
 const state = {
   token: getToken(),
   id: '',
-  employeeCode: '',
+  empCode: '',
   email: '',
   fullname: '',
   phoneNumber: '',
   roleId: '',
   performanceStatus: '',
   avatarUrl: '',
-  filterValue: {}
+  filterValue: {},
+  report: {}
 }
 
 const mutations = {
@@ -22,7 +23,7 @@ const mutations = {
     state.id = id
   },
   SET_EMPLOYYEECODE: (state, employeeCode) => {
-    state.employeeCode = employeeCode
+    state.empCode = employeeCode
   },
   SET_EMAIL: (state, email) => {
     state.email = email
@@ -40,10 +41,10 @@ const mutations = {
     state.avatarUrl = avatarUrl
   },
   SET_FILTERVALUE: (state, filterValue) => {
-    // state.filterValue = {startDate: 'abc', endDate: 'xya'}
-    // filterValue = {startDate: 'mnp', fullname: 'QWERT'}
-    // => new => state.filterValue = {startDate: 'mnp', endDate: 'xya', fullname: 'QWERT'}
     state.filterValue = { ...state.filterValue, ...filterValue }
+  },
+  SET_REPORT: (state, report) => {
+    state.report = { ...state.report, ...report }
   },
   SET_STATUS: (state, performanceStatus) => {
     state.performanceStatus = performanceStatus
@@ -68,6 +69,9 @@ const actions = {
   },
   setFilterValue({ commit }, filterValue) {
     commit('SET_FILTERVALUE', filterValue)
+  },
+  setReport({ commit }, report) {
+    commit('SET_REPORT', report)
   }
 }
 

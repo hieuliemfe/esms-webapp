@@ -77,18 +77,6 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-//   {
-//     path: '/session',
-//     component: Layout,
-//     children: [
-//       {
-//         path: 'index',
-//         component: () => import('@/views/session/index'),
-//         name: 'Session',
-//         meta: { title: 'Session', icon: 'el-icon-s-order', roles: ['Manager'] }
-//       }
-//     ]
-//   },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
