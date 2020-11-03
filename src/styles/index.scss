@@ -232,6 +232,8 @@ aside {
 }
 .body-list {
   padding-top: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
   float: left;
   overflow-y: scroll;
   width: 100%;
@@ -323,7 +325,10 @@ aside {
 }
 
 .reportSession {
+<<<<<<< Updated upstream
   border-radius: 5px;
+=======
+>>>>>>> Stashed changes
   width: 100%;
   height: 100%;
   float: left;
@@ -331,6 +336,7 @@ aside {
 #please-scroll {
   height: calc(100vh - 120px);
   overflow-y: scroll;
+<<<<<<< Updated upstream
 }
 #please-scroll-list {
   height: calc(100vh - 180px);
@@ -351,6 +357,37 @@ aside {
   transform: translate(-50%, -50%);
 }
 .report-item{
+=======
+  padding: 0px;
+}
+.filter.row{
+  height: 60px;
+}
+.takecare.row{
+  min-height: calc(100vh - 110px);
+}
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.report-item{
+  width: 100%;
+  font-size: 20px;
+  height: 25px;
+  float: left;
+}
+.reportName {
+  float: left;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  position: sticky;
+  position: -webkit-sticky;
+  text-align: center;
+>>>>>>> Stashed changes
   width: 100%;
   height: 100%;
   // background: #337ab7;
@@ -366,8 +403,14 @@ aside {
   width: 100%;
   background: #007d00; padding: 10px; color: white;
 }
+<<<<<<< Updated upstream
 .body-action{
   border-left: 1px solid;
+=======
+.header-report{
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+>>>>>>> Stashed changes
   float: left;
   overflow-y: scroll;
   width: 100%;
