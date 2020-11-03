@@ -325,10 +325,7 @@ aside {
 }
 
 .reportSession {
-<<<<<<< Updated upstream
   border-radius: 5px;
-=======
->>>>>>> Stashed changes
   width: 100%;
   height: 100%;
   float: left;
@@ -336,7 +333,6 @@ aside {
 #please-scroll {
   height: calc(100vh - 120px);
   overflow-y: scroll;
-<<<<<<< Updated upstream
 }
 #please-scroll-list {
   height: calc(100vh - 180px);
@@ -357,7 +353,6 @@ aside {
   transform: translate(-50%, -50%);
 }
 .report-item{
-=======
   padding: 0px;
 }
 .filter.row{
@@ -387,7 +382,6 @@ aside {
   position: sticky;
   position: -webkit-sticky;
   text-align: center;
->>>>>>> Stashed changes
   width: 100%;
   height: 100%;
   // background: #337ab7;
@@ -403,14 +397,12 @@ aside {
   width: 100%;
   background: #007d00; padding: 10px; color: white;
 }
-<<<<<<< Updated upstream
 .body-action{
   border-left: 1px solid;
-=======
+}
 .header-report{
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
->>>>>>> Stashed changes
   float: left;
   overflow-y: scroll;
   width: 100%;
