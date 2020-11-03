@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="list"
-    width="100%"
-  >
-    <div class="header-list">
-      <h3>Warning List</h3>
-    </div>
+  <div class="list">
     <div
       id="please-scroll-list"
       v-loading="listLoading"
@@ -26,10 +20,10 @@
             </div>
             <div class="col-9">
               <div class="row">
-                <span><b>#{{ index+1 }}</b></span>
+                <span><b>#{{ index + 1 }}</b></span>
               </div>
               <div class="row">
-                <span>{{ row.fullname }} </span>
+                <span class="fullname">{{ row.fullname }} </span>
               </div>
             </div>
           </div>
@@ -71,7 +65,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = false
-      getWarningList(this.filterValue).then((response) => {
+      getWarningList(this.filterValue).then(response => {
         this.list = response.message
 
         if (this.list[0]) {

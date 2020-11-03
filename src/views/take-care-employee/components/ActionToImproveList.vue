@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="action"
-    width="100%"
-  >
-    <div class="header-action">
-      <h3>Action Suggest</h3>
-    </div>
+  <div class="action">
     <div
       id="please-scroll-action"
       v-loading="actionLoading"
@@ -26,7 +20,7 @@
             </div>
             <div class="col-9">
               <div class="row">
-                <span><b>#{{ index+1 }}</b></span>
+                <span><b>#{{ index + 1 }}</b></span>
               </div>
               <div class="row">
                 <span>{{ row.fullname }} </span>

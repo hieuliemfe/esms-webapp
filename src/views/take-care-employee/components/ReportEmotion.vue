@@ -1,8 +1,5 @@
 <template>
-  <div v-if="data" class="reportSession">
-    <div class="header-report">
-      <h3>Report</h3>
-    </div>
+  <div v-if="data" class="report">
     <div class="body-report">
       <div class="emp-info">
         <div class="row">
@@ -60,12 +57,19 @@ export default {
       if (ms < 3600000) {
         const mins = Math.floor(ms / 60000)
         _callCount += 1
-        return mins + ` min${mins === 1 ? '' : 's'}` + this.msToStr(ms % 60000, _callCount)
+        return (
+          mins +
+          ` min${mins === 1 ? '' : 's'}` +
+          this.msToStr(ms % 60000, _callCount)
+        )
       }
       const hours = Math.floor(ms / 3600000)
       _callCount += 1
-      return hours + ` hour${hours === 1 ? '' : 's'}` +
-      this.msToStr(ms % 3600000, _callCount)
+      return (
+        hours +
+        ` hour${hours === 1 ? '' : 's'}` +
+        this.msToStr(ms % 3600000, _callCount)
+      )
     }
   }
 }

@@ -4,10 +4,25 @@
       <filter-container />
     </div>
     <div class="takecare row">
-      <warning-list id="please-scroll" class="col-3" />
-      <div class="col-9">
-        <report-emotion id="please-scroll" class="col-8" />
-        <action-suggest id="please-scroll" class="col-4" />
+      <div class="col-3 no-padding">
+        <div class="header-list">
+          <h3>Warning List</h3>
+        </div>
+        <warning-list id="please-scroll" />
+      </div>
+      <div class="col-9 no-padding">
+        <div class="col-8 no-padding">
+          <div class="header-report">
+            <h3>Report</h3>
+          </div>
+          <report-emotion id="please-scroll" />
+        </div>
+        <div class="col-4 no-padding">
+          <div class="header-action">
+            <h3>Action Suggest</h3>
+          </div>
+          <action-suggest id="please-scroll" />
+        </div>
       </div>
     </div>
   </div>
