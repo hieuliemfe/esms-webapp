@@ -63,7 +63,7 @@ export const constantRoutes = [
         name: 'Warning List',
         meta: {
           affix: true,
-          title: 'take-care-employee',
+          title: 'Take Care Employee',
           icon: 'el-icon-warning',
           roles: ['Manager'] // you can set roles in root nav
         }

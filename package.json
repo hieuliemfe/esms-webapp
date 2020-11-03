@@ -94,6 +94,17 @@
     "management-system"
   ],
   "license": "MIT",
+  "lint-staged": {
+    "src/**/*.{js,vue}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hieuliemfe/esms-webapp.git"

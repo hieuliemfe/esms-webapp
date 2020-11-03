@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "http://localhost:4000",
+    "baseUrl": "http://api.esms-team.site",
     "paths": {
       "@/*": ["src/*"]
     }
