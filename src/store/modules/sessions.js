@@ -33,9 +33,6 @@ const mutations = {
     // => new => state.filterValue = {startDate: 'mnp', endDate: 'xya', fullname: 'QWERT'}
     state.filterValue = { ...state.filterValue, ...filterValue }
   },
-  SET_STATUS: (state, performanceStatus) => {
-    state.performanceStatus = performanceStatus
-  },
   SET_CREATED: (state, createdAt) => {
     state.createdAt = createdAt
   }

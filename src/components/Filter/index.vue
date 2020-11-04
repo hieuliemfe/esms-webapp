@@ -7,9 +7,9 @@
       clearable
       class="filter-item"
       style="width: 30vh"
-      :fetch-suggestions="querySearch"
-      @select="handleSelect"
     />
+    <!-- :fetch-suggestions="querySearch"
+      @select="handleSelect" -->
     <!-- Select date -->
     <el-date-picker
       v-model="listQuery.date"
@@ -80,6 +80,7 @@ export default {
   name: 'FilterContainer',
   directives: { waves },
   data() {
+    const current = new Date()
     return {
       shiftOptions: [1, 2, 3],
       statusOptions: ['Negative', 'Neutral', 'Positive', 'Poker Face'],
@@ -87,7 +88,8 @@ export default {
         fullname: undefined,
         employeeCode: undefined,
         employeeInfo: [],
-        date: undefined,
+        date: [new Date(new Date(current.toJSON().split('T')[0] + 'T00:00:00+07:00').getTime()),
+          new Date(new Date(current.toJSON().split('T')[0] + 'T23:59:59+07:00').getTime())],
         shift: undefined,
         status: undefined
       },

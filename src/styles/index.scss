@@ -105,7 +105,7 @@ aside {
   border-radius: 2px;
   display: block;
   line-height: 32px;
-  font-size: 16px;
+  font-size: 14px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   color: #2c3e50;
@@ -188,15 +188,16 @@ aside {
   margin-left: auto;
   margin-right: auto;
   height: 8vh;
-  .filter-item {
-    // display: inline-block;
-    vertical-align: middle;
-    border-radius: 5px;
-    margin: 5px;
-    color: white !important;
-    font-weight: bold;
-    font-size: 14px;
-  }
+ 
+}
+.filter-item {
+  // display: inline-block;
+  vertical-align: middle;
+  border-radius: 5px;
+  margin: 5px;
+  color: white !important;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 //refine vue-multiselect plugin
@@ -222,23 +223,25 @@ aside {
   float: left;
 }
 .header-list {
+  font-weight: bold;
+  font-size: 2vw;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   float: left;
   position: sticky;
   position: -webkit-sticky;
-  height: 60px;
+  height: 5vw;
   text-align: center;
   width: 100%;
   background: #b30000;
   padding: 10px;
   color: white;
 }
-.avatar {
+.avatarReport {
   border: 1px solid black;
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 50%;
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 5%;
 }
 .body-list {
   padding-top: 10px;
@@ -260,9 +263,15 @@ aside {
     margin: 5px;
     .row {
       margin: 5px 0px 5px 0px;
+      .avatar {
+        border: 1px solid black;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 50%;
+      }
       .fullname {
         vertical-align: middle;
-        font-size: 16px;
+        font-size: 1.2vw;
         color: #304156;
         .span {
           max-lines: 2;
@@ -273,7 +282,7 @@ aside {
 
   .cardEmployee:hover {
     background: #deebff;
-  
+
     .fullname {
       color: #0052cc;
     }
@@ -343,9 +352,11 @@ aside {
   border-right: 1px solid grey;
 }
 .header-action {
+  font-weight: bold;
+  font-size: 2vw;
   float: left;
   position: sticky;
-  height: 60px;
+  height: 5vw;
   position: -webkit-sticky;
   text-align: center;
   width: 100%;
@@ -363,8 +374,10 @@ aside {
   height: 100%;
 }
 .header-report {
+  font-weight: bold;
+  font-size: 2vw;
   float: left;
-  height: 60px;
+  height: 5vw;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   position: sticky;
@@ -386,4 +399,10 @@ aside {
   padding-left: 0px;
   padding-right: 0px;
   float: left;
+}
+.table{
+  text-align: center;
+}
+.conditionTable{
+  margin: 20px;
 }

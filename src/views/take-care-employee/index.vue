@@ -6,20 +6,20 @@
     <div class="takecare row">
       <div class="col-3 no-padding">
         <div class="header-list">
-          <h3>Warning List</h3>
+          <span>Warning List</span>
         </div>
         <warning-list id="please-scroll" />
       </div>
       <div class="col-9 no-padding">
         <div class="col-8 no-padding">
           <div class="header-report">
-            <h3>Report</h3>
+            <span>Report</span>
           </div>
           <report-emotion id="please-scroll" />
         </div>
         <div class="col-4 no-padding">
           <div class="header-action">
-            <h3>Action Suggest</h3>
+            <span>Action Suggest</span>
           </div>
           <action-suggest id="please-scroll" />
         </div>

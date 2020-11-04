@@ -67,7 +67,6 @@ export default {
       this.listLoading = false
       getWarningList(this.filterValue).then(response => {
         this.list = response.message
-
         if (this.list[0]) {
           this.$store.dispatch('employees/setReport', this.list[0])
         }

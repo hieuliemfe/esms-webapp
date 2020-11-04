@@ -7,9 +7,9 @@
       width="100%"
       highlight-current-message
     >
-      <div v-if="action">
+      <!-- <div v-if="action">
         <div
-          v-for="(row, index) in action"
+          v-for="row in action"
           :key="row"
           class="cardEmployee"
           @click="getReport(row)"
@@ -19,9 +19,9 @@
               <img class="avatar center" :src="row.avatarUrl">
             </div>
             <div class="col-9">
-              <div class="row">
-                <span><b>#{{ index + 1 }}</b></span>
-              </div>
+              <div class="row"> -->
+      <!-- <span><b>#{{ index + 1 }}</b></span> -->
+      <!-- </div>
               <div class="row">
                 <span>{{ row.fullname }} </span>
               </div>
@@ -31,7 +31,7 @@
       </div>
       <div v-else>
         <span> No data </span>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -43,8 +43,8 @@ export default {
   directives: { waves },
   data() {
     return {
-      reportLoading: true,
-      data: undefined
+      actionLoading: true,
+      action: undefined
     }
   },
   computed: {
@@ -61,8 +61,8 @@ export default {
   mounted() {},
   methods: {
     getReport() {
-      this.reportLoading = false
-      this.data = this.report
+      this.actionLoading = false
+      this.action = this.report
     }
   }
 }

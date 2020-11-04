@@ -8,8 +8,7 @@ const state = {
   email: '',
   fullname: '',
   phoneNumber: '',
-  roleId: '',
-  performanceStatus: '',
+  roleId: 3,
   avatarUrl: '',
   filterValue: {},
   report: {}
@@ -34,8 +33,8 @@ const mutations = {
   SET_PHONE: (state, phoneNumber) => {
     state.phoneNumber = phoneNumber
   },
-  SET_ROLES: (state, roles) => {
-    state.roles = roles
+  SET_ROLES: (state, roleId) => {
+    state.roleId = roleId
   },
   SET_AVATAR: (state, avatarUrl) => {
     state.avatarUrl = avatarUrl
@@ -45,9 +44,6 @@ const mutations = {
   },
   SET_REPORT: (state, report) => {
     state.report = { ...state.report, ...report }
-  },
-  SET_STATUS: (state, performanceStatus) => {
-    state.performanceStatus = performanceStatus
   }
 }
 
@@ -59,7 +55,7 @@ const actions = {
         const data = response.message
         let filteredData
         if (data && data.length > 0) {
-          filteredData = data.filter(e => e.performanceStatus === 'Warning')
+          filteredData = data.filter(e => e.roleId === 3)
         }
         resolve(filteredData)
       }).catch(error => {
@@ -78,7 +74,6 @@ const actions = {
 export default {
   namespaced: true,
   state,
-  // getters,
   mutations,
   actions
 }
