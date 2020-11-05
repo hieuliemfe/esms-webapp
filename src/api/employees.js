@@ -6,9 +6,3 @@ export function getWarningList(query) {
     params: query
   })
 }
-// export function getEmployeeById(empCode) {
-//   return request({
-//     url: '/employees/' + empCode,
-//     method: 'get'
-//   })
-// }

@@ -12,28 +12,29 @@
         </div>
       </div>
       <div>
-        <span>From: ... To: ...</span><br>
+        <!-- <span>From: ... To: ...</span><br> -->
         <span>Total session: {{ data.totalSessions }}</span>
         <table class="table table-bordered">
           <thead class="thead-light">
             <tr>
-              <th scope="col">#</th>
+              <!-- <th scope="col">#</th> -->
               <th scope="col">Conditions</th>
               <th scope="col">Number of Session</th>
               <th scope="col">Total Percentage</th>
             </tr>
           </thead>
-          <tbody v-for="(row, index) in data.report" :key="row">
+          <tbody v-for="(row, index) in data.report" :key="index">
             <tr v-if="row.count!=0">
-              <th scope="row">{{ index }}</th>
-              <td> Angry {{ row.condition }}</td>
+              <!-- <th scope="row">{{ index }}</th> -->
+              <td>{{ convertExpression(row.condition) }}</td>
               <td>{{ row.count }}</td>
-              <td>{{ row.percentage }}</td>
+              <td>{{ parseFloat(row.percentage).toFixed(2) + "%" }}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button type="button" class="btn btn-dark" @click="isHidden = !isHidden">
+      <!-- Negative -->
+      <!-- <button type="button" class="btn btn-dark" @click="isHidden = !isHidden">
         Negative Criterias
       </button>
       <div v-if="isHidden && list">
@@ -46,16 +47,16 @@
               <th scope="col">Limit Percentage</th>
             </tr>
           </thead>
-          <tbody v-for="(row, index) in list" :key="row">
+          <tbody v-for="(row, index) in list" :key="index">
             <tr>
               <th>{{ index }}</th>
-              <td>Average angry {{ row.operator }} {{ row.comparingNumber*100 }}%</td>
-              <!-- <td></td>
-              <td></td> -->
+              <td>...</td>
+              <td></td>
+              <td></td>
             </tr>
           </tbody>
         </table>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -74,22 +75,25 @@ export default {
     }
   },
   computed: {
-    ...mapState('employees', ['report'])
+    ...mapState('employees', ['reportList', 'reportIndex'])
   },
   watch: {
-    report: function(value) {
-      this.getReport()
+    reportList: function(value) {
+      this.getReportList()
+    },
+    reportIndex: function(value) {
+      this.getReportList()
     }
   },
   created() {
-    this.getReport()
+    this.getReportList()
     this.getCriterias()
   },
   mounted() {},
   methods: {
-    getReport() {
+    getReportList() {
       this.reportLoading = false
-      this.data = this.report
+      this.data = this.reportList[this.reportIndex]
     },
     msToStr(ms, _callCount = 1) {
       if (ms < 1000) {
@@ -121,6 +125,40 @@ export default {
       getCriterias().then(response => {
         this.list = response.message
       })
+    },
+    convertExpression(condition) {
+      condition = condition.split(' ').join('')
+      var tmp = condition.match(/\[[0||4||6]\]\/\[0,4,6\]/g)
+      tmp.forEach(element => {
+        var emotion = element.match(/\[[0||4||6]\]/g)[0].match(/[0||4||6]/g)[0]
+        console.log(emotion)
+        var string = ''
+        switch (parseInt(emotion)) {
+          case 0:
+            string = 'Percentage of angry'
+            break
+          case 4:
+            string = 'Percentage of neutral'
+            break
+          case 6:
+            string = 'Percentage of happy'
+            break
+        }
+        console.log(element)
+        console.log(string)
+        condition = condition.replace(element, string)
+      })
+      condition = condition.split('&&').join(' and ')
+      condition = condition.split('>=').join(' greater and equal than ')
+      condition = condition.split('<=').join(' less and equal than ')
+      condition = condition.split('>').join(' greater than ')
+      condition = condition.split('<').join(' less than ')
+      var percents = condition.match(/0\.[0-9]*/g)
+      percents.forEach(element => {
+        var percent = parseFloat(parseFloat(element) * 100)
+        condition = condition.replace(element, percent + '%')
+      })
+      return condition
     }
   }
 }

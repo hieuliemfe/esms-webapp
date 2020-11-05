@@ -77,18 +77,18 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  {
-    path: '/setting-condition',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/setting-condition/index'),
-        name: 'SettingCondition',
-        meta: { title: 'Setting Condition', icon: 'el-icon-s-tools', roles: ['Manager'] }
-      }
-    ]
-  },
+  // {
+  //   path: '/setting-condition',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/setting-condition/index'),
+  //       name: 'SettingCondition',
+  //       meta: { title: 'Setting Condition', icon: 'el-icon-s-tools', roles: ['Manager'] }
+  //     }
+  //   ]
+  // },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

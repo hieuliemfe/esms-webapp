@@ -1,7 +1,6 @@
 <template>
   <div class="list">
     <div
-      id="please-scroll-list"
       v-loading="listLoading"
       class="body-list"
       width="100%"
@@ -10,9 +9,9 @@
       <div v-if="list">
         <div
           v-for="(row, index) in list"
-          :key="row"
+          :key="index"
           class="cardEmployee"
-          @click="getReport(row)"
+          @click="getReportIndex(index)"
         >
           <div class="row">
             <div class="col-3">
@@ -65,18 +64,20 @@ export default {
   methods: {
     getList() {
       this.listLoading = false
-      getWarningList(this.filterValue).then(response => {
-        this.list = response.message
-        if (this.list[0]) {
-          this.$store.dispatch('employees/setReport', this.list[0])
-        }
-        setTimeout(() => {
-          this.listLoading = false
-        }, 2 * 1000)
-      })
+      getWarningList(this.filterValue)
+        .then(() => this.$store.dispatch('employees/getWarningList', this.filterValue))
+        .then((filteredList) => {
+          this.list = filteredList
+          if (this.list) {
+            this.$store.dispatch('employees/setReportList', this.list)
+          }
+          setTimeout(() => {
+            this.listLoading = false
+          }, 2 * 1000)
+        })
     },
-    getReport(row) {
-      this.$store.dispatch('employees/setReport', row)
+    getReportIndex(index) {
+      this.$store.dispatch('employees/setReportIndex', index)
     }
   }
 }

@@ -18,10 +18,10 @@
           <tr>
             <th>{{ index }}</th>
             <td>
-              Average angry {{ row.operator }} {{ row.comparingNumber * 100 }}%
+              Percentage of Angry {{ row.operator }} {{ row.comparingNumber * 100 }}%
             </td>
             <td>{{ row.NegativeEmotionActions.percentageLimit }}</td>
-            <td>aaa</td>
+            <td>{{ row.NegativeEmotionActions.percentageLimit }}</td>
             <td>
               <el-button
                 class="filter-item"
@@ -43,8 +43,8 @@
       </table>
     </div>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="180px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="Angry time per session">
+      <el-form ref="dataForm" :model="temp" label-position="left" label-width="190px" style="width: 450px; margin-left:50px;">
+        <el-form-item label="Angry time per session(%)">
           <el-select v-model="temp.operator" class="filter-item" placeholder="Operator" style="width: 100px;">
             <el-option v-for="item in operatorOptions" :key="item" :label="item" :value="item" />
           </el-select>

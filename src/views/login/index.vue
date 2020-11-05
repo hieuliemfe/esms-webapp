@@ -51,7 +51,6 @@
 </template>
 
 <script>
-// import SocialSign from './components/SocialSignin'
 
 export default {
   name: 'Login',
@@ -73,8 +72,8 @@ export default {
     }
     return {
       loginForm: {
-        employeeCode: 'MG0001',
-        password: 'password'
+        employeeCode: '',
+        password: ''
       },
       loginRules: {
         employeeCode: [{ required: true, trigger: 'blur', validator: validateEmployeeCode }],

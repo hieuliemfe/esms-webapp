@@ -1,37 +1,37 @@
 <template>
   <div class="action">
     <div
-      id="please-scroll-action"
       v-loading="actionLoading"
       class="body-action"
       width="100%"
       highlight-current-message
     >
-      <!-- <div v-if="action">
-        <div
-          v-for="row in action"
-          :key="row"
-          class="cardEmployee"
-          @click="getReport(row)"
-        >
+      <div v-if="data" class="cardAction">
+        <el-form ref="mailForm" :model="mailForm" label-position="left">
           <div class="row">
-            <div class="col-3">
-              <img class="avatar center" :src="row.avatarUrl">
-            </div>
-            <div class="col-9">
-              <div class="row"> -->
-      <!-- <span><b>#{{ index + 1 }}</b></span> -->
-      <!-- </div>
-              <div class="row">
-                <span>{{ row.fullname }} </span>
-              </div>
-            </div>
+            <span>{{ data.action }} </span>
           </div>
-        </div>
+          <div class="row">
+            <!-- <el-input v-model="mailForm.employeeCode" class="filter-item" placeholder="EmployeeCode" style="width: 100px;" /> -->
+            <el-select v-model="mailForm.type" class="filter-item" placeholder="Mail Type" style="width: 150px;">
+              <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+            <el-date-picker
+              v-if="mailForm.type==='appointment'"
+              v-model="mailForm.datetime"
+              type="datetime"
+              placeholder="Select date and time"
+              default-time="09:00:00"
+            />
+          </div>
+          <div class="row">
+            <el-button size="mini" round icon="el-icon-message" @click="sendMail()">Send mail</el-button>
+          </div>
+        </el-form>
       </div>
       <div v-else>
         <span> No data </span>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>
@@ -43,26 +43,50 @@ export default {
   directives: { waves },
   data() {
     return {
+      typeOptions: ['day_off', 'cheering', 'appointment'],
+      mailForm: {
+        employeeCode: undefined,
+        type: undefined,
+        datetime: undefined
+      },
       actionLoading: true,
-      action: undefined
+      data: undefined
     }
   },
   computed: {
-    ...mapState('employees', ['report'])
+    ...mapState('employees', ['reportList', 'reportIndex'])
   },
   watch: {
-    report: function(value) {
-      this.getReport()
+    reportList: function(value) {
+      this.getActionList()
+    },
+    reportIndex: function(value) {
+      this.getActionList()
     }
   },
   created() {
-    this.getReport()
+    this.getActionList()
   },
   mounted() {},
   methods: {
-    getReport() {
+    getActionList() {
       this.actionLoading = false
-      this.action = this.report
+      this.data = this.reportList[this.reportIndex]
+      this.mailForm.employeeCode = this.reportList[this.reportIndex].employeeCode
+      // console.log('this.mailForm.employeeCode', this.mailForm.employeeCode)
+    },
+    sendMail() {
+      this.$refs.mailForm.validate(valid => {
+        this.loading = true
+        this.$store.dispatch('email/sendMail', this.mailForm)
+          .then(() => {
+            this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+            this.loading = false
+          })
+          .catch(() => {
+            this.loading = false
+          })
+      })
     }
   }
 }

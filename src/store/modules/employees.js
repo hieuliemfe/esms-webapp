@@ -11,7 +11,8 @@ const state = {
   roleId: 3,
   avatarUrl: '',
   filterValue: {},
-  report: {}
+  reportList: [],
+  reportIndex: 0
 }
 
 const mutations = {
@@ -42,8 +43,11 @@ const mutations = {
   SET_FILTERVALUE: (state, filterValue) => {
     state.filterValue = { ...state.filterValue, ...filterValue }
   },
-  SET_REPORT: (state, report) => {
-    state.report = { ...state.report, ...report }
+  SET_REPORT: (state, reportList) => {
+    state.reportList = { ...state.reportList, ...reportList }
+  },
+  SET_REPORT_INDEX: (state, reportIndex) => {
+    state.reportIndex = reportIndex
   }
 }
 
@@ -66,8 +70,11 @@ const actions = {
   setFilterValue({ commit }, filterValue) {
     commit('SET_FILTERVALUE', filterValue)
   },
-  setReport({ commit }, report) {
-    commit('SET_REPORT', report)
+  setReportList({ commit }, reportList) {
+    commit('SET_REPORT', reportList)
+  },
+  setReportIndex({ commit }, reportIndex) {
+    commit('SET_REPORT_INDEX', reportIndex)
   }
 }
 
