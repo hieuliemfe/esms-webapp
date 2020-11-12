@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="esms-container">
     <div class="sideBar">
       <span class="appName">EsmsApp</span>
       <div class="navigation">
@@ -11,14 +11,14 @@
         </div>
         <div
           :class="{ btnNav: true, active: isShowemployeeList }"
-          v-on:click="toggleShowemployeeList"
+          @click="toggleShowemployeeList"
         >
           <div class="iconBox">
             <i class="far fa-calendar-alt" />
           </div>
           <span class="btnText">Employees</span>
         </div>
-        <div class="btnNav" v-on:click="logout">
+        <div class="btnNav" @click="logout">
           <div class="iconBox">
             <i class="fa fa-sign-out-alt" />
           </div>
@@ -27,7 +27,7 @@
         <div class="paddingFlex" />
         <div class="avatarNav">
           <div class="avatarBox">
-            <img class="avatar" :src="profile.avatarUrl" alt="EmployeeAvatar" />
+            <img class="avatar" :src="avatarUrl+'?imageView2/1/w/80/h/80'" alt="EmployeeAvatar">
           </div>
           <span class="avatarText">{{ profile.fullname }}</span>
         </div>
@@ -62,9 +62,9 @@
     <div class="mainContent">
       <div class="headerWrapper">
         <div class="firstPart">
-          <div class="calendarWrapper">
+          <!-- <div class="calendarWrapper">
             <span class="calendarTitle">Nov, 2020</span>
-          </div>
+          </div> -->
           <div class="greetingWrapper">
             <div class="welcomeWrapper">
               <span class="hello"> Hello, {{ profile.fullname }} </span>
@@ -73,12 +73,63 @@
                 Please check in your employee to start working!
               </span>
             </div>
-            <img :src="logo" alt="ESMSLogo" class="greetingLogo" />
+            <img :src="logo" alt="ESMSLogo" class="greetingLogo">
           </div>
         </div>
       </div>
       <div class="footerWrapper">
-        <span class="footerTitle">Session History</span>
+        <div class="footerInner">
+          <div class="resultWrapper">
+            <div class="resultTextWrapper">
+              <span class="footerTitle">Session History</span>
+              <span class="resultTextItem">
+                {{ `Total Sessions Count: ` }}
+                <span>{{ sessionSummary.totalSessions }}</span>
+              </span>
+              <span class="resultTextItem">
+                {{ `Total Angry Warnings Count: ` }}
+                <span>{{ sessionSummary.angryWarningCount }}</span>
+              </span>
+            </div>
+            <div :class="{ videoWrapper: true, show: isShowEvi }">
+              <!-- {videoEviPath ? (
+                <video controls autoPlay>
+                  <source src={videoEviPath} type="video/mp4" />
+                  No video found
+                </video>
+              ) : videoEviName ? (
+                <video controls autoPlay>
+                  <source src={eviUrls[videoEviName]} type="video/mp4" />
+                  No video found
+                </video>
+              ) : (
+                <></>
+              )} -->
+            </div>
+          </div>
+          <div class="sessionList">
+            <div v-if="sessionList.length > 0" class="sessionInner" :style="{ width: (40 + 230 * sessionList.length) + 'px'}">
+              <div v-for="session in sessionList" :key="session.id" class="sessionItem">
+                <div class="sessionItemHead" @click="showEvi(session.id)">
+                  <i class="far fa-clock" />
+                  <div class="viewEviBtn">Show Evidence</div>
+                </div>
+                <div class="sessionItemTail">
+                  <span class="sname">
+                    {{ `session_${fourDigits(session.id)}` }}
+                  </span>
+                  <span />
+                  <span class="stime">
+                    {{ `Duration: ${msToStr(session.sessionDuration)}` }}
+                  </span>
+                  <span class="stime">
+                    {{ `Angry Warnings: ${session.angryWarningCount}` }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -89,15 +140,16 @@
 // import WarningList from "./components/WarningList";
 // import ReportEmotion from "./components/ReportEmotion";
 import waves from '@/directive/waves'
+import { mapGetters } from 'vuex'
 export default {
   name: 'TakeCareEmployee',
   // components: { WarningList, ActionSuggest, ReportEmotion, FilterContainer },
   directives: { waves },
   data() {
     return {
-      logo: '',
+      logo: 'https://i.upanh.org/2020/10/26/logo1.png',
       isShowemployeeList: false,
-      avatarUrl: '',
+      isShowEvi: false,
       show: false,
       list: null,
       listLoading: true,
@@ -117,10 +169,25 @@ export default {
         {
           name: 'employee 3',
           angryWarningCount: 10
-        },
-
-      ]
+        }
+      ],
+      sessionSummary: {
+        totalSessions: 1,
+        angryWarningCount: 15
+      },
+      sessionList: new Array(15).fill(0).map((e, i) => ({
+        id: i + 1,
+        sessionDuration: 24 * 60 * 60 * 1000,
+        angryWarningCount: 15
+      }))
     }
+  },
+  computed: {
+    ...mapGetters([
+      'sidebar',
+      'avatarUrl',
+      'device'
+    ])
   },
   methods: {
     toggleShowemployeeList: function() {
@@ -132,6 +199,36 @@ export default {
     },
     logout: function() {
 
+    },
+    fourDigits: (num) => `${`000${num}`.substr(-4)}`,
+    showEvi: function(sessionId) {
+
+    },
+    msToStr(ms, _callCount = 1) {
+      if (ms < 1000) {
+        return ms + ' ms '
+      }
+      if (ms < 60000) {
+        const secs = Math.floor(ms / 1000)
+        _callCount += 1
+        return secs + ` sec${secs === 1 ? '' : 's'} `
+      }
+      if (ms < 3600000) {
+        const mins = Math.floor(ms / 60000)
+        _callCount += 1
+        return (
+          mins +
+          ` min${mins === 1 ? '' : 's'} ` +
+          this.msToStr(ms % 60000, _callCount)
+        )
+      }
+      const hours = Math.floor(ms / 3600000)
+      _callCount += 1
+      return (
+        hours +
+        ` hour${hours === 1 ? '' : 's'} ` +
+        this.msToStr(ms % 3600000, _callCount)
+      )
     }
   }
 }
@@ -142,12 +239,30 @@ export default {
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "~@/styles/index.scss";
 @import '~@fortawesome/fontawesome-free/css/all.css';
-.container {
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background-color: rgba(91, 155, 213, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(91, 155, 213, 0.5);
+  border-radius: 10px;
+  cursor: pointer;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(91, 155, 213);
+  cursor: pointer;
+}
+
+.esms-container {
   position: absolute;
-  top: 10px;
+  top: 60px;
   left: 10px;
-  width: calc(100vw - 20px);
-  height: calc(100vh - 20px);
+  width: calc(100vw - 74px);
+  height: calc(100vh - 70px);
   background-color: #f8fbff;
   border-radius: 30px;
   overflow: hidden;
@@ -541,4 +656,190 @@ span.footerTitle {
   font-weight: bold;
   padding-bottom: 30px;
 }
+
+.footerInner {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  width: 0;
+  height: 100%;
+  padding: 30px 30px 0;
+  background-color: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  -webkit-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+}
+
+span.footerTitle {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  padding-bottom: 30px;
+}
+
+.resultWrapper {
+  display: flex;
+}
+
+.resultTextWrapper {
+  height: 100%;
+  flex: auto;
+}
+
+span.resultTextItem {
+  display: block;
+}
+
+span.resultTextItem span {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.footerTailWrapper {
+  height: 0;
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.videoWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 20px;
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+.videoWrapper video {
+  height: 100%;
+}
+
+.btnCloseEvi {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.sessionListWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.1s ease;
+}
+
+.sessionList {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+}
+
+.footerTailWrapper.showVideo {
+  padding-top: 10px;
+}
+
+.footerTailWrapper.showVideo .videoWrapper {
+  height: 100%;
+}
+
+.footerTailWrapper.showVideo .sessionListWrapper {
+  height: 0;
+}
+
+.sessionInner {
+  display: block;
+  padding: 20px;
+  flex: auto;
+  height: 100%;
+}
+
+.sessionInner::after {
+  display: block;
+  content: '';
+  clear: both;
+}
+
+.sessionItem {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100%;
+  margin-right: 30px;
+  background-color: #fff;
+  border: 2px solid #f3f8ff;
+  border-radius: 15px;
+  -webkit-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+}
+
+.sessionItem:hover {
+  border: 2px solid #1479ff;
+}
+
+.sessionItemHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: #f3f8ff;
+  overflow: hidden;
+  color: #1479ff;
+  font-size: 20px;
+  position: relative;
+}
+
+.viewEviBtn {
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  background-color: #1479ff;
+  color: #fff;
+  cursor: pointer;
+  display: none;
+  font-size: 16px;
+}
+
+.viewEviBtn:hover {
+  -webkit-box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+}
+
+.sessionItem:hover .viewEviBtn {
+  display: flex;
+}
+
+.sessionItemTail {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  padding: 0 10px;
+}
+
+.sname {
+  font-weight: bold;
+}
+
+.stime {
+  font-size: 12px;
+}
+
 </style>
