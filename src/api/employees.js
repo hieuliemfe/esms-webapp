@@ -6,3 +6,10 @@ export function getWarningList(query) {
     params: query
   })
 }
+export function getHistory(query) {
+  return request({
+    url: '/sessions',
+    method: 'get',
+    params: query
+  })
+}

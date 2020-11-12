@@ -33,29 +33,23 @@
         </div>
       </div>
     </div>
-    <div :class="{ employeeListWrapper: true, show: isShowemployeeList }">
-      <div class="employeeListInner">
-        <span class="employeeListTitle">Employees</span>
-        <div class="employeeList">
-          <ul>
-            <li v-for="employee in employeeList" :key="employee.name">
-              <div class="">
-                <div class="">
-                  <i class="far fa-clock" />
-                  <span class="employeeName">{{ employee.name }}</span>
+    <div :class="{ shiftListWrapper: true, show: isShowemployeeList }">
+      <div class="shiftListInner">
+        <span class="shiftListTitle">Bank teller list</span>
+        <div class="shiftList">
+          <div v-for="employee in employeeList" :key="employee.id" class="available shiftItem" @click="viewHistory(employee.employeeCode)">
+            <div class="shiftHead">
+              <!-- <i class="far fa-clock" /> -->
+              <span class="shiftName">{{ employee.fullname }}</span>
+            </div>
+            <div class="shiftTail">
+              <!-- <span class="startTime">{sh.shiftStart}</span> -->
+              <span class="endTime">{{ `Warnings: ${employee.angryWarningCount}` }}</span>
+                <div class="shiftBtn">
+                  View history
                 </div>
-                <div class="">
-                  <div>
-                    <label>Angry Warning: </label><span>{{ employee.angryWarningCount }}</span>
-                  </div>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="employeeSeparator" />
-        <div class="btnEndemployee">
-          <span>End your employee</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -139,6 +133,8 @@
 // import ActionSuggest from "./components/ActionToImproveList";
 // import WarningList from "./components/WarningList";
 // import ReportEmotion from "./components/ReportEmotion";
+import { getWarningList } from '@/api/employees'
+import { getHistory } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 export default {
@@ -157,29 +153,12 @@ export default {
         fullname: 'Nguyen Hieu Liem',
         avatarUrl: ''
       },
-      employeeList: [
-        {
-          name: 'employee 1',
-          angryWarningCount: 10
-        },
-        {
-          name: 'employee 2',
-          angryWarningCount: 10
-        },
-        {
-          name: 'employee 3',
-          angryWarningCount: 10
-        }
-      ],
+      employeeList: [],
       sessionSummary: {
-        totalSessions: 1,
-        angryWarningCount: 15
+        totalSessions: 0,
+        angryWarningCount: 0
       },
-      sessionList: new Array(15).fill(0).map((e, i) => ({
-        id: i + 1,
-        sessionDuration: 24 * 60 * 60 * 1000,
-        angryWarningCount: 15
-      }))
+      sessionList: []
     }
   },
   computed: {
@@ -189,7 +168,22 @@ export default {
       'device'
     ])
   },
+  created() {
+    this.getList()
+  },
   methods: {
+    getList() {
+      getWarningList({ role: 3 }).then((response) => {
+        this.employeeList = response.message
+      })
+    },
+    viewHistory(code) {
+      getHistory({ employeeCode: code }).then((response) => {
+        this.sessionSummary = response.message.sumary
+        this.sessionList = response.message.sessions
+        console.log(this.sessionList)
+      })
+    },
     toggleShowemployeeList: function() {
       if (this.isShowemployeeList === false) {
         this.isShowemployeeList = true
@@ -383,7 +377,7 @@ export default {
 }
 
 .avatarBox::before {
-  content: "";
+  content: '';
   display: block;
   width: 18px;
   height: 18px;
@@ -399,7 +393,7 @@ export default {
 }
 
 .avatarBox::after {
-  content: "";
+  content: '';
   display: block;
   width: 12px;
   height: 12px;
@@ -423,7 +417,7 @@ export default {
   font-weight: bold;
 }
 
-.employeeListWrapper {
+.shiftListWrapper {
   display: block;
   position: relative;
   width: 0;
@@ -432,11 +426,11 @@ export default {
   overflow: hidden;
 }
 
-.employeeListWrapper.show {
+.shiftListWrapper.show {
   width: 25vw;
 }
 
-.employeeListInner {
+.shiftListInner {
   position: absolute;
   top: 0;
   right: 0;
@@ -447,20 +441,20 @@ export default {
   overflow: hidden;
 }
 
-.employeeListTitle {
+.shiftListTitle {
   width: 100%;
   font-weight: bold;
   font-size: 28px;
 }
 
-.employeeList {
+.shiftList {
   display: flex;
   padding-top: 20px;
   flex-direction: column;
   align-items: center;
 }
 
-.employeeItem {
+.shiftItem {
   display: flex;
   width: 100%;
   padding: 12px 14px;
@@ -471,43 +465,44 @@ export default {
   color: #999;
 }
 
-.employeeItem.unavailable {
+.shiftItem.unavailable {
   background-color: #e6f1ff;
 }
 
-.employeeItem.available {
+.shiftItem.available {
   border-color: #1479ff;
   color: #1479ff;
 }
 
-.employeeItem.active {
+.shiftItem.active {
   border-color: #1479ff;
   background-color: #1479ff;
   color: #fff;
 }
 
-.employeeHead {
+.shiftHead {
   display: flex;
   height: 100%;
   align-items: center;
 }
 
-.employeeHead i {
+.shiftHead i {
   font-size: 16px;
 }
 
-.employeeName {
+.shiftName {
   margin-left: 12px;
 }
 
-.employeeTail {
+.shiftTail {
   display: flex;
   height: 100%;
   align-items: center;
+  position: relative;
 }
 
 .startTime::after {
-  content: "-";
+  content: '-';
   display: inline-block;
   padding-left: 10px;
 }
@@ -516,17 +511,40 @@ export default {
   padding-left: 10px;
 }
 
-.employeeSeparator {
+.shiftBtn {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  border-radius: 5px;
+  background-color: #1479ff;
+  color: #fff;
+  cursor: pointer;
+  display: none;
+}
+
+.shiftBtn:hover {
+  -webkit-box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+}
+
+.shiftItem:hover .shiftBtn {
+  display: block;
+}
+
+.shiftSeparator {
   width: 50%;
   height: 1px;
   background-color: #999;
   margin: 10px auto;
 }
 
-.btnEndemployee {
+.btnEndShift {
   display: flex;
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 12px;
   margin: 16px 0;
   justify-content: center;
   align-items: center;
@@ -537,7 +555,7 @@ export default {
   cursor: pointer;
 }
 
-.btnEndemployee:hover {
+.btnEndShift:hover {
   -webkit-box-shadow: 0 5px 24px 0 rgba(20, 121, 255, 0.3);
   -moz-box-shadow: 0 5px 24px 0 rgba(20, 121, 255, 0.3);
   box-shadow: 0 5px 24px 0 rgba(20, 121, 255, 0.3);
@@ -555,18 +573,31 @@ export default {
   display: flex;
   width: 100%;
   height: 220px;
-  position: relative;
   margin-bottom: 20px;
 }
 
 .firstPart {
-  position: absolute;
-  top: 0;
-  right: 0;
   display: flex;
   width: 100%;
   height: 100%;
   transition: all 0.1s ease-in-out;
+}
+
+.secondPart {
+  display: flex;
+  flex: auto;
+  width: 0;
+  height: 100%;
+  transition: all 0.1s ease-in-out;
+}
+
+.overflowHidden {
+  overflow: hidden;
+}
+
+.headerWrapper.isCheckedIn .firstPart {
+  width: 0;
+  overflow: hidden;
 }
 
 .calendarWrapper {
@@ -634,14 +665,7 @@ span.tips {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  transition: all 0.1s ease-in-out;
-}
-
-.footerWrapper {
-  display: flex;
-  flex: auto;
-  width: 100%;
-  padding: 30px;
+  padding: 30px 30px 0;
   background-color: #fff;
   border-radius: 20px;
   overflow: hidden;
@@ -650,11 +674,112 @@ span.tips {
   box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
 }
 
-span.footerTitle {
+span.waitingListTitle {
   display: block;
   font-size: 20px;
   font-weight: bold;
-  padding-bottom: 30px;
+}
+
+.waitingList {
+  height: 100%;
+  overflow-x: auto;
+}
+
+.waitingInner {
+  display: block;
+  padding: 20px;
+  flex: auto;
+  height: 100%;
+}
+
+.waitingInner::after {
+  display: block;
+  content: '';
+  clear: both;
+}
+
+.waitingItem {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  width: 150px;
+  height: 100%;
+  margin-right: 30px;
+  background-color: #fff;
+  border: 2px solid #f3f8ff;
+  border-radius: 15px;
+  -webkit-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+}
+
+.waitingItem:hover {
+  border: 2px solid #1479ff;
+}
+
+.waitingItemHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: #f3f8ff;
+  overflow: hidden;
+  color: #1479ff;
+  font-size: 20px;
+  position: relative;
+}
+
+.startSessionBtn {
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  background-color: #1479ff;
+  color: #fff;
+  cursor: pointer;
+  display: none;
+  font-size: 16px;
+}
+
+.startSessionBtn:hover {
+  -webkit-box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
+}
+
+.waitingItem:hover .startSessionBtn {
+  display: flex;
+}
+
+.waitingItemTail {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 0 10px;
+}
+
+.wNo {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.wCat {
+  color: #999;
+  text-align: center;
+}
+
+.footerWrapper {
+  display: flex;
+  flex: auto;
+  width: 100%;
 }
 
 .footerInner {
