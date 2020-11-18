@@ -27,7 +27,11 @@
         <div class="paddingFlex" />
         <div class="avatarNav">
           <div class="avatarBox">
-            <img class="avatar" :src="avatarUrl+'?imageView2/1/w/80/h/80'" alt="EmployeeAvatar">
+            <img
+              class="avatar"
+              :src="avatarUrl + '?imageView2/1/w/80/h/80'"
+              alt="EmployeeAvatar"
+            >
           </div>
           <span class="avatarText">{{ profile.fullname }}</span>
         </div>
@@ -37,17 +41,24 @@
       <div class="shiftListInner">
         <span class="shiftListTitle">Bank teller list</span>
         <div class="shiftList">
-          <div v-for="employee in employeeList" :key="employee.id" class="available shiftItem" @click="viewHistory(employee.employeeCode)">
+          <div
+            v-for="employee in employeeList"
+            :key="employee.id"
+            class="available shiftItem"
+            @click="viewHistory(employee.employeeCode)"
+          >
             <div class="shiftHead">
               <!-- <i class="far fa-clock" /> -->
               <span class="shiftName">{{ employee.fullname }}</span>
             </div>
             <div class="shiftTail">
               <!-- <span class="startTime">{sh.shiftStart}</span> -->
-              <span class="endTime">{{ `Warnings: ${employee.angryWarningCount}` }}</span>
-                <div class="shiftBtn">
-                  View history
-                </div>
+              <span class="endTime">{{
+                `Warnings: ${employee.angryWarningCount}`
+              }}</span>
+              <div class="shiftBtn">
+                View history
+              </div>
             </div>
           </div>
         </div>
@@ -102,8 +113,16 @@
             </div>
           </div>
           <div class="sessionList">
-            <div v-if="sessionList.length > 0" class="sessionInner" :style="{ width: (40 + 230 * sessionList.length) + 'px'}">
-              <div v-for="session in sessionList" :key="session.id" class="sessionItem">
+            <div
+              v-if="sessionList.length > 0"
+              class="sessionInner"
+              :style="{ width: 40 + 230 * sessionList.length + 'px' }"
+            >
+              <div
+                v-for="session in sessionList"
+                :key="session.id"
+                class="sessionItem"
+              >
                 <div class="sessionItemHead" @click="showEvi(session.id)">
                   <i class="far fa-clock" />
                   <div class="viewEviBtn">Show Evidence</div>
@@ -162,23 +181,19 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'sidebar',
-      'avatarUrl',
-      'device'
-    ])
+    ...mapGetters(['sidebar', 'avatarUrl', 'device'])
   },
   created() {
     this.getList()
   },
   methods: {
     getList() {
-      getWarningList({ role: 3 }).then((response) => {
+      getWarningList({ role: 3 }).then(response => {
         this.employeeList = response.message
       })
     },
     viewHistory(code) {
-      getHistory({ employeeCode: code }).then((response) => {
+      getHistory({ employeeCode: code }).then(response => {
         this.sessionSummary = response.message.sumary
         this.sessionList = response.message.sessions
         console.log(this.sessionList)
@@ -191,13 +206,9 @@ export default {
         this.isShowemployeeList = false
       }
     },
-    logout: function() {
-
-    },
-    fourDigits: (num) => `${`000${num}`.substr(-4)}`,
-    showEvi: function(sessionId) {
-
-    },
+    logout: function() {},
+    fourDigits: num => `${`000${num}`.substr(-4)}`,
+    showEvi: function(sessionId) {},
     msToStr(ms, _callCount = 1) {
       if (ms < 1000) {
         return ms + ' ms '
@@ -232,7 +243,7 @@ export default {
 @import "~@/styles/mixin.scss";
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "~@/styles/index.scss";
-@import '~@fortawesome/fontawesome-free/css/all.css';
+@import "~@fortawesome/fontawesome-free/css/all.css";
 /* scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
@@ -377,7 +388,7 @@ export default {
 }
 
 .avatarBox::before {
-  content: '';
+  content: "";
   display: block;
   width: 18px;
   height: 18px;
@@ -393,7 +404,7 @@ export default {
 }
 
 .avatarBox::after {
-  content: '';
+  content: "";
   display: block;
   width: 12px;
   height: 12px;
@@ -502,7 +513,7 @@ export default {
 }
 
 .startTime::after {
-  content: '-';
+  content: "-";
   display: inline-block;
   padding-left: 10px;
 }
@@ -515,6 +526,7 @@ export default {
   position: absolute;
   left: 0;
   width: 100%;
+  min-width: 100px;
   padding: 5px;
   text-align: center;
   border-radius: 5px;
@@ -694,7 +706,7 @@ span.waitingListTitle {
 
 .waitingInner::after {
   display: block;
-  content: '';
+  content: "";
   clear: both;
 }
 
@@ -887,7 +899,7 @@ span.resultTextItem span {
 
 .sessionInner::after {
   display: block;
-  content: '';
+  content: "";
   clear: both;
 }
 
@@ -966,5 +978,4 @@ span.resultTextItem span {
 .stime {
   font-size: 12px;
 }
-
 </style>
