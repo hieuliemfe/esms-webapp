@@ -103,7 +103,7 @@
                   <div class="angryPeriodsInnerInner">
                     <div v-if="isShowEvi" class="angryPeriods">
                       <div
-                        v-for="period in eviPeriods[periodEviName]"
+                        v-for="(period, ind) in eviPeriods[periodEviName]"
                         :key="period.period_start"
                         class="periodItem"
                         @click="skipToPeriod(period.period_start)"
@@ -235,6 +235,14 @@ export default {
       getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
       })
+    },
+    videoEviName() {
+      const videoRef = this.$refs.videoRef
+      if (videoRef) {
+        videoRef.pause()
+        videoRef.load()
+        videoRef.play()
+      }
     }
   },
   created() {
@@ -285,22 +293,30 @@ export default {
     },
     fourDigits: num => `${`000${num}`.substr(-4)}`,
     twoDigits: num => `${`0${num}`.substr(-2)}`,
-
+    skipToPeriod(ms) {
+      const videoRef = this.$refs.videoRef
+      if (videoRef) {
+        videoRef.currentTime = ms / 1000
+      }
+    },
     showEvi(sessionId) {
       const eviName = `session_${this.fourDigits(sessionId)}`
       if (!this.eviVideos[eviName]) {
         getGCSUrl({ gcpath: `${eviName}/video.mp4` }).then(response => {
           if (response.message !== '"File not existed"') {
-            this.eviVideos[eviName] = response.message[0]
+            this.eviVideos = { ...this.eviVideos, ...{ [eviName]: response.message[0] }}
             getGCSUrl({ gcpath: `${eviName}/periods_info.json` }).then(response2 => {
               if (response2.message !== '"File not existed"') {
                 const url = response2.message[0]
-                console.log('url', url)
                 fetch(url, {
                   method: 'get'
-                }).then(response3 => {
-                  this.eviPeriods[eviName] = response3
                 })
+                  .then(res => res.json())
+                  .then(response3 => {
+                    this.eviPeriods[eviName] = response3
+                    this.periodEviName = eviName
+                    console.log(this.eviPeriods[this.periodEviName])
+                  })
               }
               this.videoEviName = eviName
               this.isShowEvi = true
@@ -311,6 +327,7 @@ export default {
           }
         })
       } else {
+        this.periodEviName = eviName
         this.videoEviName = eviName
         this.isShowEvi = true
       }
