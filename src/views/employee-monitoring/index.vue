@@ -102,8 +102,6 @@
                 <div class="angryPeriodsInner">
                   <div class="angryPeriodsInnerInner">
                     <div v-if="isShowEvi" class="angryPeriods">
-                      <!-- {eviPeriods[periodEviName].map((period, ind) => (
-                      ))} -->
                       <div
                         v-for="period in eviPeriods[periodEviName]"
                         :key="period.period_start"
@@ -249,7 +247,14 @@ export default {
       })
     },
     viewHistory(code) {
-      getHistory({ employeeCode: code }).then(response => {
+      const selectedDate = new Date(this.selectedWeek)
+      selectedDate.setHours(0)
+      selectedDate.setMinutes(0)
+      selectedDate.setSeconds(0)
+      selectedDate.setMilliseconds(0)
+      selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
+      const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+      getHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.sessionSummary = response.message.summary
         this.sessionList = response.message.sessions
       })
