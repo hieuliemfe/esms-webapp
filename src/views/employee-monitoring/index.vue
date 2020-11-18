@@ -14,7 +14,7 @@
           @click="toggleShowemployeeList"
         >
           <div class="iconBox">
-            <i class="far fa-calendar-alt" />
+            <i class="fas fa-users" />
           </div>
           <span class="btnText">Employees</span>
         </div>
@@ -29,17 +29,22 @@
           <div class="avatarBox">
             <img
               class="avatar"
-              :src="avatarUrl + '?imageView2/1/w/80/h/80'"
+              :src="avatarUrl"
               alt="EmployeeAvatar"
             >
           </div>
-          <span class="avatarText">{{ profile.fullname }}</span>
+          <span class="avatarText">{{ fullname }}</span>
         </div>
       </div>
     </div>
     <div :class="{ shiftListWrapper: true, show: isShowemployeeList }">
       <div class="shiftListInner">
-        <span class="shiftListTitle">Bank teller list</span>
+        <span class="shiftListTitle">Bank Teller List</span>
+        <el-date-picker
+          v-model="selectedWeek"
+          type="week"
+          placeholder="Pick a week"
+        />
         <div class="shiftList">
           <div
             v-for="employee in employeeList"
@@ -67,15 +72,12 @@
     <div class="mainContent">
       <div class="headerWrapper">
         <div class="firstPart">
-          <!-- <div class="calendarWrapper">
-            <span class="calendarTitle">Nov, 2020</span>
-          </div> -->
           <div class="greetingWrapper">
             <div class="welcomeWrapper">
-              <span class="hello"> Hello, {{ profile.fullname }} </span>
+              <span class="hello"> Hello, {{ fullname }} </span>
               <span class="tips">Have a nice day!</span>
               <span class="tips">
-                Please check in your employee to start working!
+                Welcome to Employee Status Monitoring website!
               </span>
             </div>
             <img :src="logo" alt="ESMSLogo" class="greetingLogo">
@@ -86,58 +88,93 @@
         <div class="footerInner">
           <div class="resultWrapper">
             <div class="resultTextWrapper">
-              <span class="footerTitle">Session History</span>
-              <span class="resultTextItem">
-                {{ `Total Sessions Count: ` }}
-                <span>{{ sessionSummary.totalSessions }}</span>
-              </span>
-              <span class="resultTextItem">
-                {{ `Total Angry Warnings Count: ` }}
-                <span>{{ sessionSummary.angryWarningCount }}</span>
-              </span>
-            </div>
-            <div :class="{ videoWrapper: true, show: isShowEvi }">
-              <!-- {videoEviPath ? (
-                <video controls autoPlay>
-                  <source src={videoEviPath} type="video/mp4" />
-                  No video found
-                </video>
-              ) : videoEviName ? (
-                <video controls autoPlay>
-                  <source src={eviUrls[videoEviName]} type="video/mp4" />
-                  No video found
-                </video>
-              ) : (
-                <></>
-              )} -->
+              <span class="footerTitle">Bank Teller Session History</span>
             </div>
           </div>
-          <div class="sessionList">
-            <div
-              v-if="sessionList.length > 0"
-              class="sessionInner"
-              :style="{ width: 40 + 230 * sessionList.length + 'px' }"
-            >
-              <div
-                v-for="session in sessionList"
-                :key="session.id"
-                class="sessionItem"
-              >
-                <div class="sessionItemHead" @click="showEvi(session.id)">
-                  <i class="far fa-clock" />
-                  <div class="viewEviBtn">Show Evidence</div>
+          <div
+            :class="{footerTailWrapper: true, showVideo: isShowEvi}"
+          >
+            <div class="videoWrapper">
+              <div v-if="periodEviName && eviPeriods && eviPeriods[periodEviName] && eviPeriods[periodEviName].length > 0" class="angryPeriodsWrapper">
+                <span class="angryPeriodsTitle">
+                  Angry Periods:
+                </span>
+                <div class="angryPeriodsInner">
+                  <div class="angryPeriodsInnerInner">
+                    <div v-if="isShowEvi" class="angryPeriods">
+                      <!-- {eviPeriods[periodEviName].map((period, ind) => (
+                      ))} -->
+                      <div
+                        v-for="period in eviPeriods[periodEviName]"
+                        :key="period.period_start"
+                        class="periodItem"
+                        @click="skipToPeriod(period.period_start)"
+                      >
+                        <div class="periodHead">
+                          <i class="fas fa-history" />
+                          <span class="periodName">
+                            {{ `P${fourDigits(ind + 1)}` }}
+                          </span>
+                        </div>
+                        <div class="periodTail">
+                          <span class="periodDuration">
+                            {{ `Duration: ${msToStr(period.duration)}` }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="sessionItemTail">
-                  <span class="sname">
-                    {{ `session_${fourDigits(session.id)}` }}
-                  </span>
-                  <span />
-                  <span class="stime">
-                    {{ `Duration: ${msToStr(session.sessionDuration)}` }}
-                  </span>
-                  <span class="stime">
-                    {{ `Angry Warnings: ${session.angryWarningCount}` }}
-                  </span>
+              </div>
+              <div class="videoInner">
+                <div class="videoOuter">
+                  <div
+                    class="btnCloseEvi"
+                    @click="closeEvi"
+                  >
+                    <i class="fa fa-times" />
+                    {{ ` Close` }}
+                  </div>
+                  <video v-if="videoEviName" ref="videoRef" controls autoPlay>
+                    <source
+                      :src="eviVideos[videoEviName]"
+                      type="video/mp4"
+                    >
+                    No video found
+                  </video>
+                </div>
+              </div>
+            </div>
+            <div class="sessionListWrapper">
+              <div class="sessionList">
+                <div v-if="sessionList && sessionList.length > 0" class="sessionInner">
+
+                  <div v-for="session in sessionList" :key="session.id" class="sessionItem">
+                    <div
+                      class="sessionItemHead"
+                      @click="showEvi(session.id)"
+                    >
+                      <i class="far fa-clock" />
+                      <div class="viewEviBtn">
+                        Show Evidence
+                      </div>
+                    </div>
+                    <div class="sessionItemTail">
+                      <span class="sname">
+                        {{ `session_${fourDigits(session.id)}` }}
+                      </span>
+                      <span />
+                      <span class="stime">
+                        {{ `Time: ${getClientTime(session.sessionStart)}` }}
+                      </span>
+                      <span class="stime">
+                        {{ `Duration: ${msToStr(session.sessionDuration)}` }}
+                      </span>
+                      <span class="stime">
+                        {{ `Angries: ${session.angryWarningCount}` }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -148,28 +185,28 @@
   </div>
 </template>
 <script>
-// import FilterContainer from "@/components/Filter";
-// import ActionSuggest from "./components/ActionToImproveList";
-// import WarningList from "./components/WarningList";
-// import ReportEmotion from "./components/ReportEmotion";
-import { getWarningList } from '@/api/employees'
-import { getHistory } from '@/api/employees'
+// import FilterContainer from '@/components/Filter'
+// import ActionSuggest from './components/ActionToImproveList'
+// import WarningList from './components/WarningList'
+// import ReportEmotion from './components/ReportEmotion'
+import { getWarningList, getHistory, getGCSUrl } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
+import esmsLogo from '@/assets/esms_logo300.png'
 export default {
   name: 'TakeCareEmployee',
   // components: { WarningList, ActionSuggest, ReportEmotion, FilterContainer },
   directives: { waves },
   data() {
     return {
-      logo: 'https://i.upanh.org/2020/10/26/logo1.png',
-      isShowemployeeList: false,
+      logo: esmsLogo,
+      isShowemployeeList: true,
       isShowEvi: false,
       show: false,
       list: null,
       listLoading: true,
       profile: {
-        fullname: 'Nguyen Hieu Liem',
+        fullname: '',
         avatarUrl: ''
       },
       employeeList: [],
@@ -177,11 +214,30 @@ export default {
         totalSessions: 0,
         angryWarningCount: 0
       },
+      selectedWeek: new Date(),
+      periodEviName: null,
+      videoEviName: null,
+      eviVideos: {},
+      eviPeriods: {},
       sessionList: []
     }
   },
   computed: {
-    ...mapGetters(['sidebar', 'avatarUrl', 'device'])
+    ...mapGetters(['avatarUrl', 'fullname'])
+  },
+  watch: {
+    selectedWeek(value) {
+      const selectedDate = new Date(value)
+      selectedDate.setHours(0)
+      selectedDate.setMinutes(0)
+      selectedDate.setSeconds(0)
+      selectedDate.setMilliseconds(0)
+      selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
+      const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+      getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
+        this.employeeList = response.message
+      })
+    }
   },
   created() {
     this.getList()
@@ -194,10 +250,15 @@ export default {
     },
     viewHistory(code) {
       getHistory({ employeeCode: code }).then(response => {
-        this.sessionSummary = response.message.sumary
+        this.sessionSummary = response.message.summary
         this.sessionList = response.message.sessions
-        console.log(this.sessionList)
       })
+    },
+    getClientTime(dateStr) {
+      const date = new Date(dateStr)
+      return `${this.twoDigits(date.getHours())}:${this.twoDigits(
+        date.getMinutes()
+      )}:${this.twoDigits(date.getSeconds())}`
     },
     toggleShowemployeeList: function() {
       if (this.isShowemployeeList === false) {
@@ -206,9 +267,49 @@ export default {
         this.isShowemployeeList = false
       }
     },
-    logout: function() {},
+    async logout() {
+      this.$store.dispatch('root/resetToken')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    closeEvi() {
+      this.isShowEvi = false
+      const videoRef = this.$refs.videoRef
+      if (videoRef) {
+        videoRef.pause()
+      }
+    },
     fourDigits: num => `${`000${num}`.substr(-4)}`,
-    showEvi: function(sessionId) {},
+    twoDigits: num => `${`0${num}`.substr(-2)}`,
+
+    showEvi(sessionId) {
+      const eviName = `session_${this.fourDigits(sessionId)}`
+      if (!this.eviVideos[eviName]) {
+        getGCSUrl({ gcpath: `${eviName}/video.mp4` }).then(response => {
+          if (response.message !== '"File not existed"') {
+            this.eviVideos[eviName] = response.message[0]
+            getGCSUrl({ gcpath: `${eviName}/periods_info.json` }).then(response2 => {
+              if (response2.message !== '"File not existed"') {
+                const url = response2.message[0]
+                console.log('url', url)
+                fetch(url, {
+                  method: 'get'
+                }).then(response3 => {
+                  this.eviPeriods[eviName] = response3
+                })
+              }
+              this.videoEviName = eviName
+              this.isShowEvi = true
+            })
+          } else {
+            this.videoEviName = eviName
+            this.isShowEvi = true
+          }
+        })
+      } else {
+        this.videoEviName = eviName
+        this.isShowEvi = true
+      }
+    },
     msToStr(ms, _callCount = 1) {
       if (ms < 1000) {
         return ms + ' ms '
@@ -264,10 +365,10 @@ export default {
 
 .esms-container {
   position: absolute;
-  top: 60px;
+  top: 10px;
   left: 10px;
-  width: calc(100vw - 74px);
-  height: calc(100vh - 70px);
+  width: calc(100vw - 20px);
+  height: calc(100vh - 20px);
   background-color: #f8fbff;
   border-radius: 30px;
   overflow: hidden;
@@ -476,10 +577,11 @@ export default {
   color: #999;
 }
 
-.shiftItem.unavailable {
+.shiftItem.inactive {
   background-color: #e6f1ff;
 }
 
+.shiftItem:not(.unavailable):not(.inactive):not(.active):hover,
 .shiftItem.available {
   border-color: #1479ff;
   color: #1479ff;
@@ -526,7 +628,6 @@ export default {
   position: absolute;
   left: 0;
   width: 100%;
-  min-width: 100px;
   padding: 5px;
   text-align: center;
   border-radius: 5px;
@@ -694,27 +795,27 @@ span.waitingListTitle {
 
 .waitingList {
   height: 100%;
-  overflow-x: auto;
 }
 
 .waitingInner {
-  display: block;
-  padding: 20px;
+  display: flex;
+  padding: 20px 0 20px 20px;
   flex: auto;
   height: 100%;
+  overflow: auto;
 }
 
 .waitingInner::after {
   display: block;
   content: "";
-  clear: both;
+  padding: 0 1px 0 0;
 }
 
 .waitingItem {
-  float: left;
   display: flex;
   flex-direction: column;
-  width: 150px;
+  width: 180px;
+  min-width: 180px;
   height: 100%;
   margin-right: 30px;
   background-color: #fff;
@@ -723,10 +824,29 @@ span.waitingListTitle {
   -webkit-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
   -moz-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
   box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  position: relative;
 }
 
-.waitingItem:hover {
+.waitingItem::before {
+  display: block;
+  content: "";
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  border-radius: 15px;
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-color: #fff;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.waitingItem:first-child:hover {
   border: 2px solid #1479ff;
+}
+
+.waitingItem:first-child::before {
+  display: none;
 }
 
 .waitingItemHead {
@@ -735,13 +855,62 @@ span.waitingListTitle {
   justify-content: center;
   width: 100%;
   height: 40px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   background-color: #f3f8ff;
-  overflow: hidden;
+  border-bottom: 2px solid #f3f8ff;
   color: #1479ff;
   font-size: 20px;
   position: relative;
+}
+
+.waitingItemHead i.queueIcon {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  height: calc(100% + 4px);
+  border-top-left-radius: 15px;
+  font-size: 16px;
+  padding: 0 12px;
+  background-color: #1479ff;
+  color: #fff;
+}
+
+.waitingItemHead i.skipIcon {
+  display: none;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  border-top-right-radius: 15px;
+  font-size: 16px;
+  padding: 0 10px;
+  background-color: #f3f8ff;
+  color: #1479ff;
+  cursor: pointer;
+}
+
+.waitingNo {
+  flex: auto;
+  text-align: center;
+}
+
+.removeIcon {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  z-index: 1;
+  font-size: 25px;
+  color: #fd6083;
+  background-color: #fff;
+  padding: 1px;
+  border: 1px solid #fd6083;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
 }
 
 .startSessionBtn {
@@ -749,10 +918,11 @@ span.waitingListTitle {
   justify-content: center;
   align-items: center;
   left: 0;
-  width: 100%;
+  width: calc(100% - 36px);
   height: 100%;
   padding: 5px;
   background-color: #1479ff;
+  border-top-left-radius: 15px;
   color: #fff;
   cursor: pointer;
   display: none;
@@ -765,7 +935,19 @@ span.waitingListTitle {
   box-shadow: 0 0 10px 0 rgba(20, 121, 255, 0.2);
 }
 
-.waitingItem:hover .startSessionBtn {
+.waitingItem:first-child:hover .waitingItemHead {
+  border-bottom-color: #1479ff;
+}
+
+.waitingItem:first-child:hover .removeIcon {
+  display: block;
+}
+
+.waitingItem:first-child:hover .startSessionBtn {
+  display: flex;
+}
+
+.waitingItem:first-child:hover i.skipIcon {
   display: flex;
 }
 
@@ -781,6 +963,7 @@ span.waitingListTitle {
 .wNo {
   font-size: 16px;
   font-weight: bold;
+  text-align: center;
 }
 
 .wCat {
@@ -813,7 +996,7 @@ span.footerTitle {
   display: block;
   font-size: 20px;
   font-weight: bold;
-  padding-bottom: 30px;
+  padding: 0 0 10px;
 }
 
 .resultWrapper {
@@ -823,6 +1006,26 @@ span.footerTitle {
 .resultTextWrapper {
   height: 100%;
   flex: auto;
+  position: relative;
+}
+
+.btnDateWrapper {
+  display: block;
+}
+
+.btnDate {
+  padding: 5px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #fff;
+  border: 2px solid #1479ff;
+  color: #1479ff;
+  border-radius: 5px;
+}
+
+.btnDate:hover {
+  background-color: #1479ff;
+  color: #fff;
 }
 
 span.resultTextItem {
@@ -843,17 +1046,32 @@ span.resultTextItem span {
 
 .videoWrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
   height: 0;
   overflow: hidden;
-  padding-bottom: 20px;
   transition: all 0.1s ease;
+}
+
+.videoInner {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  height: 100%;
+  padding-left: 20px;
   position: relative;
 }
 
-.videoWrapper video {
+.videoOuter {
+  height: 100%;
+  max-width: 100%;
+  padding: 20px 0;
+  position: relative;
+}
+
+.videoInner video {
+  border: 2px solid #f388a0;
+  border-radius: 10px;
   height: 100%;
 }
 
@@ -862,9 +1080,107 @@ span.resultTextItem span {
   top: 0;
   right: 0;
   cursor: pointer;
+  color: #cc002f;
+}
+
+.angryPeriodsWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  height: 100%;
+  padding: 20px 0;
+}
+
+span.angryPeriodsTitle {
+  display: block;
+  font-size: 16px;
+  text-decoration: underline;
+  color: #cc002f;
+}
+
+.angryPeriodsInner {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  padding: 20px 0;
+}
+
+.angryPeriodsInnerInner {
+  flex: auto;
+  height: 0;
+  display: block;
+  width: 100%;
+  overflow: auto;
+  padding-right: 10px;
+}
+
+/* scrollbar */
+.angryPeriodsInnerInner::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.angryPeriodsInnerInner::-webkit-scrollbar-track {
+  background-color: rgba(204, 0, 47, 0.3);
+}
+.angryPeriodsInnerInner::-webkit-scrollbar-thumb {
+  background-color: rgba(204, 0, 47, 0.5);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.angryPeriodsInnerInner::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(204, 0, 47);
+  cursor: pointer;
+}
+
+.angryPeriods {
+  display: block;
+  width: 100%;
+}
+
+.periodItem {
+  display: flex;
+  width: 100%;
+  padding: 12px 14px;
+  margin: 8px 0;
+  justify-content: space-between;
+  border: 2px solid #e6f1ff;
+  border-radius: 10px;
+  color: #999;
+  cursor: pointer;
+}
+
+.periodItem:hover {
+  border-color: #cc002f;
+  color: #cc002f;
+}
+
+.periodHead {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.periodHead i {
+  font-size: 16px;
+}
+
+.periodName {
+  margin-left: 12px;
+}
+
+.periodTail {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  position: relative;
+}
+.periodDuration {
+  padding-left: 10px;
 }
 
 .sessionListWrapper {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   position: relative;
@@ -874,12 +1190,7 @@ span.resultTextItem span {
 
 .sessionList {
   width: 100%;
-  height: 100%;
-  overflow-x: auto;
-}
-
-.footerTailWrapper.showVideo {
-  padding-top: 10px;
+  flex: auto;
 }
 
 .footerTailWrapper.showVideo .videoWrapper {
@@ -891,23 +1202,24 @@ span.resultTextItem span {
 }
 
 .sessionInner {
-  display: block;
+  display: flex;
   padding: 20px;
   flex: auto;
   height: 100%;
+  overflow: auto;
 }
 
 .sessionInner::after {
   display: block;
   content: "";
-  clear: both;
+  padding: 0 1px 0 0;
 }
 
 .sessionItem {
-  float: left;
   display: flex;
   flex-direction: column;
   width: 200px;
+  min-width: 200px;
   height: 100%;
   margin-right: 30px;
   background-color: #fff;

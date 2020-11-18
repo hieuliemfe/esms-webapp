@@ -13,3 +13,10 @@ export function getHistory(query) {
     params: query
   })
 }
+export function getGCSUrl(query) {
+  return request({
+    url: '/videos',
+    method: 'get',
+    params: query
+  })
+}
