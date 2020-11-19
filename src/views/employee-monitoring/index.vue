@@ -94,7 +94,7 @@
             <div class="resultTextWrapper">
               <span class="footerTitle">Bank Teller Session History</span>
               <button
-                v-if="sessionList && sessionList.length > 0"
+                v-if="sessionList && sessionList.length > 0 && selectedEmployee.angrySessionPercent > angryPercentMax"
                 class="actionBtn"
                 :disabled="selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
                 @click="dialogFormVisible = true"
@@ -228,7 +228,7 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getWarningList, getSessionHistory, getGCSUrl, suspendEmployee } from '@/api/employees'
+import { getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, getConfigs } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
@@ -251,6 +251,7 @@ export default {
       eviVideos: {},
       eviPeriods: {},
       sessionList: [],
+      angryPercentMax: 1,
       suspendForm: {
         reason: null,
         expiration: null
@@ -285,8 +286,20 @@ export default {
   },
   created() {
     this.getList()
+    this.getConfigurations()
   },
   methods: {
+    getConfigurations() {
+      getConfigs().then(response => {
+        if (response) {
+          const data = response.message
+          if (data) {
+            const { angry_percent_max } = data
+            this.angryPercentMax = angry_percent_max
+          }
+        }
+      })
+    },
     cancelSuspend() {
       const form = this.$refs.susForm
       form.resetFields()

@@ -27,3 +27,9 @@ export function suspendEmployee(code, body) {
     data: body
   })
 }
+export function getConfigs() {
+  return request({
+    url: `/configs`,
+    method: 'get'
+  })
+}
