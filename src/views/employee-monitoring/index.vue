@@ -1,5 +1,10 @@
 <template>
   <div class="esms-container">
+    <div :class="{ loadingBar: true, show: isLoading }">
+      <div class="line" />
+      <div class="subline inc" />
+      <div class="subline dec" />
+    </div>
     <div class="sideBar">
       <span class="appName">EsmsApp</span>
       <div class="navigation">
@@ -61,7 +66,7 @@
             <div class="shiftTail">
               <!-- <span class="startTime">{sh.shiftStart}</span> -->
               <span class="endTime">{{
-                `Warnings: ${employee.angryWarningCount}`
+                `Warnings: ${employee.totalWarningSessions}`
               }}</span>
             </div>
           </div>
@@ -234,6 +239,7 @@ export default {
   data() {
     return {
       logo: esmsLogo,
+      isLoading: false,
       isShowemployeeList: true,
       isShowEvi: false,
       employeeList: [],
@@ -291,10 +297,12 @@ export default {
       const form = this.$refs.susForm
       form.validate(valid => {
         if (valid) {
+          this.isLoading = true
           suspendEmployee(this.selectedEmployee.employeeCode, form.model).then(response => {
             console.log(response)
             this.dialogFormVisible = false
             form.resetFields()
+            this.isLoading = false
             this.updateEmployeeList().then(() => {
               this.selectedEmployee = this.employeeList.find(e => e.id === this.selectedEmployee.id)
             })
@@ -312,14 +320,18 @@ export default {
       selectedDate.setMilliseconds(0)
       selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+      this.isLoading = true
       getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
+        this.isLoading = false
       })
     },
     selectEmployee(employee) {
+      this.isLoading = true
       this.selectedEmployee = employee
     },
     updateEmployeeList() {
+      this.isLoading = true
       const selectedDate = new Date(this.selectedWeekDay)
       selectedDate.setHours(0)
       selectedDate.setMinutes(0)
@@ -331,6 +343,7 @@ export default {
         this.employeeList = response.message
         const slEmp = this.employeeList.find(e => e.id === this.selectedEmployee.id)
         if (slEmp) {
+          this.isLoading = false
           this.updateSessionList()
         } else {
           this.selectedEmployee = {}
@@ -339,6 +352,7 @@ export default {
       })
     },
     updateSessionList() {
+      this.isLoading = true
       const code = this.selectedEmployee.employeeCode
       const selectedDate = new Date(this.selectedWeekDay)
       selectedDate.setHours(0)
@@ -349,6 +363,7 @@ export default {
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
       return getSessionHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.sessionList = response.message.sessions
+        this.isLoading = false
       })
     },
     getClientDate(dateStr) {
@@ -390,6 +405,7 @@ export default {
       }
     },
     showEvi(sessionId) {
+      this.isLoading = true
       const eviName = `session_${this.fourDigits(sessionId)}`
       if (!this.eviVideos[eviName]) {
         getGCSUrl({ gcpath: `${eviName}/video.mp4` }).then(response => {
@@ -403,20 +419,24 @@ export default {
                 })
                   .then(res => res.json())
                   .then(response3 => {
+                    this.isLoading = false
                     this.eviPeriods[eviName] = response3
                     this.periodEviName = eviName
                     console.log(this.eviPeriods[this.periodEviName])
                   })
               }
+              this.isLoading = false
               this.videoEviName = eviName
               this.isShowEvi = true
             })
           } else {
+            this.isLoading = false
             this.videoEviName = eviName
             this.isShowEvi = true
           }
         })
       } else {
+        this.isLoading = false
         this.periodEviName = eviName
         this.videoEviName = eviName
         this.isShowEvi = true
@@ -1230,6 +1250,7 @@ span.resultTextItem span {
   display: flex;
   flex-direction: column;
   width: 40%;
+  min-width: 40%;
   height: 100%;
   padding: 20px 0;
 }
@@ -1439,5 +1460,63 @@ span.angryPeriodsTitle {
 
 .stime {
   font-size: 12px;
+}
+
+/* loading bar */
+.loadingBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 2px;
+  overflow-x: hidden;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.loadingBar.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.line {
+  position: absolute;
+  opacity: 0.4;
+  background: #4a8df8;
+  width: 150%;
+  height: 2px;
+}
+
+.subline {
+  position: absolute;
+  background: #4a8df8;
+  height: 2px;
+}
+.inc {
+  animation: increase 2s infinite;
+}
+.dec {
+  animation: decrease 2s 0.5s infinite;
+}
+
+@keyframes increase {
+  from {
+    left: -5%;
+    width: 5%;
+  }
+  to {
+    left: 130%;
+    width: 100%;
+  }
+}
+@keyframes decrease {
+  from {
+    left: -80%;
+    width: 80%;
+  }
+  to {
+    left: 110%;
+    width: 10%;
+  }
 }
 </style>
