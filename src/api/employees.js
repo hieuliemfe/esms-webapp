@@ -6,7 +6,7 @@ export function getWarningList(query) {
     params: query
   })
 }
-export function getHistory(query) {
+export function getSessionHistory(query) {
   return request({
     url: '/sessions',
     method: 'get',
@@ -18,5 +18,12 @@ export function getGCSUrl(query) {
     url: '/videos',
     method: 'get',
     params: query
+  })
+}
+export function suspendEmployee(code, body) {
+  return request({
+    url: `/employees/${code}/suspend`,
+    method: 'post',
+    data: body
   })
 }
