@@ -33,3 +33,17 @@ export function getConfigs() {
     method: 'get'
   })
 }
+export function getReport(query) {
+  return request({
+    url: `/reports`,
+    method: 'get',
+    params: query
+  })
+}
+export function exportReport(query) {
+  return request({
+    url: `/reports`,
+    method: 'get',
+    params: query
+  })
+}

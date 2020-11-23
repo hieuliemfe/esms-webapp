@@ -15,13 +15,22 @@
           <span class="btnText">Home</span>
         </div>
         <div
-          :class="{ btnNav: true, active: isShowemployeeList }"
+          :class="{ btnNav: true, active: isShowemployeeList, freezed: isShowReport }"
           @click="toggleShowemployeeList"
         >
           <div class="iconBox">
             <i class="fas fa-users" />
           </div>
           <span class="btnText">Employees</span>
+        </div>
+        <div
+          :class="{ btnNav: true, active: isShowReport }"
+          @click="toggleShowReport"
+        >
+          <div class="iconBox">
+            <i class="far fa-chart-bar" />
+          </div>
+          <span class="btnText">Report</span>
         </div>
         <div class="btnNav" @click="logout">
           <div class="iconBox">
@@ -42,15 +51,17 @@
         </div>
       </div>
     </div>
-    <div :class="{ shiftListWrapper: true, show: isShowemployeeList }">
+    <div v-if="!isShowReport" :class="{ shiftListWrapper: true, show: isShowemployeeList }">
       <div class="shiftListInner">
         <span class="shiftListTitle">Bank Teller List</span>
+        <br>
         <el-date-picker
           v-model="selectedWeekDay"
           type="week"
+          format="[Week] WW [of Year] yyyy"
+          placeholder="Pick a week"
           :editable="false"
           :clearable="false"
-          placeholder="Pick a week"
         />
         <div class="shiftList">
           <div
@@ -73,12 +84,101 @@
         </div>
       </div>
     </div>
-    <div class="mainContent">
+    <div v-show="isShowReport" class="mainContent">
+      <div class="reportWrapper">
+        <div class="reportInner">
+          <span class="shiftListTitle">Employee Status Report</span>
+          <br>
+          <el-date-picker
+            v-model="selectedRange"
+            type="daterange"
+            format="dd/MM/yyyy"
+            range-separator="to"
+            start-placeholder="Start date"
+            end-placeholder="End date"
+            :editable="false"
+            :clearable="false"
+          />
+          <br>
+          <span
+            v-if="reportTableData"
+            class="acceptable"
+          >
+            Acceptable Percentage of Warning session:
+            <el-tag
+              type="danger"
+              disable-transitions
+            >
+              {{ angryPercentMax * 100 }}%
+            </el-tag>
+          </span>
+          <br>
+          <el-table
+            v-if="reportTableData"
+            :data="reportTableData"
+            style="width: 100%"
+          >
+            <el-table-column
+              prop="employeeCode"
+              label="Employee code"
+              width="150"
+            />
+            <el-table-column
+              prop="fullname"
+              label="Full name"
+              width="200"
+            />
+            <el-table-column
+              prop="totalSession"
+              label="Total session"
+              width="120"
+            />
+            <el-table-column
+              prop="totalWarningSessions"
+              label="Warning session"
+              width="150"
+            />
+            <el-table-column
+              prop="totalWarningSessions"
+              label="Warning session"
+              width="150"
+            />
+            <el-table-column
+              prop="angrySessionPercent"
+              label="Percentage of Warning session"
+              width="250"
+            />
+            <el-table-column
+              prop="note"
+              label="Note"
+            />
+          </el-table>
+          <br>
+          <el-button
+            v-if="reportTableData"
+            type="primary"
+            icon="el-icon-download"
+            @click="downloadReport('pdf')"
+          >
+            Export to PDF
+          </el-button>
+          <el-button
+            v-if="reportTableData"
+            type="secondary"
+            icon="el-icon-download"
+            @click="downloadReport('xlsx')"
+          >
+            Export to Excel
+          </el-button>
+        </div>
+      </div>
+    </div>
+    <div v-show="!isShowReport" class="mainContent">
       <div class="headerWrapper">
         <div class="firstPart">
           <div class="greetingWrapper">
             <div class="welcomeWrapper">
-              <span class="hello"> Hello, {{ fullname }} </span>
+              <span class="hello"> Hello, {{ fullname }}</span>
               <span class="tips">Have a nice day!</span>
               <span class="tips">
                 Welcome to Employee Status Monitoring website!
@@ -228,7 +328,7 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, getConfigs } from '@/api/employees'
+import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, getConfigs } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
@@ -241,11 +341,14 @@ export default {
       logo: esmsLogo,
       isLoading: false,
       isShowemployeeList: true,
+      isShowReport: false,
       isShowEvi: false,
       employeeList: [],
       selectedEmployee: {},
       dialogFormVisible: false,
       selectedWeekDay: new Date(),
+      selectedRange: null,
+      reportTableData: null,
       periodEviName: null,
       videoEviName: null,
       eviVideos: {},
@@ -264,11 +367,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['avatarUrl', 'fullname'])
+    ...mapGetters(['avatarUrl', 'fullname', 'token'])
   },
   watch: {
     selectedWeekDay() {
       this.updateEmployeeList()
+    },
+    selectedRange(value) {
+      this.updateReport()
     },
     selectedEmployee(value) {
       if (this.selectedEmployee.employeeCode) {
@@ -289,6 +395,70 @@ export default {
     this.getConfigurations()
   },
   methods: {
+    updateReport() {
+      if (this.selectedRange && this.selectedRange.length > 0) {
+        this.isLoading = true
+        const selectedStart = new Date(this.selectedRange[0])
+        selectedStart.setHours(0)
+        selectedStart.setMinutes(0)
+        selectedStart.setSeconds(0)
+        selectedStart.setMilliseconds(0)
+        const selectedEnd = new Date(this.selectedRange[1])
+        selectedEnd.setHours(0)
+        selectedEnd.setMinutes(0)
+        selectedEnd.setSeconds(0)
+        selectedEnd.setMilliseconds(0)
+        console.log({ type: 'json', startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() })
+        return getReport({ type: 'json', startDate: selectedStart, endDate: selectedEnd }).then(response => {
+          this.isLoading = false
+          const reportList = response.message
+          if (reportList) {
+            reportList.forEach(e => {
+              e.note = e.angrySessionPercent > this.angryPercentMax ? 'Need for action' : '-'
+              e.angrySessionPercent = e.angrySessionPercent ? `${(e.angrySessionPercent * 100).toFixed(1)}%` : '-'
+            })
+            this.reportTableData = reportList
+          }
+        })
+      }
+    },
+    downloadReport(exportType) {
+      if (this.selectedRange && this.selectedRange.length > 0) {
+        this.isLoading = true
+        const selectedStart = new Date(this.selectedRange[0])
+        selectedStart.setHours(0)
+        selectedStart.setMinutes(0)
+        selectedStart.setSeconds(0)
+        selectedStart.setMilliseconds(0)
+        const selectedEnd = new Date(this.selectedRange[1])
+        selectedEnd.setHours(0)
+        selectedEnd.setMinutes(0)
+        selectedEnd.setSeconds(0)
+        selectedEnd.setMilliseconds(0)
+        console.log({ type: exportType, startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() })
+        const objToParamStr = (obj) =>
+          Object.entries(obj)
+            .map((e) => e.join('='))
+            .join('&')
+        const queryData = { type: exportType, startDate: selectedStart, endDate: selectedEnd }
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${this.token}`)
+        fetch(
+          `http://api.esms-team.site/reports?${objToParamStr(queryData)}`,
+          { headers }
+        )
+          .then(res => res.blob())
+          .then(blob => {
+            this.isLoading = false
+            const link = document.createElement('a')
+            const objUrl = URL.createObjectURL(blob)
+            link.href = objUrl
+            link.download = `ESMSReport.${exportType}`
+            link.dispatchEvent(new MouseEvent('click'))
+            URL.revokeObjectURL(objUrl)
+          })
+      }
+    },
     getConfigurations() {
       getConfigs().then(response => {
         if (response) {
@@ -326,6 +496,7 @@ export default {
       })
     },
     getList() {
+      this.isLoading = true
       const selectedDate = new Date(this.selectedWeekDay)
       selectedDate.setHours(0)
       selectedDate.setMinutes(0)
@@ -333,7 +504,6 @@ export default {
       selectedDate.setMilliseconds(0)
       selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
-      this.isLoading = true
       getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
         this.isLoading = false
@@ -355,8 +525,8 @@ export default {
       return getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
         const slEmp = this.employeeList.find(e => e.id === this.selectedEmployee.id)
+        this.isLoading = false
         if (slEmp) {
-          this.isLoading = false
           this.updateSessionList()
         } else {
           this.selectedEmployee = {}
@@ -375,8 +545,8 @@ export default {
       selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
       return getSessionHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
-        this.sessionList = response.message.sessions
         this.isLoading = false
+        this.sessionList = response.message.sessions
       })
     },
     getClientDate(dateStr) {
@@ -392,10 +562,21 @@ export default {
       )}:${this.twoDigits(date.getSeconds())}`
     },
     toggleShowemployeeList: function() {
-      if (this.isShowemployeeList === false) {
-        this.isShowemployeeList = true
+      if (!this.isShowReport) {
+        if (this.isShowemployeeList === false) {
+          this.isShowemployeeList = true
+        } else {
+          this.isShowemployeeList = false
+        }
+      }
+    },
+    toggleShowReport: function() {
+      if (this.isShowReport === false) {
+        this.isShowReport = true
       } else {
-        this.isShowemployeeList = false
+        this.isShowReport = false
+        this.selectedRange = null
+        this.reportTableData = null
       }
     },
     async logout() {
@@ -528,6 +709,19 @@ textarea {
   box-shadow: 0 0 100px 50px rgba(223, 233, 243, 1);
 }
 
+.acceptable {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  font-weight: normal;
+  padding-left: 10px;
+}
+
+.acceptable .el-tag {
+  margin-left: 10px;
+  font-size: 16px;
+}
+
 .sideBar {
   display: flex;
   width: 150px;
@@ -550,7 +744,7 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .paddingFlex {
@@ -560,7 +754,7 @@ textarea {
 
 .btnNav {
   display: flex;
-  margin-top: 40px;
+  margin-top: 30px;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
@@ -580,7 +774,7 @@ textarea {
   box-shadow: none;
 }
 
-.btnNav:hover .iconBox {
+.btnNav:not(.freezed):not(.active):hover .iconBox {
   color: #1479ff;
   border-color: rgba(19, 121, 255, 0.7);
 }
@@ -597,10 +791,12 @@ textarea {
   box-shadow: 0 5px 24px 0 rgba(20, 121, 255, 0.3);
 }
 
+.btnNav.freezed,
 .btnNav.noHover {
   cursor: auto;
 }
 
+.btnNav.freezed:hover .iconBox,
 .btnNav.noHover:hover .iconBox {
   box-shadow: none;
 }
@@ -614,7 +810,7 @@ textarea {
 }
 
 .btnNav.active .btnText,
-.btnNav:hover .btnText {
+.btnNav:not(.freezed):hover .btnText {
   color: #1479ff;
 }
 
@@ -1127,6 +1323,7 @@ span.waitingListTitle {
   text-align: center;
 }
 
+.reportWrapper,
 .footerWrapper {
   display: flex;
   flex: auto;
@@ -1154,6 +1351,20 @@ span.waitingListTitle {
 .footerInner {
   display: flex;
   flex-direction: column;
+  flex: auto;
+  width: 0;
+  height: 100%;
+  padding: 30px 30px 0;
+  background-color: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  -webkit-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  -moz-box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+  box-shadow: 0 0 16px 0 rgba(20, 121, 255, 0.2);
+}
+
+.reportInner {
+  display: block;
   flex: auto;
   width: 0;
   height: 100%;
