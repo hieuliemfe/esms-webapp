@@ -27,6 +27,13 @@ export function suspendEmployee(code, body) {
     data: body
   })
 }
+export function updateSuspendEmployee(code, body) {
+  return request({
+    url: `/employees/${code}/suspend`,
+    method: 'put',
+    data: body
+  })
+}
 export function getConfigs() {
   return request({
     url: `/configs`,

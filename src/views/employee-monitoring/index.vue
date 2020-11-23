@@ -194,15 +194,25 @@
             <div class="resultTextWrapper">
               <span class="footerTitle">Bank Teller Session History</span>
               <button
-                v-if="sessionList && sessionList.length > 0 && selectedEmployee.angrySessionPercent > angryPercentMax"
+                v-if="sessionList && sessionList.length > 0 && selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
                 class="actionBtn"
-                :disabled="selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
+                :disabled="true"
+              >
+                Currently in Suspension
+              </button>
+              <button
+                v-if="sessionList && sessionList.length > 0 && selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
+                class="actionBtn update"
+                @click="updateFormVisible = true"
+              >
+                Update Suspension
+              </button>
+              <button
+                v-if="sessionList && sessionList.length > 0 && selectedEmployee.angrySessionPercent > angryPercentMax && !(selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0)"
+                class="actionBtn"
                 @click="dialogFormVisible = true"
               >
-                {{ selectedEmployee.Suspensions
-                  && selectedEmployee.Suspensions.length > 0
-                  ? 'Currently in Suspension'
-                  : 'Take an Action' }}
+                Take an Action
               </button>
             </div>
           </div>
@@ -313,12 +323,49 @@
             type="datetime"
             :editable="false"
             :clearable="false"
+            :picker-options="suspendPickerOptions"
           />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancelSuspend()">Cancel</el-button>
         <el-button type="primary" @click="submitSuspend()">Confirm</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="Update Suspension for this Bank Teller account" :visible.sync="updateFormVisible">
+      <el-form ref="updateSusForm" :model="updateSuspendForm" :rules="updateSuspendRules">
+        <el-form-item label="Reason for Update:" prop="reason">
+          <el-input
+            v-model="updateSuspendForm.reason"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 4}"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="selectedEmployee && selectedEmployee.Suspensions && selectedEmployee.Suspensions[0]"
+          label="Current Expiration:"
+        >
+          <el-date-picker
+            v-model="selectedEmployee.Suspensions[0].expiredOn"
+            type="datetime"
+            :readonly="true"
+            :editable="false"
+            :clearable="false"
+          />
+        </el-form-item>
+        <el-form-item label="New Expiration:" prop="expiration">
+          <el-date-picker
+            v-model="updateSuspendForm.expiration"
+            type="datetime"
+            :editable="false"
+            :clearable="false"
+            :picker-options="updateSuspendPickerOptions"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateSuspend()">Cancel</el-button>
+        <el-button type="primary" @click="submitUpdateSuspend()">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -328,7 +375,7 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, getConfigs } from '@/api/employees'
+import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
@@ -346,6 +393,7 @@ export default {
       employeeList: [],
       selectedEmployee: {},
       dialogFormVisible: false,
+      updateFormVisible: false,
       selectedWeekDay: new Date(),
       selectedRange: null,
       reportTableData: null,
@@ -359,10 +407,45 @@ export default {
         reason: null,
         expiration: null
       },
+      updateSuspendForm: {
+        reason: null,
+        expiration: null
+      },
       suspendRules: {
         expiration: [
           { required: true, message: 'Please input an expiration time for this suspension', trigger: 'blur' }
         ]
+      },
+      updateSuspendRules: {
+        expiration: [
+          { required: true, message: 'Please input new expiration time', trigger: 'blur' }
+        ]
+      },
+      suspendPickerOptions: {
+        disabledDate(time) {
+          const currentDate = new Date()
+          currentDate.setHours(0)
+          currentDate.setMinutes(0)
+          currentDate.setSeconds(0)
+          currentDate.setMilliseconds(0)
+          return time.getTime() < currentDate.getTime()
+        }
+      },
+      updateSuspendPickerOptions: {
+        disabledDate: function(time) {
+          const currentDate = new Date()
+          currentDate.setHours(0)
+          currentDate.setMinutes(0)
+          currentDate.setSeconds(0)
+          currentDate.setMilliseconds(0)
+          return time.getTime() < currentDate.getTime() || (
+            this.selectedEmployee &&
+            this.selectedEmployee.Suspensions &&
+            this.selectedEmployee.Suspensions[0] &&
+            this.selectedEmployee.Suspensions[0].expiredOn &&
+            time.getTime() > new Date(this.selectedEmployee.Suspensions[0].expiredOn).getTime()
+          )
+        }.bind(this)
       }
     }
   },
@@ -373,10 +456,10 @@ export default {
     selectedWeekDay() {
       this.updateEmployeeList()
     },
-    selectedRange(value) {
+    selectedRange() {
       this.updateReport()
     },
-    selectedEmployee(value) {
+    selectedEmployee() {
       if (this.selectedEmployee.employeeCode) {
         this.updateSessionList()
       }
@@ -476,6 +559,12 @@ export default {
       console.log('hello cancel')
       this.dialogFormVisible = false
     },
+    cancelUpdateSuspend() {
+      const form = this.$refs.updateSusForm
+      form.resetFields()
+      console.log('hello cancel')
+      this.updateFormVisible = false
+    },
     submitSuspend() {
       const form = this.$refs.susForm
       form.validate(valid => {
@@ -484,6 +573,28 @@ export default {
           suspendEmployee(this.selectedEmployee.employeeCode, form.model).then(response => {
             console.log(response)
             this.dialogFormVisible = false
+            form.resetFields()
+            this.isLoading = false
+            this.updateEmployeeList().then(() => {
+              this.selectedEmployee = this.employeeList.find(e => e.id === this.selectedEmployee.id)
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    submitUpdateSuspend() {
+      const form = this.$refs.updateSusForm
+      form.validate(valid => {
+        if (valid) {
+          this.isLoading = true
+          updateSuspendEmployee(this.selectedEmployee.employeeCode, {
+            ...form.model,
+            id: this.selectedEmployee.Suspensions[0].id
+          }).then(response => {
+            console.log(response)
+            this.updateFormVisible = false
             form.resetFields()
             this.isLoading = false
             this.updateEmployeeList().then(() => {
@@ -527,7 +638,7 @@ export default {
         const slEmp = this.employeeList.find(e => e.id === this.selectedEmployee.id)
         this.isLoading = false
         if (slEmp) {
-          this.updateSessionList()
+          this.selectedEmployee = slEmp
         } else {
           this.selectedEmployee = {}
           this.sessionList = []
@@ -537,17 +648,19 @@ export default {
     updateSessionList() {
       this.isLoading = true
       const code = this.selectedEmployee.employeeCode
-      const selectedDate = new Date(this.selectedWeekDay)
-      selectedDate.setHours(0)
-      selectedDate.setMinutes(0)
-      selectedDate.setSeconds(0)
-      selectedDate.setMilliseconds(0)
-      selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
-      const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
-      return getSessionHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
-        this.isLoading = false
-        this.sessionList = response.message.sessions
-      })
+      if (code) {
+        const selectedDate = new Date(this.selectedWeekDay)
+        selectedDate.setHours(0)
+        selectedDate.setMinutes(0)
+        selectedDate.setSeconds(0)
+        selectedDate.setMilliseconds(0)
+        selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay())
+        const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+        return getSessionHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
+          this.isLoading = false
+          this.sessionList = response.message.sessions
+        })
+      }
     },
     getClientDate(dateStr) {
       const date = new Date(dateStr)
@@ -1339,8 +1452,18 @@ span.waitingListTitle {
   margin-left: 20px;
 }
 
+.actionBtn.update {
+  color: #e6a23c;
+  border: 2px solid #e6a23c;
+}
+
 .actionBtn:not(:disabled):hover {
   background-color: #cc002f;
+  color: #ffffff;
+}
+
+.actionBtn.update:not(:disabled):hover {
+  background-color: #e6a23c;
   color: #ffffff;
 }
 
