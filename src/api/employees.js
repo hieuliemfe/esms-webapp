@@ -54,3 +54,9 @@ export function exportReport(query) {
     params: query
   })
 }
+export function getSessionMinDate() {
+  return request({
+    url: `/sessions/mindate`,
+    method: 'get'
+  })
+}

@@ -60,6 +60,7 @@
           type="week"
           format="[Week] WW [of Year] yyyy"
           placeholder="Pick a week"
+          :picker-options="weekPickerOptions"
           :editable="false"
           :clearable="false"
         />
@@ -104,7 +105,7 @@
             v-if="reportTableData"
             class="acceptable"
           >
-            Acceptable Percentage of Warning session:
+            Acceptable percentage of warning session:
             <el-tag
               type="danger"
               disable-transitions
@@ -139,7 +140,7 @@
             />
             <el-table-column
               prop="angrySessionPercent"
-              label="Percentage of Warning session"
+              label="Percentage of warning session"
               width="250"
             />
             <el-table-column
@@ -375,7 +376,7 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs } from '@/api/employees'
+import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
@@ -401,6 +402,7 @@ export default {
       videoEviName: null,
       eviVideos: {},
       eviPeriods: {},
+      minDate: new Date(0),
       sessionList: [],
       angryPercentMax: 1,
       suspendForm: {
@@ -420,6 +422,18 @@ export default {
         expiration: [
           { required: true, message: 'Please input new expiration time', trigger: 'blur' }
         ]
+      },
+      weekPickerOptions: {
+        firstDayOfWeek: 1,
+        disabledDate: function(time) {
+          const currentDate = new Date()
+          currentDate.setHours(0)
+          currentDate.setMinutes(0)
+          currentDate.setSeconds(0)
+          currentDate.setMilliseconds(0)
+          currentDate.setTime(currentDate.getTime() + 24 * 60 * 60 * 1000)
+          return time.getTime() < this.minDate
+        }.bind(this)
       },
       suspendPickerOptions: {
         disabledDate(time) {
@@ -475,10 +489,24 @@ export default {
     }
   },
   created() {
+    this.getMin()
     this.getList()
     this.getConfigurations()
   },
   methods: {
+    getMin() {
+      getSessionMinDate()
+        .then(response => {
+          if (response.success) {
+            const mDate = new Date()
+            mDate.setHours(0)
+            mDate.setMinutes(0)
+            mDate.setSeconds(0)
+            mDate.setMilliseconds(0)
+            this.minDate = mDate
+          }
+        })
+    },
     openUpdate() {
       this.updateFormVisible = true
     },
@@ -496,8 +524,7 @@ export default {
         selectedEnd.setSeconds(0)
         selectedEnd.setMilliseconds(0)
         selectedEnd.setTime(selectedEnd.getTime() + 24 * 60 * 60 * 1000)
-        console.log({ type: 'json', startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() })
-        return getReport({ type: 'json', startDate: selectedStart, endDate: selectedEnd }).then(response => {
+        return getReport({ type: 'json', startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() }).then(response => {
           this.isLoading = false
           const reportList = response.message
           if (reportList) {
@@ -525,12 +552,11 @@ export default {
         selectedEnd.setSeconds(0)
         selectedEnd.setMilliseconds(0)
         selectedEnd.setTime(selectedEnd.getTime() + 24 * 60 * 60 * 1000)
-        console.log({ type: exportType, startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() })
         const objToParamStr = (obj) =>
           Object.entries(obj)
             .map((e) => e.join('='))
             .join('&')
-        const queryData = { type: exportType, startDate: selectedStart, endDate: selectedEnd }
+        const queryData = { type: exportType, startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() }
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${this.token}`)
         fetch(
@@ -551,7 +577,7 @@ export default {
     },
     getConfigurations() {
       getConfigs().then(response => {
-        if (response) {
+        if (response.success) {
           const data = response.message
           if (data) {
             const { angry_percent_max } = data
@@ -628,8 +654,10 @@ export default {
       })
     },
     selectEmployee(employee) {
-      this.isLoading = true
-      this.selectedEmployee = employee
+      if (employee.id !== this.selectedEmployee.id) {
+        this.isLoading = true
+        this.selectedEmployee = employee
+      }
     },
     updateEmployeeList() {
       this.isLoading = true
