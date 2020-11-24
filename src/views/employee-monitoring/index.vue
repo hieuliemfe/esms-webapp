@@ -646,7 +646,7 @@ export default {
       selectedDate.setMinutes(0)
       selectedDate.setSeconds(0)
       selectedDate.setMilliseconds(0)
-      selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay() + 1)
+      selectedDate.setTime(selectedDate.getTime() - (selectedDate.getDay() - 1) * 24 * 60 * 60 * 1000)
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
       getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
@@ -666,7 +666,7 @@ export default {
       selectedDate.setMinutes(0)
       selectedDate.setSeconds(0)
       selectedDate.setMilliseconds(0)
-      selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay() + 1)
+      selectedDate.setTime(selectedDate.getTime() - (selectedDate.getDay() - 1) * 24 * 60 * 60 * 1000)
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
       return getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
@@ -689,7 +689,7 @@ export default {
         selectedDate.setMinutes(0)
         selectedDate.setSeconds(0)
         selectedDate.setMilliseconds(0)
-        selectedDate.setDate(selectedDate.getDate() - selectedDate.getDay() + 1)
+        selectedDate.setTime(selectedDate.getTime() - (selectedDate.getDay() - 1) * 24 * 60 * 60 * 1000)
         const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
         return getSessionHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
           this.isLoading = false
