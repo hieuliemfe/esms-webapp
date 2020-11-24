@@ -495,6 +495,7 @@ export default {
         selectedEnd.setMinutes(0)
         selectedEnd.setSeconds(0)
         selectedEnd.setMilliseconds(0)
+        selectedEnd.setTime(selectedEnd.getTime() + 24 * 60 * 60 * 1000)
         console.log({ type: 'json', startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() })
         return getReport({ type: 'json', startDate: selectedStart, endDate: selectedEnd }).then(response => {
           this.isLoading = false
@@ -523,6 +524,7 @@ export default {
         selectedEnd.setMinutes(0)
         selectedEnd.setSeconds(0)
         selectedEnd.setMilliseconds(0)
+        selectedEnd.setTime(selectedEnd.getTime() + 24 * 60 * 60 * 1000)
         console.log({ type: exportType, startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() })
         const objToParamStr = (obj) =>
           Object.entries(obj)
@@ -671,7 +673,7 @@ export default {
       const date = new Date(dateStr)
       return `${this.twoDigits(date.getDate())}/${this.twoDigits(
         date.getMonth() + 1
-      )}/${this.twoDigits(date.getFullYear())}`
+      )}/${date.getFullYear()}`
     },
     getClientTime(dateStr) {
       const date = new Date(dateStr)
