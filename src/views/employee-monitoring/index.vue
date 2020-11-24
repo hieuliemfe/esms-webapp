@@ -157,7 +157,7 @@
           <br>
           <el-button
             v-if="reportTableData"
-            type="primary"
+            type="danger"
             icon="el-icon-download"
             @click="downloadReport('pdf')"
           >
@@ -165,7 +165,7 @@
           </el-button>
           <el-button
             v-if="reportTableData"
-            type="secondary"
+            type="success"
             icon="el-icon-download"
             @click="downloadReport('xlsx')"
           >
