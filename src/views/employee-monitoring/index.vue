@@ -121,22 +121,16 @@
             <el-table-column
               prop="employeeCode"
               label="Employee code"
-              width="150"
+              width="125"
             />
             <el-table-column
               prop="fullname"
               label="Full name"
-              width="200"
             />
             <el-table-column
               prop="totalSession"
               label="Total session"
-              width="120"
-            />
-            <el-table-column
-              prop="totalWarningSessions"
-              label="Warning session"
-              width="150"
+              width="110"
             />
             <el-table-column
               prop="totalWarningSessions"
@@ -151,6 +145,12 @@
             <el-table-column
               prop="note"
               label="Note"
+              width="120"
+            />
+            <el-table-column
+              prop="suspensionCount"
+              label="Suspension times"
+              width="140"
             />
           </el-table>
           <br>
@@ -334,9 +334,13 @@
     </el-dialog>
     <el-dialog title="Update Suspension for this Bank Teller account" :visible.sync="updateFormVisible">
       <el-form ref="updateSusForm" :model="updateSuspendForm" :rules="updateSuspendRules">
-        <el-form-item label="Reason for Update:" prop="reason">
+        <el-form-item
+          v-if="selectedEmployee && selectedEmployee.Suspensions && selectedEmployee.Suspensions[0]"
+          label="Reason:"
+          prop="reason"
+        >
           <el-input
-            v-model="updateSuspendForm.reason"
+            v-model="selectedEmployee.Suspensions[0].reason"
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4}"
           />
@@ -499,6 +503,7 @@ export default {
             reportList.forEach(e => {
               e.note = e.angrySessionPercent > this.angryPercentMax ? 'Need for action' : '-'
               e.angrySessionPercent = e.angrySessionPercent ? `${(e.angrySessionPercent * 100).toFixed(1)}%` : '-'
+              e.suspensionCount = e.Suspensions ? e.Suspensions.length : '-'
             })
             this.reportTableData = reportList
           }
