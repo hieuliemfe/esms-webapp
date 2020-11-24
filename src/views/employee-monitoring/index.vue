@@ -203,7 +203,7 @@
               <button
                 v-if="sessionList && sessionList.length > 0 && selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
                 class="actionBtn update"
-                @click="updateFormVisible = true"
+                @click="openUpdate"
               >
                 Update Suspension
               </button>
@@ -334,13 +334,9 @@
     </el-dialog>
     <el-dialog title="Update Suspension for this Bank Teller account" :visible.sync="updateFormVisible">
       <el-form ref="updateSusForm" :model="updateSuspendForm" :rules="updateSuspendRules">
-        <el-form-item
-          v-if="selectedEmployee && selectedEmployee.Suspensions && selectedEmployee.Suspensions[0]"
-          label="Reason:"
-          prop="reason"
-        >
+        <el-form-item label="Reason:" prop="reason">
           <el-input
-            v-model="selectedEmployee.Suspensions[0].reason"
+            v-model="updateSuspendForm.reason"
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4}"
           />
@@ -463,8 +459,9 @@ export default {
     selectedRange() {
       this.updateReport()
     },
-    selectedEmployee() {
+    selectedEmployee(value) {
       if (this.selectedEmployee.employeeCode) {
+        this.updateSuspendForm.reason = value.Suspensions && value.Suspensions[0] ? value.Suspensions[0].reason : null
         this.updateSessionList()
       }
     },
@@ -482,6 +479,9 @@ export default {
     this.getConfigurations()
   },
   methods: {
+    openUpdate() {
+      this.updateFormVisible = true
+    },
     updateReport() {
       if (this.selectedRange && this.selectedRange.length > 0) {
         this.isLoading = true
