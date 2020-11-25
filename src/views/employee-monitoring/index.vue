@@ -1618,6 +1618,7 @@ span.resultTextItem span {
   border: 2px solid #f388a0;
   border-radius: 10px;
   height: 100%;
+  max-width: 100%
 }
 
 .btnCloseEvi {
