@@ -6,7 +6,7 @@
       <div class="subline dec" />
     </div>
     <div class="sideBar">
-      <span class="appName">EsmsApp</span>
+      <span class="appName">EsmsManager</span>
       <div class="navigation">
         <div class="btnNav active noHover">
           <div class="iconBox">
@@ -64,6 +64,9 @@
           :editable="false"
           :clearable="false"
         />
+        <br>
+        <br>
+        <span class="reportNote"><span class="noteItem">*WS:</span> Warning Sessions - number of sessions recorded with angry warnings.</span>
         <div class="shiftList">
           <div
             v-for="employee in employeeList"
@@ -78,7 +81,7 @@
             <div class="shiftTail">
               <!-- <span class="startTime">{sh.shiftStart}</span> -->
               <span class="endTime">{{
-                `Warnings: ${employee.totalWarningSessions}`
+                `WS: ${employee.totalWarningSessions}`
               }}</span>
             </div>
           </div>
@@ -114,6 +117,9 @@
             </el-tag>
           </span>
           <br>
+          <span v-if="reportTableData" class="reportNote"><span class="noteItem">*Face-absences:</span> counting when camera cannot detect Bank Teller face for more than a minute due to leaving the working space or improper sitting posture.</span>
+          <br>
+          <br>
           <el-table
             v-if="reportTableData"
             :data="reportTableData"
@@ -121,8 +127,8 @@
           >
             <el-table-column
               prop="employeeCode"
-              label="Employee code"
-              width="125"
+              label="EmpCode"
+              width="90"
             />
             <el-table-column
               prop="fullname"
@@ -131,26 +137,31 @@
             <el-table-column
               prop="totalSession"
               label="Total session"
+              align="right"
               width="110"
             />
             <el-table-column
               prop="totalWarningSessions"
               label="Warning session"
-              width="150"
+              align="right"
+              width="140"
             />
             <el-table-column
               prop="angrySessionPercent"
-              label="Percentage of warning session"
-              width="250"
+              label="Warning session (%)"
+              align="right"
+              width="160"
             />
             <el-table-column
-              prop="note"
-              label="Note"
-              width="120"
+              prop="faceAbsenceCount"
+              label="Face-absences"
+              align="right"
+              width="140"
             />
             <el-table-column
               prop="suspensionCount"
-              label="Suspension times"
+              label="Suspensions"
+              align="right"
               width="140"
             />
           </el-table>
@@ -209,7 +220,7 @@
                 Update Suspension
               </button>
               <button
-                v-if="sessionList && sessionList.length > 0 && selectedEmployee.angrySessionPercent > angryPercentMax && !(selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0)"
+                v-if="isShowActionBtn && sessionList && sessionList.length > 0 && selectedEmployee.angrySessionPercent > angryPercentMax && !(selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0)"
                 class="actionBtn"
                 @click="dialogFormVisible = true"
               >
@@ -229,7 +240,7 @@
                   <div class="angryPeriodsInnerInner">
                     <div v-if="isShowEvi" class="angryPeriods">
                       <div
-                        v-for="(period, ind) in eviPeriods[periodEviName]"
+                        v-for="period in eviPeriods[periodEviName]"
                         :key="period.period_start"
                         class="periodItem"
                         @click="skipToPeriod(period.period_start)"
@@ -237,7 +248,7 @@
                         <div class="periodHead">
                           <i class="fas fa-history" />
                           <span class="periodName">
-                            {{ `P${fourDigits(ind + 1)}` }}
+                            {{ `P${fourDigits(period.no)}` }}
                           </span>
                         </div>
                         <div class="periodTail">
@@ -269,6 +280,7 @@
                 </div>
               </div>
             </div>
+            <span v-if="sessionList && sessionList.length > 0" class="reportNote sessionHistory"><span class="noteItem">*Angry Warnings:</span> Each minute, if more than 15 seconds of angry facial expression detected, an angry warning will be recorded.</span>
             <div class="sessionListWrapper">
               <div class="sessionList">
                 <div v-if="sessionList && sessionList.length > 0" class="sessionInner">
@@ -298,7 +310,7 @@
                         {{ `Duration: ${msToStr(session.sessionDuration)}` }}
                       </span>
                       <span class="stime">
-                        {{ `Warnings: ${session.angryWarningCount}` }}
+                        {{ `Angry Warnings: ${session.angryWarningCount}` }}
                       </span>
                     </div>
                   </div>
@@ -322,6 +334,7 @@
           <el-date-picker
             v-model="suspendForm.expiration"
             type="datetime"
+            format="dd/MM/yyyy HH:mm:ss"
             :editable="false"
             :clearable="false"
             :picker-options="suspendPickerOptions"
@@ -349,6 +362,7 @@
           <el-date-picker
             v-model="selectedEmployee.Suspensions[0].expiredOn"
             type="datetime"
+            format="dd/MM/yyyy HH:mm:ss"
             :readonly="true"
             :editable="false"
             :clearable="false"
@@ -358,6 +372,7 @@
           <el-date-picker
             v-model="updateSuspendForm.expiration"
             type="datetime"
+            format="dd/MM/yyyy HH:mm:ss"
             :editable="false"
             :clearable="false"
             :picker-options="updateSuspendPickerOptions"
@@ -396,6 +411,7 @@ export default {
       dialogFormVisible: false,
       updateFormVisible: false,
       selectedWeekDay: new Date(),
+      prevSelectedWeekDay: new Date(),
       selectedRange: null,
       reportTableData: null,
       periodEviName: null,
@@ -415,24 +431,25 @@ export default {
       },
       suspendRules: {
         expiration: [
-          { required: true, message: 'Please input an expiration time for this suspension', trigger: 'blur' }
+          { required: true, message: 'Please input an expiration time for this suspension', trigger: 'change' }
         ]
       },
       updateSuspendRules: {
         expiration: [
-          { required: true, message: 'Please input new expiration time', trigger: 'blur' }
+          { required: true, message: 'Please input new expiration time', trigger: 'change' }
         ]
       },
       weekPickerOptions: {
         firstDayOfWeek: 1,
         disabledDate: function(time) {
-          const currentDate = new Date()
-          currentDate.setHours(0)
-          currentDate.setMinutes(0)
-          currentDate.setSeconds(0)
-          currentDate.setMilliseconds(0)
-          currentDate.setTime(currentDate.getTime() + 24 * 60 * 60 * 1000)
-          return time.getTime() < this.minDate.getTime()
+          const nextWeekDay = new Date()
+          nextWeekDay.setHours(0)
+          nextWeekDay.setMinutes(0)
+          nextWeekDay.setSeconds(0)
+          nextWeekDay.setMilliseconds(0)
+          nextWeekDay.setTime(nextWeekDay.getTime() + (8 - nextWeekDay.getDay()) * 24 * 60 * 60 * 1000)
+          return time.getTime() < this.minDate.getTime() ||
+            time.getTime() >= nextWeekDay.getTime()
         }.bind(this)
       },
       suspendPickerOptions: {
@@ -464,7 +481,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['avatarUrl', 'fullname', 'token'])
+    ...mapGetters(['avatarUrl', 'fullname', 'token']),
+    isShowActionBtn() {
+      const startWeekDay = new Date()
+      startWeekDay.setHours(0)
+      startWeekDay.setMinutes(0)
+      startWeekDay.setSeconds(0)
+      startWeekDay.setMilliseconds(0)
+      startWeekDay.setTime(startWeekDay.getTime() - (startWeekDay.getDay() - 1) * 24 * 60 * 60 * 1000)
+      return this.prevSelectedWeekDay.getTime() >= startWeekDay.getTime()
+    }
   },
   watch: {
     selectedWeekDay() {
@@ -498,12 +524,14 @@ export default {
       getSessionMinDate()
         .then(response => {
           if (response.success) {
-            const mDate = new Date()
+            const mDate = new Date(response.message)
             mDate.setHours(0)
             mDate.setMinutes(0)
             mDate.setSeconds(0)
             mDate.setMilliseconds(0)
+            mDate.setTime(mDate.getTime() - (mDate.getDay() - 1) * 24 * 60 * 60 * 1000)
             this.minDate = mDate
+            console.log('mindate', this.minDate)
           }
         })
     },
@@ -529,9 +557,19 @@ export default {
           const reportList = response.message
           if (reportList) {
             reportList.forEach(e => {
-              e.note = e.angrySessionPercent > this.angryPercentMax ? 'Need for action' : '-'
+              const lastAction = e.Suspensions && e.Suspensions.length > 0
+                ? e.Suspensions[e.Suspensions.length - 1]
+                : null
+              e.note = e.angrySessionPercent > this.angryPercentMax
+                ? lastAction
+                  ? new Date(lastAction.expiredOn).getTime() > Date.now()
+                    ? e.Suspensions[e.Suspensions.length - 1].reason
+                    : ('Need for action' + ` (last action expired on ${this.twoDigits(new Date(lastAction.expiredOn).getDate())}/${this.twoDigits(new Date(lastAction.expiredOn).getMonth() + 1)}/${new Date(lastAction.expiredOn).getFullYear()} at ${this.twoDigits(new Date(lastAction.expiredOn).getHours())}:${this.twoDigits(new Date(lastAction.expiredOn).getMinutes())}:${this.twoDigits(new Date(lastAction.expiredOn).getSeconds())})`)
+                  : 'Need for action'
+                : '-'
               e.angrySessionPercent = e.angrySessionPercent ? `${(e.angrySessionPercent * 100).toFixed(1)}%` : '-'
               e.suspensionCount = e.Suspensions ? e.Suspensions.length : '-'
+              e.faceAbsenceCount = 0
             })
             this.reportTableData = reportList
           }
@@ -672,6 +710,7 @@ export default {
         this.employeeList = response.message
         const slEmp = this.employeeList.find(e => e.id === this.selectedEmployee.id)
         this.isLoading = false
+        this.prevSelectedWeekDay = new Date(this.selectedWeekDay)
         if (slEmp) {
           this.selectedEmployee = slEmp
         } else {
@@ -928,6 +967,20 @@ textarea {
   font-size: 20px;
   border-radius: 12px;
   box-shadow: none;
+}
+
+.reportNote {
+  font-size: 13px;
+  font-style: italic;
+  color: #909399;
+}
+
+.reportNote.sessionHistory {
+  padding: 10px 0 0 20px;
+}
+
+.noteItem {
+  font-weight: bold;
 }
 
 .btnNav:not(.freezed):not(.active):hover .iconBox {
@@ -1547,7 +1600,7 @@ span.footerTitle {
   display: block;
   font-size: 20px;
   font-weight: bold;
-  padding: 10px 0;
+  padding: 10px 0 10px 20px;
 }
 
 .resultWrapper {
