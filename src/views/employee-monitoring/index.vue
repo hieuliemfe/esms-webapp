@@ -762,7 +762,15 @@ export default {
                   .then(res => res.json())
                   .then(response3 => {
                     this.isLoading = false
-                    this.eviPeriods[eviName] = response3
+                    let arrPeriod = response3
+                    if (arrPeriod && arrPeriod.length > 0) {
+                      arrPeriod = arrPeriod.filter((e) => e.duration > 1000)
+                      arrPeriod.forEach((e, i) => {
+                        e.no = i + 1
+                      })
+                      arrPeriod = arrPeriod.sort((a, b) => b.duration - a.duration)
+                    }
+                    this.eviPeriods = { ...this.eviPeriods, ...{ [eviName]: arrPeriod }}
                     this.periodEviName = eviName
                     console.log(this.eviPeriods[this.periodEviName])
                   })
