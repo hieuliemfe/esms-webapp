@@ -403,32 +403,28 @@ export default {
   directives: { waves },
   data() {
     const validateSusExp = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('Please input an expiration time for this suspension'))
+      if (value.getTime() <= Date.now()) {
+        callback(new Error('Expiration time must be a future time.'))
+      } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
+        callback(new Error('Expiration time must be at least 15 minutes from now.'))
       } else {
-        if (value.getTime() <= Date.now()) {
-          callback(new Error('Expiration time must be a future time.'))
-        } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
-          callback(new Error('Expiration time must be at least 15 minutes from now.'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
     const validateUpdateSusExp = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('Please input new expiration time'))
+      const oldExp = this.selectedEmployee && this.selectedEmployee.Suspensions && this.selectedEmployee.Suspensions[0] ? new Date(this.selectedEmployee.Suspensions[0].expiredOn) : null
+      if (oldExp && oldExp.getTime() <= Date.now() + 15 * 60 * 1000) {
+        this.cancelUpdateSuspend()
+        this.selectedEmployee = JSON.parse(JSON.stringify(this.selectedEmployee))
+      }
+      if (value.getTime() <= Date.now()) {
+        callback(new Error('New Expiration time must be a future time.'))
+      } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
+        callback(new Error('New Expiration time must be at least 15 minutes from now.'))
+      } else if (oldExp && value.getTime() > oldExp.getTime()) {
+        callback(new Error('New Expiration time must be sooner than the current one.'))
       } else {
-        const oldExp = this.selectedEmployee && this.selectedEmployee.Suspensions && this.selectedEmployee.Suspensions[0] ? new Date(this.selectedEmployee.Suspensions[0].expiredOn) : null
-        if (value.getTime() <= Date.now()) {
-          callback(new Error('New Expiration time must be a future time.'))
-        } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
-          callback(new Error('New Expiration time must be at least 15 minutes from now.'))
-        } else if (oldExp && value.getTime() >= oldExp.getTime()) {
-          callback(new Error('New Expiration time must be sooner than the current one.'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
     return {
@@ -463,11 +459,13 @@ export default {
       },
       suspendRules: {
         expiration: [
+          { type: 'date', required: true, message: 'Please input an expiration time for this suspension', trigger: 'change' },
           { validator: validateSusExp, trigger: 'change' }
         ]
       },
       updateSuspendRules: {
         expiration: [
+          { type: 'date', required: true, message: 'Please input new expiration time for this suspension', trigger: 'change' },
           { validator: validateUpdateSusExp, trigger: 'change' }
         ]
       },
@@ -606,16 +604,6 @@ export default {
           const reportList = response.message
           if (reportList) {
             reportList.forEach(e => {
-              const lastAction = e.Suspensions && e.Suspensions.length > 0
-                ? e.Suspensions[e.Suspensions.length - 1]
-                : null
-              e.note = e.angrySessionPercent > this.angryPercentMax
-                ? lastAction
-                  ? new Date(lastAction.expiredOn).getTime() > Date.now()
-                    ? e.Suspensions[e.Suspensions.length - 1].reason
-                    : ('Need for action' + ` (last action expired on ${this.twoDigits(new Date(lastAction.expiredOn).getDate())}/${this.twoDigits(new Date(lastAction.expiredOn).getMonth() + 1)}/${new Date(lastAction.expiredOn).getFullYear()} at ${this.twoDigits(new Date(lastAction.expiredOn).getHours())}:${this.twoDigits(new Date(lastAction.expiredOn).getMinutes())}:${this.twoDigits(new Date(lastAction.expiredOn).getSeconds())})`)
-                  : 'Need for action'
-                : '-'
               e.angrySessionPercent = e.angrySessionPercent ? `${(e.angrySessionPercent * 100).toFixed(1)}%` : '-'
               e.suspensionCount = e.Suspensions ? e.Suspensions.length : '-'
               e.faceAbsenceCount = 0
