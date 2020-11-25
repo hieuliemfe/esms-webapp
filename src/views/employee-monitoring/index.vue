@@ -102,6 +102,7 @@
             end-placeholder="End date"
             :editable="false"
             :clearable="false"
+            :picker-options="reportPickerOptions"
           />
           <br>
           <span
@@ -215,9 +216,10 @@
               <button
                 v-if="sessionList && sessionList.length > 0 && selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
                 class="actionBtn update"
+                :disabled="!isShowUpdateSus"
                 @click="openUpdate"
               >
-                Update Suspension
+                {{ isShowUpdateSus ? 'Update Suspension' : 'Expire within 15 minutes' }}
               </button>
               <button
                 v-if="isShowActionBtn && sessionList && sessionList.length > 0 && selectedEmployee.angrySessionPercent > angryPercentMax && !(selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0)"
@@ -400,6 +402,35 @@ export default {
   // components: { WarningList, ActionSuggest, ReportEmotion, FilterContainer },
   directives: { waves },
   data() {
+    const validateSusExp = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('Please input an expiration time for this suspension'))
+      } else {
+        if (value.getTime() <= Date.now()) {
+          callback(new Error('Expiration time must be a future time.'))
+        } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
+          callback(new Error('Expiration time must be at least 15 minutes from now.'))
+        } else {
+          callback()
+        }
+      }
+    }
+    const validateUpdateSusExp = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('Please input new expiration time'))
+      } else {
+        const oldExp = this.selectedEmployee && this.selectedEmployee.Suspensions && this.selectedEmployee.Suspensions[0] ? new Date(this.selectedEmployee.Suspensions[0].expiredOn) : null
+        if (value.getTime() <= Date.now()) {
+          callback(new Error('New Expiration time must be a future time.'))
+        } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
+          callback(new Error('New Expiration time must be at least 15 minutes from now.'))
+        } else if (oldExp && value.getTime() >= oldExp.getTime()) {
+          callback(new Error('New Expiration time must be sooner than the current one.'))
+        } else {
+          callback()
+        }
+      }
+    }
     return {
       logo: esmsLogo,
       isLoading: false,
@@ -421,6 +452,7 @@ export default {
       minDate: new Date(0),
       sessionList: [],
       angryPercentMax: 1,
+      isShowUpdateSus: true,
       suspendForm: {
         reason: null,
         expiration: null
@@ -431,28 +463,44 @@ export default {
       },
       suspendRules: {
         expiration: [
-          { required: true, message: 'Please input an expiration time for this suspension', trigger: 'change' }
+          { validator: validateSusExp, trigger: 'change' }
         ]
       },
       updateSuspendRules: {
         expiration: [
-          { required: true, message: 'Please input new expiration time', trigger: 'change' }
+          { validator: validateUpdateSusExp, trigger: 'change' }
         ]
+      },
+      reportPickerOptions: {
+        firstDayOfWeek: 1,
+        disabledDate: function(time) {
+          const tomorrow = new Date()
+          tomorrow.setHours(0)
+          tomorrow.setMinutes(0)
+          tomorrow.setSeconds(0)
+          tomorrow.setMilliseconds(0)
+          tomorrow.setTime(tomorrow.getTime() + 24 * 60 * 60 * 1000)
+          return time.getTime() < this.minDate.getTime() ||
+            time.getTime() >= tomorrow.getTime()
+        }.bind(this)
       },
       weekPickerOptions: {
         firstDayOfWeek: 1,
         disabledDate: function(time) {
+          const mDate = new Date(this.minDate)
+          mDate.setTime(mDate.getTime() - (mDate.getDay() - 1) * 24 * 60 * 60 * 1000)
           const nextWeekDay = new Date()
           nextWeekDay.setHours(0)
           nextWeekDay.setMinutes(0)
           nextWeekDay.setSeconds(0)
           nextWeekDay.setMilliseconds(0)
           nextWeekDay.setTime(nextWeekDay.getTime() + (8 - nextWeekDay.getDay()) * 24 * 60 * 60 * 1000)
-          return time.getTime() < this.minDate.getTime() ||
+          return time.getTime() < mDate.getTime() ||
             time.getTime() >= nextWeekDay.getTime()
         }.bind(this)
       },
       suspendPickerOptions: {
+        firstDayOfWeek: 1,
         disabledDate(time) {
           const currentDate = new Date()
           currentDate.setHours(0)
@@ -463,6 +511,7 @@ export default {
         }
       },
       updateSuspendPickerOptions: {
+        firstDayOfWeek: 1,
         disabledDate: function(time) {
           const currentDate = new Date()
           currentDate.setHours(0)
@@ -500,7 +549,8 @@ export default {
       this.updateReport()
     },
     selectedEmployee(value) {
-      if (this.selectedEmployee.employeeCode) {
+      if (value && value.employeeCode) {
+        this.isShowUpdateSus = value.Suspensions && value.Suspensions[0] && (new Date(value.Suspensions[0].expiredOn).getTime() > Date.now() + 15 * 60 * 1000)
         this.updateSuspendForm.reason = value.Suspensions && value.Suspensions[0] ? value.Suspensions[0].reason : null
         this.updateSessionList()
       }
@@ -529,7 +579,6 @@ export default {
             mDate.setMinutes(0)
             mDate.setSeconds(0)
             mDate.setMilliseconds(0)
-            mDate.setTime(mDate.getTime() - (mDate.getDay() - 1) * 24 * 60 * 60 * 1000)
             this.minDate = mDate
             console.log('mindate', this.minDate)
           }
