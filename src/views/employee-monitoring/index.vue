@@ -432,7 +432,7 @@ export default {
           currentDate.setSeconds(0)
           currentDate.setMilliseconds(0)
           currentDate.setTime(currentDate.getTime() + 24 * 60 * 60 * 1000)
-          return time.getTime() < this.minDate
+          return time.getTime() < this.minDate.getTime()
         }.bind(this)
       },
       suspendPickerOptions: {
