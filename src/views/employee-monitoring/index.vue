@@ -53,7 +53,7 @@
     </div>
     <div v-if="!isShowReport" :class="{ shiftListWrapper: true, show: isShowemployeeList }">
       <div class="shiftListInner">
-        <span class="shiftListTitle">Bank Teller List</span>
+        <span class="shiftListTitle">Warning Bank Tellers</span>
         <br>
         <el-date-picker
           v-model="selectedWeekDay"
@@ -124,6 +124,7 @@
           <el-table
             v-if="reportTableData"
             :data="reportTableData"
+            :height="'calc(100vh - 368px)'"
             style="width: 100%"
           >
             <el-table-column
@@ -154,7 +155,7 @@
               width="160"
             />
             <el-table-column
-              prop="faceAbsenceCount"
+              prop="totalFaceAbscences"
               label="Face-absences"
               align="right"
               width="140"
@@ -205,7 +206,7 @@
         <div class="footerInner">
           <div class="resultWrapper">
             <div class="resultTextWrapper">
-              <span class="footerTitle">Bank Teller Session History</span>
+              <span class="footerTitle">Bank Teller Warning Sessions</span>
               <button
                 v-if="sessionList && sessionList.length > 0 && selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
                 class="actionBtn"
@@ -282,7 +283,7 @@
                 </div>
               </div>
             </div>
-            <span v-if="sessionList && sessionList.length > 0" class="reportNote sessionHistory"><span class="noteItem">*Angry Warnings:</span> Each minute, if more than 15 seconds of angry facial expression detected, an angry warning will be recorded.</span>
+            <span v-if="!isShowEvi && sessionList && sessionList.length > 0" class="reportNote sessionHistory"><span class="noteItem">*Angry Warnings:</span> Each minute, if more than 15 seconds of angry facial expression detected, an angry warning will be recorded.</span>
             <div class="sessionListWrapper">
               <div class="sessionList">
                 <div v-if="sessionList && sessionList.length > 0" class="sessionInner">
@@ -606,7 +607,6 @@ export default {
             reportList.forEach(e => {
               e.angrySessionPercent = e.angrySessionPercent ? `${(e.angrySessionPercent * 100).toFixed(1)}%` : '-'
               e.suspensionCount = e.Suspensions ? e.Suspensions.length : '-'
-              e.faceAbsenceCount = 0
             })
             this.reportTableData = reportList
           }
@@ -946,7 +946,6 @@ textarea {
   align-items: center;
   margin-top: 20px;
   font-weight: normal;
-  padding-left: 10px;
 }
 
 .acceptable .el-tag {
@@ -1138,9 +1137,10 @@ textarea {
   position: absolute;
   top: 0;
   right: 0;
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 25vw;
-  padding: 50px 0 0 50px;
+  padding: 50px 0 50px 50px;
   height: 100%;
   overflow: hidden;
 }
@@ -1152,7 +1152,10 @@ textarea {
 }
 
 .shiftList {
+  flex: auto;
   display: flex;
+  height: 0;
+  overflow: auto;
   padding-top: 20px;
   flex-direction: column;
   align-items: center;
