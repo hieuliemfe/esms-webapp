@@ -139,9 +139,6 @@ export default {
             .catch(() => {
               this.loading = false
             })
-        } else {
-          console.log('Login Error!!')
-          return false
         }
       })
     },

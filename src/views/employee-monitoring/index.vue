@@ -104,6 +104,25 @@
             :clearable="false"
             :picker-options="reportPickerOptions"
           />
+          <el-autocomplete
+            v-model="searchBT"
+            :clearable="true"
+            :fetch-suggestions="querySearch"
+            :trigger-on-focus="false"
+            placeholder="Search for a Bank Teller"
+            style="width: 300px"
+            @change="handleChange"
+            @select="handleSelect"
+          >
+            <i
+              slot="suffix"
+              class="el-icon-user el-input__icon"
+            />
+            <template slot-scope="{ item }">
+              <span>{{ item.employeeCode }}</span>
+              <span> - {{ item.fullname }}</span>
+            </template>
+          </el-autocomplete>
           <br>
           <span
             v-if="reportTableData"
@@ -183,6 +202,22 @@
             @click="downloadReport('xlsx')"
           >
             Export to Excel
+          </el-button>
+          <el-button
+            v-if="reportTableData && selectedBT && selectedBT.employeeCode"
+            type="warning"
+            icon="el-icon-message"
+            @click="sendWarningEmail()"
+          >
+            Send Warning Email
+          </el-button>
+          <el-button
+            v-if="reportTableData && selectedBT && selectedBT.employeeCode"
+            type="secondary"
+            icon="el-icon-postcard"
+            @click="appointmentFormVisible = true"
+          >
+            Make An Appointment
           </el-button>
         </div>
       </div>
@@ -324,6 +359,31 @@
         </div>
       </div>
     </div>
+    <el-dialog title="Make an appointment" :visible.sync="appointmentFormVisible">
+      <el-form ref="appointForm" :model="appointmentForm" :rules="appointmentRules">
+        <el-form-item label="Bank Teller:">
+          <el-input
+            :value="selectedBT ? selectedBT.employeeCode + ' - ' + selectedBT.fullname : ''"
+            :readonly="true"
+            style="width: 300px"
+          />
+        </el-form-item>
+        <el-form-item label="Appointment time:" prop="datetime">
+          <el-date-picker
+            v-model="appointmentForm.datetime"
+            type="datetime"
+            format="dd/MM/yyyy HH:mm:ss"
+            :editable="false"
+            :clearable="false"
+            :picker-options="appointmentPickerOptions"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelAppointment()">Cancel</el-button>
+        <el-button type="primary" icon="el-icon-message" @click="sendAppointmentEmail()">Send Appointment Email</el-button>
+      </span>
+    </el-dialog>
     <el-dialog title="Suspend this Bank Teller account" :visible.sync="dialogFormVisible">
       <el-form ref="susForm" :model="suspendForm" :rules="suspendRules">
         <el-form-item label="Reason:" prop="reason">
@@ -394,15 +454,23 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate } from '@/api/employees'
+import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate, emailAction } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
+import { Message } from 'element-ui'
 export default {
   name: 'TakeCareEmployee',
   // components: { WarningList, ActionSuggest, ReportEmotion, FilterContainer },
   directives: { waves },
   data() {
+    const validateAppDate = (rule, value, callback) => {
+      if (value.getTime() <= Date.now()) {
+        callback(new Error('Appointment time must be a future time.'))
+      } else {
+        callback()
+      }
+    }
     const validateSusExp = (rule, value, callback) => {
       if (value.getTime() <= Date.now()) {
         callback(new Error('Expiration time must be a future time.'))
@@ -440,7 +508,7 @@ export default {
       updateFormVisible: false,
       selectedWeekDay: new Date(),
       prevSelectedWeekDay: new Date(),
-      selectedRange: null,
+      selectedRange: [new Date(), new Date()],
       reportTableData: null,
       periodEviName: null,
       videoEviName: null,
@@ -525,6 +593,29 @@ export default {
             time.getTime() > new Date(this.selectedEmployee.Suspensions[0].expiredOn).getTime()
           )
         }.bind(this)
+      },
+      searchBT: '',
+      selectedBT: null,
+      appointmentFormVisible: false,
+      appointmentForm: {
+        datetime: null
+      },
+      appointmentRules: {
+        datetime: [
+          { type: 'date', required: true, message: 'Please input a specific time for the appointment', trigger: 'change' },
+          { validator: validateAppDate, trigger: 'change' }
+        ]
+      },
+      appointmentPickerOptions: {
+        firstDayOfWeek: 1,
+        disabledDate(time) {
+          const currentDate = new Date()
+          currentDate.setHours(0)
+          currentDate.setMinutes(0)
+          currentDate.setSeconds(0)
+          currentDate.setMilliseconds(0)
+          return time.getTime() < currentDate.getTime()
+        }
       }
     }
   },
@@ -554,6 +645,9 @@ export default {
         this.updateSessionList()
       }
     },
+    selectedBT() {
+      this.updateReport()
+    },
     videoEviName() {
       const videoRef = this.$refs.videoRef
       if (videoRef) {
@@ -567,8 +661,37 @@ export default {
     this.getMin()
     this.getList()
     this.getConfigurations()
+    this.updateReport()
   },
   methods: {
+    querySearch(queryString, cb) {
+      const list = this.reportTableData || []
+      const results = queryString ? list.filter(this.createFilter(queryString)) : list
+      if (results) {
+        results.forEach(e => {
+          e.value = e.employeeCode + ' - ' + e.fullname
+          return e
+        })
+      }
+      // call callback function to return suggestion objects
+      cb(results)
+    },
+    createFilter(queryString) {
+      return (bt) => {
+        return bt.fullname.toLowerCase().indexOf(queryString.toLowerCase()) >= 0 ||
+          bt.employeeCode.toLowerCase().indexOf(queryString.toLowerCase()) >= 0 ||
+          queryString.toLowerCase().indexOf(bt.fullname.toLowerCase()) >= 0 ||
+          queryString.toLowerCase().indexOf(bt.employeeCode.toLowerCase()) >= 0
+      }
+    },
+    handleSelect(item) {
+      this.selectedBT = item
+    },
+    handleChange(value) {
+      if (!value) {
+        this.selectedBT = null
+      }
+    },
     getMin() {
       getSessionMinDate()
         .then(response => {
@@ -600,7 +723,13 @@ export default {
         selectedEnd.setSeconds(0)
         selectedEnd.setMilliseconds(0)
         selectedEnd.setTime(selectedEnd.getTime() + 24 * 60 * 60 * 1000)
-        return getReport({ type: 'json', startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() }).then(response => {
+        const queryData = { type: 'json', startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() }
+        if (this.selectedBT) {
+          if (this.selectedBT.employeeCode) {
+            queryData.employeeCode = this.selectedBT.employeeCode
+          }
+        }
+        return getReport(queryData).then(response => {
           this.isLoading = false
           const reportList = response.message
           if (reportList) {
@@ -632,6 +761,11 @@ export default {
             .map((e) => e.join('='))
             .join('&')
         const queryData = { type: exportType, startDate: selectedStart.toJSON(), endDate: selectedEnd.toJSON() }
+        if (this.selectedBT) {
+          if (this.selectedBT.employeeCode) {
+            queryData.employeeCode = this.selectedBT.employeeCode
+          }
+        }
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${this.token}`)
         fetch(
@@ -650,6 +784,26 @@ export default {
           })
       }
     },
+    sendWarningEmail() {
+      if (this.selectedBT) {
+        if (this.selectedBT.employeeCode) {
+          const btCode = this.selectedBT.employeeCode
+          const emailData = { employeeCode: btCode, type: 'cheering' }
+          this.isLoading = true
+          emailAction(emailData)
+            .then(res => {
+              if (res.success) {
+                this.isLoading = false
+                Message({
+                  message: 'Warning Email is successfully sent!',
+                  type: 'success',
+                  duration: 3 * 1000
+                })
+              }
+            })
+        }
+      }
+    },
     getConfigurations() {
       getConfigs().then(response => {
         if (response.success) {
@@ -661,17 +815,49 @@ export default {
         }
       })
     },
+    cancelAppointment() {
+      const form = this.$refs.appointForm
+      form.resetFields()
+      this.appointmentFormVisible = false
+    },
     cancelSuspend() {
       const form = this.$refs.susForm
       form.resetFields()
-      console.log('hello cancel')
       this.dialogFormVisible = false
     },
     cancelUpdateSuspend() {
       const form = this.$refs.updateSusForm
       form.resetFields()
-      console.log('hello cancel')
       this.updateFormVisible = false
+    },
+    sendAppointmentEmail() {
+      const form = this.$refs.appointForm
+      form.validate(valid => {
+        if (valid) {
+          if (this.selectedBT) {
+            if (this.selectedBT.employeeCode) {
+              const btCode = this.selectedBT.employeeCode
+              const emailData = { employeeCode: btCode, type: 'appointment', date: form.model.datetime }
+              this.appointmentFormVisible = false
+              form.resetFields()
+              this.isLoading = true
+              emailAction(emailData)
+                .then(res => {
+                  if (res.success) {
+                    this.isLoading = false
+                    Message({
+                      message: 'Appoitment Email is successfully sent!',
+                      type: 'success',
+                      duration: 3 * 1000
+                    })
+                  }
+                })
+            }
+          }
+        } else {
+          return false
+        }
+      })
     },
     submitSuspend() {
       const form = this.$refs.susForm
@@ -683,6 +869,24 @@ export default {
             this.dialogFormVisible = false
             form.resetFields()
             this.isLoading = false
+            if (this.selectedBT) {
+              if (this.selectedBT.employeeCode) {
+                const btCode = this.selectedBT.employeeCode
+                const emailData = { employeeCode: btCode, type: 'suspension', date: form.model.expiration }
+                this.isLoading = true
+                emailAction(emailData)
+                  .then(res => {
+                    if (res.success) {
+                      this.isLoading = false
+                      Message({
+                        message: 'Suspension Email is successfully sent!',
+                        type: 'success',
+                        duration: 3 * 1000
+                      })
+                    }
+                  })
+              }
+            }
             this.updateEmployeeList().then(() => {
               this.selectedEmployee = this.employeeList.find(e => e.id === this.selectedEmployee.id)
             })

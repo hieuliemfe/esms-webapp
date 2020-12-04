@@ -1,5 +1,6 @@
 import { login, getProfile } from '@/api/root'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { Message } from 'element-ui'
 
 const state = {
   token: getToken(),
@@ -42,10 +43,25 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ employeeCode: employeeCode, password: password }).then(response => {
         const data = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
+        const role = data.message.roleName
+        if (role !== 'Manager') {
+          Message({
+            message: 'Your account do not have permission to access this website',
+            type: 'error',
+            duration: 5 * 1000
+          })
+          reject()
+        } else {
+          commit('SET_TOKEN', data.token)
+          setToken(data.token)
+          resolve()
+        }
       }).catch(error => {
+        Message({
+          message: 'Invalid Employee Code or Password!',
+          type: 'error',
+          duration: 5 * 1000
+        })
         reject(error)
       })
     })

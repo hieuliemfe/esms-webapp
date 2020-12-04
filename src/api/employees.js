@@ -60,3 +60,10 @@ export function getSessionMinDate() {
     method: 'get'
   })
 }
+export function emailAction(body) {
+  return request({
+    url: `/emails/action`,
+    method: 'post',
+    data: body
+  })
+}
