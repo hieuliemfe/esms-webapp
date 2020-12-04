@@ -1003,8 +1003,6 @@ export default {
         this.isShowReport = true
       } else {
         this.isShowReport = false
-        this.selectedRange = null
-        this.reportTableData = null
       }
     },
     async logout() {
