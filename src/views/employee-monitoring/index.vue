@@ -883,7 +883,15 @@ export default {
                       })
                     }
                   })
+              } else {
+                this.isLoading = false
+                this.dialogFormVisible = false
+                form.resetFields()
               }
+            } else {
+              this.isLoading = false
+              this.dialogFormVisible = false
+              form.resetFields()
             }
             this.updateEmployeeList().then(() => {
               this.selectedEmployee = this.employeeList.find(e => e.id === this.selectedEmployee.id)
