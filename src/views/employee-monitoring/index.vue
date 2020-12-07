@@ -866,9 +866,9 @@ export default {
           this.isLoading = true
           suspendEmployee(this.selectedEmployee.employeeCode, form.model).then(response => {
             console.log(response)
-            if (this.selectedBT) {
-              if (this.selectedBT.employeeCode) {
-                const btCode = this.selectedBT.employeeCode
+            if (this.selectedEmployee) {
+              if (this.selectedEmployee.employeeCode) {
+                const btCode = this.selectedEmployee.employeeCode
                 const emailData = { employeeCode: btCode, type: 'suspension', date: form.model.expiration }
                 emailAction(emailData)
                   .then(res => {
