@@ -866,18 +866,16 @@ export default {
           this.isLoading = true
           suspendEmployee(this.selectedEmployee.employeeCode, form.model).then(response => {
             console.log(response)
-            this.dialogFormVisible = false
-            form.resetFields()
-            this.isLoading = false
             if (this.selectedBT) {
               if (this.selectedBT.employeeCode) {
                 const btCode = this.selectedBT.employeeCode
                 const emailData = { employeeCode: btCode, type: 'suspension', date: form.model.expiration }
-                this.isLoading = true
                 emailAction(emailData)
                   .then(res => {
                     if (res.success) {
                       this.isLoading = false
+                      this.dialogFormVisible = false
+                      form.resetFields()
                       Message({
                         message: 'Suspension Email is successfully sent!',
                         type: 'success',
