@@ -359,7 +359,7 @@
         </div>
       </div>
     </div>
-    <el-dialog title="Make an appointment" :visible.sync="appointmentFormVisible">
+    <el-dialog title="Make an Appointment" :visible.sync="appointmentFormVisible">
       <el-form ref="appointForm" :model="appointmentForm" :rules="appointmentRules">
         <el-form-item label="Bank Teller:">
           <el-input
