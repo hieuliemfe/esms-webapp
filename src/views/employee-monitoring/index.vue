@@ -217,7 +217,7 @@
             icon="el-icon-postcard"
             @click="appointmentFormVisible = true"
           >
-            Make An Appointment
+            Make an Appointment
           </el-button>
         </div>
       </div>
