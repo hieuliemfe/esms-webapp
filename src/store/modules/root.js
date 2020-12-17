@@ -9,7 +9,8 @@ const state = {
   employeeCode: '',
   roles: [],
   password: '',
-  email: ''
+  email: '',
+  profile: null
 }
 
 const mutations = {
@@ -33,6 +34,9 @@ const mutations = {
   },
   SET_PASSWORD: (state, password) => {
     state.password = password
+  },
+  SET_PROFILE: (state, profile) => {
+    state.profile = profile
   }
 }
 
@@ -96,6 +100,13 @@ const actions = {
         if (!data.Role.roleName || data.Role.roleName.length <= 0) {
           reject('getProfile: roles must be a non-null array!')
         }
+
+        if (data.appointments) {
+          data.appointments = JSON.parse(data.appointments)
+          console.log(data)
+        }
+
+        commit('SET_PROFILE', data)
         commit('SET_NAME', data.fullname)
         commit('SET_ROLES', [data.Role.roleName])
         commit('SET_AVATAR', data.avatarUrl)

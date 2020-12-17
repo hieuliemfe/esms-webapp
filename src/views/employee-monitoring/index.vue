@@ -378,6 +378,8 @@
             :picker-options="appointmentPickerOptions"
           />
         </el-form-item>
+        <el-tag v-if="dupApp === 0" type="warning">You have another appointment at this time. Confirm to make this appointment?</el-tag>
+        <el-tag v-if="dupApp > 0 && dupApp <= 900000" type="warning">You have another appointment which is about 15 minutes near by this time. Confirm to make this appointment?</el-tag>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancelAppointment()">Cancel</el-button>
@@ -447,6 +449,16 @@
         <el-button type="primary" @click="submitUpdateSuspend()">Confirm</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="Confirm sending Warning Email"
+      :visible.sync="confirmSusVisible"
+    >
+      <span>You have sent Warning Email to this bank teller before. Confirm resent email?</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="confirmSusVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="sendWarningEmail(true)">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -454,7 +466,7 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate, emailAction } from '@/api/employees'
+import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate, emailAction, addAppointment } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
@@ -468,6 +480,19 @@ export default {
       if (value.getTime() <= Date.now()) {
         callback(new Error('Appointment time must be a future time.'))
       } else {
+        if (this.profile.appointments) {
+          this.profile.appointments.forEach((a, i) => {
+            const d = new Date(a)
+            if (i === 0) {
+              this.dupApp = Math.abs(value.getTime() - d.getTime())
+            } else {
+              const dis = Math.abs(value.getTime() - d.getTime())
+              if (dis < this.dupApp) {
+                this.dupApp = dis
+              }
+            }
+          })
+        }
         callback()
       }
     }
@@ -518,6 +543,9 @@ export default {
       sessionList: [],
       angryPercentMax: 1,
       isShowUpdateSus: true,
+      dupApp: 1000000,
+      dupWarn: new Set(),
+      confirmSusVisible: false,
       suspendForm: {
         reason: null,
         expiration: null
@@ -620,7 +648,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['avatarUrl', 'fullname', 'token']),
+    ...mapGetters(['avatarUrl', 'fullname', 'token', 'profile']),
     isShowActionBtn() {
       const startWeekDay = new Date()
       startWeekDay.setHours(0)
@@ -784,23 +812,29 @@ export default {
           })
       }
     },
-    sendWarningEmail() {
+    sendWarningEmail(confirm) {
       if (this.selectedBT) {
         if (this.selectedBT.employeeCode) {
           const btCode = this.selectedBT.employeeCode
-          const emailData = { employeeCode: btCode, type: 'cheering' }
-          this.isLoading = true
-          emailAction(emailData)
-            .then(res => {
-              if (res.success) {
-                this.isLoading = false
-                Message({
-                  message: 'Warning Email is successfully sent!',
-                  type: 'success',
-                  duration: 3 * 1000
-                })
-              }
-            })
+          if (!confirm && this.dupWarn.has(btCode)) {
+            this.confirmSusVisible = true
+          } else {
+            const emailData = { employeeCode: btCode, type: 'cheering' }
+            this.confirmSusVisible = false
+            this.isLoading = true
+            emailAction(emailData)
+              .then(res => {
+                if (res.success) {
+                  this.isLoading = false
+                  this.dupWarn.add(btCode)
+                  Message({
+                    message: 'Warning Email is successfully sent!',
+                    type: 'success',
+                    duration: 3 * 1000
+                  })
+                }
+              })
+          }
         }
       }
     },
@@ -837,7 +871,8 @@ export default {
           if (this.selectedBT) {
             if (this.selectedBT.employeeCode) {
               const btCode = this.selectedBT.employeeCode
-              const emailData = { employeeCode: btCode, type: 'appointment', date: form.model.datetime }
+              const appointmentDate = form.model.datetime
+              const emailData = { employeeCode: btCode, type: 'appointment', date: appointmentDate }
               this.appointmentFormVisible = false
               form.resetFields()
               this.isLoading = true
@@ -845,6 +880,11 @@ export default {
                 .then(res => {
                   if (res.success) {
                     this.isLoading = false
+                    const appointmentInfo = { appointmentTime: appointmentDate.toJSON(), bankTellerCode: btCode, managerCode: this.profile.employeeCode }
+                    addAppointment(appointmentInfo)
+                      .then(() => {
+                        this.$store.dispatch('root/getProfile')
+                      })
                     Message({
                       message: 'Appoitment Email is successfully sent!',
                       type: 'success',

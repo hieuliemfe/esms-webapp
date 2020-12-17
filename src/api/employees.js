@@ -67,3 +67,10 @@ export function emailAction(body) {
     data: body
   })
 }
+export function addAppointment(query) {
+  return request({
+    url: `/employees/add-appointment`,
+    method: 'put',
+    params: query
+  })
+}
