@@ -66,7 +66,7 @@
         />
         <br>
         <br>
-        <span class="reportNote"><span class="noteItem">*WS:</span> Warning Sessions - number of sessions recorded with angry warnings.</span>
+        <span v-if="employeeList && employeeList.length > 0" class="reportNote"><span class="noteItem">*WP:</span> Warning Pecentage - percentage of sessions recorded with angry warnings over total sessions.</span>
         <div class="shiftList">
           <div
             v-for="employee in employeeList"
@@ -80,9 +80,13 @@
             </div>
             <div class="shiftTail">
               <!-- <span class="startTime">{sh.shiftStart}</span> -->
-              <span class="endTime">{{
-                `WS: ${employee.totalWarningSessions}`
-              }}</span>
+              <span class="endTime" style="text-align: right;">
+                <span>{{
+                  `WP: ${(employee.angrySessionPercent * 100).toFixed(0)}%`
+                }}</span>
+                <br>
+                <span>{{ `(${employee.totalWarningSessions}/${employee.totalSession})` }}</span>
+              </span>
             </div>
           </div>
         </div>
