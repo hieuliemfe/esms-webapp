@@ -74,3 +74,9 @@ export function addAppointment(query) {
     params: query
   })
 }
+export function getShifts() {
+  return request({
+    url: `/shifts`,
+    method: 'get'
+  })
+}

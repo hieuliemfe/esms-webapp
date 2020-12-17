@@ -247,7 +247,7 @@
                 class="actionBtn"
                 :disabled="true"
               >
-                Currently in Suspension
+                Suspended
               </button>
               <button
                 v-if="sessionList && sessionList.length > 0 && selectedEmployee.Suspensions && selectedEmployee.Suspensions.length > 0"
@@ -360,23 +360,29 @@
       </div>
     </div>
     <el-dialog title="Make an Appointment" :visible.sync="appointmentFormVisible">
-      <el-form ref="appointForm" :model="appointmentForm" :rules="appointmentRules">
+      <el-form ref="appointForm" :model="appointmentForm" :rules="appointmentRules" :label-position="'top'">
         <el-form-item label="Bank Teller:">
-          <el-input
-            :value="selectedBT ? selectedBT.employeeCode + ' - ' + selectedBT.fullname : ''"
-            :readonly="true"
-            style="width: 300px"
-          />
+          <el-col :span="24">
+            <el-input
+              :value="selectedBT ? selectedBT.employeeCode + ' - ' + selectedBT.fullname : ''"
+              :readonly="true"
+              style="width: 100%"
+            />
+          </el-col>
         </el-form-item>
         <el-form-item label="Appointment time:" prop="datetime">
-          <el-date-picker
-            v-model="appointmentForm.datetime"
-            type="datetime"
-            format="dd/MM/yyyy HH:mm:ss"
-            :editable="false"
-            :clearable="false"
-            :picker-options="appointmentPickerOptions"
-          />
+          <el-col :span="8">
+            <el-date-picker
+              v-model="appointmentForm.datetime"
+              type="datetime"
+              format="dd/MM/yyyy HH:mm:ss"
+              placeholder="Pick a time"
+              style="width: 100%"
+              :editable="false"
+              :clearable="false"
+              :picker-options="appointmentPickerOptions"
+            />
+          </el-col>
         </el-form-item>
         <el-tag v-if="dupApp === 0" type="warning">You have another appointment at this time. Confirm to make this appointment?</el-tag>
         <el-tag v-if="dupApp > 0 && dupApp <= 900000" type="warning">You have another appointment which is about 15 minutes near by this time. Confirm to make this appointment?</el-tag>
@@ -387,7 +393,7 @@
       </span>
     </el-dialog>
     <el-dialog title="Suspend this Bank Teller account" :visible.sync="dialogFormVisible">
-      <el-form ref="susForm" :model="suspendForm" :rules="suspendRules">
+      <el-form ref="susForm" :model="suspendForm" :rules="suspendRules" :label-position="'top'">
         <el-form-item label="Reason:" prop="reason">
           <el-input
             v-model="suspendForm.reason"
@@ -395,15 +401,75 @@
             :autosize="{ minRows: 2, maxRows: 4}"
           />
         </el-form-item>
+        <el-form-item label="Starts at:" prop="start">
+          <el-col :span="8">
+            <el-date-picker
+              v-model="suspendForm.start"
+              type="date"
+              format="dd/MM/yyyy"
+              placeholder="Pick a date"
+              style="width: 100%;"
+              :editable="false"
+              :clearable="false"
+              :picker-options="suspendPickerOptions"
+            />
+          </el-col>
+          <el-col :span="2" style="text-align: center;">-</el-col>
+          <el-col :span="8">
+            <el-form-item prop="shiftStart">
+              <el-select
+                v-model="suspendForm.shiftStart"
+                placeholder="Pick a shift"
+                style="width: 100%;"
+                :disabled="!suspendForm.start"
+              >
+                <el-option
+                  v-for="item in shiftList"
+                  :key="item.id"
+                  :label="item.name + ' (' + item.shiftStart + ' - ' + item.shiftEnd + ')'"
+                  :value="item.shiftStart"
+                >
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.shiftStart }} - {{ item.shiftEnd }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
         <el-form-item label="Expires after:" prop="expiration">
-          <el-date-picker
-            v-model="suspendForm.expiration"
-            type="datetime"
-            format="dd/MM/yyyy HH:mm:ss"
-            :editable="false"
-            :clearable="false"
-            :picker-options="suspendPickerOptions"
-          />
+          <el-col :span="8">
+            <el-date-picker
+              v-model="suspendForm.expiration"
+              type="date"
+              format="dd/MM/yyyy"
+              placeholder="Pick a date"
+              style="width: 100%;"
+              :editable="false"
+              :clearable="false"
+              :picker-options="suspendPickerOptions"
+            />
+          </el-col>
+          <el-col :span="2" style="text-align: center;">-</el-col>
+          <el-col :span="8">
+            <el-form-item prop="shiftExp">
+              <el-select
+                v-model="suspendForm.shiftExp"
+                placeholder="Pick a shift"
+                style="width: 100%;"
+                :disabled="!suspendForm.expiration"
+              >
+                <el-option
+                  v-for="item in shiftList"
+                  :key="item.id"
+                  :label="item.name + ' (' + item.shiftStart + ' - ' + item.shiftEnd + ')'"
+                  :value="item.shiftStart"
+                >
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.shiftStart }} - {{ item.shiftEnd }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -412,7 +478,7 @@
       </span>
     </el-dialog>
     <el-dialog title="Update Suspension for this Bank Teller account" :visible.sync="updateFormVisible">
-      <el-form ref="updateSusForm" :model="updateSuspendForm" :rules="updateSuspendRules">
+      <el-form ref="updateSusForm" :model="updateSuspendForm" :rules="updateSuspendRules" :label-position="'top'">
         <el-form-item label="Reason:" prop="reason">
           <el-input
             v-model="updateSuspendForm.reason"
@@ -424,24 +490,52 @@
           v-if="selectedEmployee && selectedEmployee.Suspensions && selectedEmployee.Suspensions[0]"
           label="Current Expiration:"
         >
-          <el-date-picker
-            v-model="selectedEmployee.Suspensions[0].expiredOn"
-            type="datetime"
-            format="dd/MM/yyyy HH:mm:ss"
-            :readonly="true"
-            :editable="false"
-            :clearable="false"
-          />
+          <el-col :span="8">
+            <el-date-picker
+              v-model="selectedEmployee.Suspensions[0].expiredOn"
+              type="datetime"
+              format="dd/MM/yyyy HH:mm:ss"
+              style="width: 100%;"
+              :readonly="true"
+              :editable="false"
+              :clearable="false"
+            />
+          </el-col>
         </el-form-item>
         <el-form-item label="New Expiration:" prop="expiration">
-          <el-date-picker
-            v-model="updateSuspendForm.expiration"
-            type="datetime"
-            format="dd/MM/yyyy HH:mm:ss"
-            :editable="false"
-            :clearable="false"
-            :picker-options="updateSuspendPickerOptions"
-          />
+          <el-col :span="8">
+            <el-date-picker
+              v-model="updateSuspendForm.expiration"
+              type="date"
+              format="dd/MM/yyyy"
+              placeholder="Pick a date"
+              style="width: 100%;"
+              :editable="false"
+              :clearable="false"
+              :picker-options="updateSuspendPickerOptions"
+            />
+          </el-col>
+          <el-col :span="2" style="text-align: center;">-</el-col>
+          <el-col :span="8">
+            <el-form-item prop="shiftExp">
+              <el-select
+                v-model="updateSuspendForm.shiftExp"
+                placeholder="Pick a shift"
+                style="width: 100%;"
+                :disabled="!updateSuspendForm.expiration"
+              >
+                <el-option
+                  v-for="item in shiftList"
+                  :key="item.id"
+                  :label="item.name + ' (' + item.shiftStart + ' - ' + item.shiftEnd + ')'"
+                  :value="item.shiftStart"
+                >
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.shiftStart }} - {{ item.shiftEnd }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -466,7 +560,7 @@
 // import ActionSuggest from './components/ActionToImproveList'
 // import WarningList from './components/WarningList'
 // import ReportEmotion from './components/ReportEmotion'
-import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate, emailAction, addAppointment } from '@/api/employees'
+import { getReport, getWarningList, getSessionHistory, getGCSUrl, suspendEmployee, updateSuspendEmployee, getConfigs, getSessionMinDate, emailAction, addAppointment, getShifts } from '@/api/employees'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import esmsLogo from '@/assets/esms_logo300.png'
@@ -478,7 +572,7 @@ export default {
   data() {
     const validateAppDate = (rule, value, callback) => {
       if (value.getTime() <= Date.now()) {
-        callback(new Error('Appointment time must be a future time.'))
+        callback(new Error('Appointment time must be a future time'))
       } else {
         if (this.profile.appointments) {
           this.profile.appointments.forEach((a, i) => {
@@ -496,30 +590,117 @@ export default {
         callback()
       }
     }
-    const validateSusExp = (rule, value, callback) => {
+    const validateSusStart = (rule, value, callback) => {
+      if (this.suspendForm.shiftStart) {
+        const timeArr = this.suspendForm.shiftStart.split(':')
+        if (timeArr && timeArr.length === 3) {
+          const shiftDate = new Date(this.suspendForm.start)
+          shiftDate.setHours(Number.parseInt(timeArr[0]))
+          shiftDate.setMinutes(Number.parseInt(timeArr[1]))
+          shiftDate.setSeconds(Number.parseInt(timeArr[2]))
+          if (shiftDate.getTime() !== value.getTime()) {
+            this.suspendForm.start = shiftDate
+          }
+        }
+      }
+      if (this.suspendForm.expiration) {
+        this.$refs.susForm.validateField('expiration')
+      }
       if (value.getTime() <= Date.now()) {
-        callback(new Error('Expiration time must be a future time.'))
-      } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
-        callback(new Error('Expiration time must be at least 15 minutes from now.'))
+        callback(new Error('Start time must be a future time'))
       } else {
         callback()
       }
     }
+    const validateSusShiftStart = (rule, value, callback) => {
+      if (value) {
+        const timeArr = value.split(':')
+        if (timeArr && timeArr.length === 3) {
+          const shiftDate = new Date(this.suspendForm.start)
+          shiftDate.setHours(Number.parseInt(timeArr[0]))
+          shiftDate.setMinutes(Number.parseInt(timeArr[1]))
+          shiftDate.setSeconds(Number.parseInt(timeArr[2]))
+          this.suspendForm.start = shiftDate
+        }
+      }
+      callback()
+    }
+    const validateSusExp = (rule, value, callback) => {
+      if (this.suspendForm.shiftExp) {
+        const timeArr = this.suspendForm.shiftExp.split(':')
+        if (timeArr && timeArr.length === 3) {
+          const shiftDate = new Date(this.suspendForm.expiration)
+          shiftDate.setHours(Number.parseInt(timeArr[0]))
+          shiftDate.setMinutes(Number.parseInt(timeArr[1]))
+          shiftDate.setSeconds(Number.parseInt(timeArr[2]))
+          if (shiftDate.getTime() !== value.getTime()) {
+            this.suspendForm.expiration = shiftDate
+          }
+        }
+      }
+      if (value.getTime() <= Date.now()) {
+        callback(new Error('Expiration time must be a future time'))
+      } else if (this.suspendForm.start && value.getTime() <= new Date(this.suspendForm.start).getTime()) {
+        callback(new Error('Expiration time must be after start time'))
+      } else {
+        callback()
+      }
+    }
+    const validateSusShiftExp = (rule, value, callback) => {
+      if (value) {
+        const timeArr = value.split(':')
+        if (timeArr && timeArr.length === 3) {
+          const shiftDate = new Date(this.suspendForm.expiration)
+          shiftDate.setHours(Number.parseInt(timeArr[0]))
+          shiftDate.setMinutes(Number.parseInt(timeArr[1]))
+          shiftDate.setSeconds(Number.parseInt(timeArr[2]))
+          this.suspendForm.expiration = shiftDate
+        }
+      }
+      callback()
+    }
     const validateUpdateSusExp = (rule, value, callback) => {
-      const oldExp = this.selectedEmployee && this.selectedEmployee.Suspensions && this.selectedEmployee.Suspensions[0] ? new Date(this.selectedEmployee.Suspensions[0].expiredOn) : null
+      if (this.updateSuspendForm.shiftExp) {
+        const timeArr = this.updateSuspendForm.shiftExp.split(':')
+        if (timeArr && timeArr.length === 3) {
+          const shiftDate = new Date(this.updateSuspendForm.expiration)
+          shiftDate.setHours(Number.parseInt(timeArr[0]))
+          shiftDate.setMinutes(Number.parseInt(timeArr[1]))
+          shiftDate.setSeconds(Number.parseInt(timeArr[2]))
+          if (shiftDate.getTime() !== value.getTime()) {
+            this.updateSuspendForm.expiration = shiftDate
+          }
+        }
+      }
+      const oldSus = this.selectedEmployee && this.selectedEmployee.Suspensions ? this.selectedEmployee.Suspensions[0] : null
+      const oldStart = oldSus ? new Date(oldSus.startTime) : null
+      const oldExp = oldSus ? new Date(oldSus.expiredOn) : null
       if (oldExp && oldExp.getTime() <= Date.now() + 15 * 60 * 1000) {
         this.cancelUpdateSuspend()
         this.selectedEmployee = JSON.parse(JSON.stringify(this.selectedEmployee))
       }
       if (value.getTime() <= Date.now()) {
-        callback(new Error('New Expiration time must be a future time.'))
-      } else if (value.getTime() <= Date.now() + 15 * 60 * 1000) {
-        callback(new Error('New Expiration time must be at least 15 minutes from now.'))
+        callback(new Error('New expiration time must be a future time'))
+      } else if (value.getTime() <= oldStart.getTime()) {
+        callback(new Error('New expiration time must be after start time'))
       } else if (oldExp && value.getTime() > oldExp.getTime()) {
-        callback(new Error('New Expiration time must be sooner than the current one.'))
+        callback(new Error('New expiration time must not be exceeded the current one'))
       } else {
         callback()
       }
+    }
+    const validateUpdateSusShiftExp = (rule, value, callback) => {
+      if (value) {
+        const timeArr = value.split(':')
+        if (timeArr && timeArr.length === 3) {
+          const shiftDate = new Date(this.updateSuspendForm.expiration)
+          shiftDate.setHours(Number.parseInt(timeArr[0]))
+          shiftDate.setMinutes(Number.parseInt(timeArr[1]))
+          shiftDate.setSeconds(Number.parseInt(timeArr[2]))
+          this.updateSuspendForm.expiration = shiftDate
+        }
+      }
+      callback()
     }
     return {
       logo: esmsLogo,
@@ -545,25 +726,46 @@ export default {
       isShowUpdateSus: true,
       dupApp: 1000000,
       dupWarn: new Set(),
+      shiftList: [],
       confirmSusVisible: false,
       suspendForm: {
         reason: null,
-        expiration: null
+        start: null,
+        shiftStart: null,
+        expiration: null,
+        shiftExp: null
       },
       updateSuspendForm: {
         reason: null,
-        expiration: null
+        expiration: null,
+        shiftExp: null
       },
       suspendRules: {
+        start: [
+          { type: 'date', required: true, message: 'Please input start date', trigger: 'change' },
+          { validator: validateSusStart, trigger: 'change' }
+        ],
+        shiftStart: [
+          { type: 'string', required: true, message: 'Please input start shift', trigger: 'change' },
+          { validator: validateSusShiftStart, trigger: 'change' }
+        ],
         expiration: [
-          { type: 'date', required: true, message: 'Please input an expiration time for this suspension', trigger: 'change' },
+          { type: 'date', required: true, message: 'Please input expiration date', trigger: 'change' },
           { validator: validateSusExp, trigger: 'change' }
+        ],
+        shiftExp: [
+          { type: 'string', required: true, message: 'Please input expiration shift', trigger: 'change' },
+          { validator: validateSusShiftExp, trigger: 'change' }
         ]
       },
       updateSuspendRules: {
         expiration: [
-          { type: 'date', required: true, message: 'Please input new expiration time for this suspension', trigger: 'change' },
+          { type: 'date', required: true, message: 'Please input new expiration date', trigger: 'change' },
           { validator: validateUpdateSusExp, trigger: 'change' }
+        ],
+        shiftExp: [
+          { type: 'string', required: true, message: 'Please input new expiration shift', trigger: 'change' },
+          { validator: validateUpdateSusShiftExp, trigger: 'change' }
         ]
       },
       reportPickerOptions: {
@@ -690,8 +892,16 @@ export default {
     this.getList()
     this.getConfigurations()
     this.updateReport()
+    this.getShiftList()
   },
   methods: {
+    getShiftList() {
+      getShifts()
+        .then(res => {
+          const data = res.message
+          this.shiftList = data
+        })
+    },
     querySearch(queryString, cb) {
       const list = this.reportTableData || []
       const results = queryString ? list.filter(this.createFilter(queryString)) : list
@@ -904,7 +1114,12 @@ export default {
       form.validate(valid => {
         if (valid) {
           this.isLoading = true
-          suspendEmployee(this.selectedEmployee.employeeCode, form.model).then(response => {
+          const susData = {
+            reason: form.model.reason,
+            start: form.model.start,
+            expiration: form.model.expiration
+          }
+          suspendEmployee(this.selectedEmployee.employeeCode, susData).then(response => {
             console.log(response)
             if (this.selectedEmployee) {
               if (this.selectedEmployee.employeeCode) {
@@ -948,7 +1163,10 @@ export default {
         if (valid) {
           this.isLoading = true
           updateSuspendEmployee(this.selectedEmployee.employeeCode, {
-            ...form.model,
+            ...{
+              reason: form.model.reason,
+              expiration: form.model.expiration
+            },
             id: this.selectedEmployee.Suspensions[0].id
           }).then(response => {
             console.log(response)
