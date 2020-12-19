@@ -343,6 +343,9 @@
                       </span>
                       <span />
                       <span class="stime">
+                        {{ `Customer: ${session.customerName}` }}
+                      </span>
+                      <span class="stime">
                         {{ `Date: ${getClientDate(session.sessionStart)}` }}
                       </span>
                       <span class="stime">
@@ -1108,7 +1111,7 @@ export default {
                         this.$store.dispatch('root/getProfile')
                       })
                     Message({
-                      message: 'Appoitment Email is successfully sent!',
+                      message: 'Appointment Email is successfully sent!',
                       type: 'success',
                       duration: 3 * 1000
                     })
@@ -1136,7 +1139,7 @@ export default {
             if (this.selectedEmployee) {
               if (this.selectedEmployee.employeeCode) {
                 const btCode = this.selectedEmployee.employeeCode
-                const emailData = { employeeCode: btCode, type: 'suspension', date: form.model.expiration }
+                const emailData = { employeeCode: btCode, type: 'suspension', startDate: form.model.start, date: form.model.expiration }
                 emailAction(emailData)
                   .then(res => {
                     if (res.success) {
