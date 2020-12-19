@@ -706,6 +706,14 @@ export default {
       }
       callback()
     }
+    const startWeekDate = new Date()
+    console.log('startWeekDate', startWeekDate)
+    startWeekDate.setHours(0)
+    startWeekDate.setMinutes(0)
+    startWeekDate.setSeconds(0)
+    startWeekDate.setMilliseconds(0)
+    startWeekDate.setTime(startWeekDate.getTime() + (1 - (startWeekDate.getDay() !== 0 ? startWeekDate.getDay() : 7)) * 24 * 60 * 60 * 1000)
+    console.log('startWeekDate', startWeekDate)
     return {
       logo: esmsLogo,
       isLoading: false,
@@ -716,7 +724,7 @@ export default {
       selectedEmployee: {},
       dialogFormVisible: false,
       updateFormVisible: false,
-      selectedWeekDay: new Date(),
+      selectedWeekDay: startWeekDate,
       prevSelectedWeekDay: new Date(),
       selectedRange: [new Date(), new Date()],
       reportTableData: null,
@@ -861,7 +869,7 @@ export default {
       startWeekDay.setMinutes(0)
       startWeekDay.setSeconds(0)
       startWeekDay.setMilliseconds(0)
-      startWeekDay.setTime(startWeekDay.getTime() - (startWeekDay.getDay() - 1) * 24 * 60 * 60 * 1000)
+      startWeekDay.setTime(startWeekDay.getTime() - ((startWeekDay.getDay() !== 0 ? startWeekDay.getDay() : 7) - 1) * 24 * 60 * 60 * 1000)
       return this.prevSelectedWeekDay.getTime() >= startWeekDay.getTime()
     }
   },
