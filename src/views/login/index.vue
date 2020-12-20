@@ -3,7 +3,8 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login to ESMS Manager</h3>
+        <img :src="logo" alt="ESMSLogo" class="logo">
+        <h3 class="title">Login to ESMS for Manager</h3>
       </div>
 
       <el-form-item prop="employeeCode">
@@ -51,6 +52,7 @@
 </template>
 
 <script>
+import esmsLogo from '@/assets/esms_logo200.png'
 
 export default {
   name: 'Login',
@@ -71,6 +73,7 @@ export default {
       }
     }
     return {
+      logo: esmsLogo,
       loginForm: {
         employeeCode: '',
         password: ''
@@ -244,10 +247,15 @@ $light_gray:#eee;
   .title-container {
     position: relative;
 
+    .logo {
+      display: block;
+      margin: 0 auto 0 auto;
+    }
+
     .title {
       font-size: 26px;
       color: $light_gray;
-      margin: 0px auto 40px auto;
+      margin: 20px auto 40px auto;
       text-align: center;
       font-weight: bold;
     }

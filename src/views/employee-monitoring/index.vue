@@ -6,7 +6,11 @@
       <div class="subline dec" />
     </div>
     <div class="sideBar">
-      <span class="appName">EsmsManager</span>
+      <span class="appName">
+        <span>ESMS</span>
+        <br>
+        <span>ManagerApp</span>
+      </span>
       <div class="navigation">
         <div class="btnNav active noHover">
           <div class="iconBox">
