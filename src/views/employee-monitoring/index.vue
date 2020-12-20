@@ -804,13 +804,13 @@ export default {
         firstDayOfWeek: 1,
         disabledDate: function(time) {
           const mDate = new Date(this.minDate)
-          mDate.setTime(mDate.getTime() - (mDate.getDay() - 1) * 24 * 60 * 60 * 1000)
+          mDate.setTime(mDate.getTime() - ((mDate.getDay() !== 0 ? mDate.getDay() : 7) - 1) * 24 * 60 * 60 * 1000)
           const nextWeekDay = new Date()
           nextWeekDay.setHours(0)
           nextWeekDay.setMinutes(0)
           nextWeekDay.setSeconds(0)
           nextWeekDay.setMilliseconds(0)
-          nextWeekDay.setTime(nextWeekDay.getTime() + (8 - nextWeekDay.getDay()) * 24 * 60 * 60 * 1000)
+          nextWeekDay.setTime(nextWeekDay.getTime() + (8 - (nextWeekDay.getDay() !== 0 ? nextWeekDay.getDay() : 7)) * 24 * 60 * 60 * 1000)
           return time.getTime() < mDate.getTime() ||
             time.getTime() >= nextWeekDay.getTime()
         }.bind(this)
@@ -1208,7 +1208,7 @@ export default {
       selectedDate.setMinutes(0)
       selectedDate.setSeconds(0)
       selectedDate.setMilliseconds(0)
-      selectedDate.setTime(selectedDate.getTime() - (selectedDate.getDay() - 1) * 24 * 60 * 60 * 1000)
+      selectedDate.setTime(selectedDate.getTime() - ((selectedDate.getDay() !== 0 ? selectedDate.getDay() : 7) - 1) * 24 * 60 * 60 * 1000)
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
       getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
@@ -1228,7 +1228,7 @@ export default {
       selectedDate.setMinutes(0)
       selectedDate.setSeconds(0)
       selectedDate.setMilliseconds(0)
-      selectedDate.setTime(selectedDate.getTime() - (selectedDate.getDay() - 1) * 24 * 60 * 60 * 1000)
+      selectedDate.setTime(selectedDate.getTime() - ((selectedDate.getDay() !== 0 ? selectedDate.getDay() : 7) - 1) * 24 * 60 * 60 * 1000)
       const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
       return getWarningList({ role: 3, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
         this.employeeList = response.message
@@ -1252,7 +1252,7 @@ export default {
         selectedDate.setMinutes(0)
         selectedDate.setSeconds(0)
         selectedDate.setMilliseconds(0)
-        selectedDate.setTime(selectedDate.getTime() - (selectedDate.getDay() - 1) * 24 * 60 * 60 * 1000)
+        selectedDate.setTime(selectedDate.getTime() - ((selectedDate.getDay() !== 0 ? selectedDate.getDay() : 7) - 1) * 24 * 60 * 60 * 1000)
         const nextWeekDate = new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000)
         return getSessionHistory({ employeeCode: code, startDate: selectedDate, endDate: nextWeekDate }).then(response => {
           this.isLoading = false
