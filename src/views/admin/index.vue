@@ -57,7 +57,7 @@
               <el-table
                 v-if="categoryList"
                 :data="categoryList"
-                :height="'calc(100vh - 180px)'"
+                :height="'calc(100vh - 240px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -95,7 +95,7 @@
               <el-table
                 v-if="serviceList"
                 :data="serviceList"
-                :height="'calc(100vh - 180px)'"
+                :height="'calc(100vh - 240px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -141,7 +141,7 @@
               <el-table
                 v-if="counterList"
                 :data="counterList"
-                :height="'calc(100vh - 180px)'"
+                :height="'calc(100vh - 240px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -180,7 +180,7 @@
               <el-table
                 v-if="shiftList"
                 :data="shiftList"
-                :height="'calc(100vh - 180px)'"
+                :height="'calc(100vh - 240px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -474,7 +474,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['avatarUrl', 'fullname', 'token', 'profile'])
+    ...mapGetters(['avatarUrl', 'fullname', 'token', 'profile', 'roles'])
   },
   watch: {
     searchEmp() {
@@ -488,12 +488,17 @@ export default {
     }
   },
   created() {
-    this.getShiftList()
-    this.getCounterList()
-    this.getServiceList()
-    this.getCategoryList()
-    this.getRoleList()
-    this.getEmployeeList()
+    const role = this.roles[0]
+    if (role === 'Manager') {
+      this.$router.push({ path: '/manager', replace: true })
+    } else {
+      this.getShiftList()
+      this.getCounterList()
+      this.getServiceList()
+      this.getCategoryList()
+      this.getRoleList()
+      this.getEmployeeList()
+    }
   },
   methods: {
     hanlderBulkRegisterSuccess() {

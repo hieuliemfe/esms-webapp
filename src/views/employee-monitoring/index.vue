@@ -869,7 +869,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['avatarUrl', 'fullname', 'token', 'profile']),
+    ...mapGetters(['avatarUrl', 'fullname', 'token', 'profile', 'roles']),
     isShowActionBtn() {
       const startWeekDay = new Date()
       startWeekDay.setHours(0)
@@ -907,11 +907,16 @@ export default {
     }
   },
   created() {
-    this.getMin()
-    this.getList()
-    this.getConfigurations()
-    this.updateReport()
-    this.getShiftList()
+    const role = this.roles[0]
+    if (role === 'Admin') {
+      this.$router.push({ path: '/admin', replace: true })
+    } else {
+      this.getMin()
+      this.getList()
+      this.getConfigurations()
+      this.updateReport()
+      this.getShiftList()
+    }
   },
   methods: {
     getShiftList() {
