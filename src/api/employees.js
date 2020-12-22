@@ -1,10 +1,4 @@
 import request from '@/utils/request'
-export function getCounters() {
-  return request({
-    url: '/counters/{id}',
-    method: 'get'
-  })
-}
 export function getEmployees() {
   return request({
     url: '/employees',
@@ -72,6 +66,13 @@ export function getConfigs() {
     method: 'get'
   })
 }
+export function updateConfigs(body) {
+  return request({
+    url: `/configs`,
+    method: 'post',
+    data: body
+  })
+}
 export function getReport(query) {
   return request({
     url: `/reports`,
@@ -106,21 +107,96 @@ export function addAppointment(query) {
     params: query
   })
 }
-export function getShifts() {
-  return request({
-    url: `/shifts`,
-    method: 'get'
-  })
-}
 export function getCategories() {
   return request({
     url: `/categories`,
     method: 'get'
   })
 }
+export function updateCategory(body) {
+  return request({
+    url: '/categories',
+    method: 'put',
+    data: body
+  })
+}
+export function deleteCategory(body) {
+  return request({
+    url: '/categories',
+    method: 'delete',
+    data: body
+  })
+}
 export function getServices() {
   return request({
     url: `/services`,
     method: 'get'
+  })
+}
+export function updateService(body) {
+  return request({
+    url: '/services',
+    method: 'put',
+    data: body
+  })
+}
+export function deleteService(body) {
+  return request({
+    url: '/services',
+    method: 'delete',
+    data: body
+  })
+}
+export function getCounters() {
+  return request({
+    url: '/counters/{id}',
+    method: 'get'
+  })
+}
+export function getCounterById(counterId) {
+  return request({
+    url: `/counters/${counterId}`,
+    method: 'get'
+  })
+}
+export function updateCounter(body) {
+  return request({
+    url: '/counters',
+    method: 'put',
+    data: body
+  })
+}
+export function updateCounterCategories(counterId, body) {
+  return request({
+    url: `/counters/${counterId}`,
+    method: 'put',
+    data: body
+  })
+}
+export function deleteCounter(body) {
+  return request({
+    url: '/counters',
+    method: 'delete',
+    data: body
+  })
+}
+export function getShifts() {
+  return request({
+    url: `/shifts`,
+    method: 'get'
+  })
+}
+export function updateShift(body) {
+  return request({
+    url: '/shifts',
+    method: 'put',
+    data: body
+  })
+}
+export function deleteShift(body) {
+  return request({
+    url: '/shifts',
+    method: 'delete',
+    data: body
   })
 }

@@ -51,13 +51,35 @@
         <div class="reportInner">
           <span class="shiftListTitle">Manage Configurations</span>
           <br>
+          <br>
+          <el-row>
+            <el-col :span="16">
+              <span>Acceptable percentage of warning sessions: (%)</span>
+              <el-slider v-model="acceptable" :format-tooltip="formatTooltip" />
+            </el-col>
+            <el-col :span="4" style="padding-left: 10px;">
+              <span>Acceptable face-absent time: (ms)</span>
+              <el-input v-model="noFace" type="number" />
+            </el-col>
+            <el-col :span="4" style="text-align: right;">
+              <br>
+              <el-button
+                type="text"
+                :disabled="!configs || (acceptable / 100 === configs.angry_percent_max && noFace === configs.no_face_detected_max)"
+                @click="updateConfigurations()"
+              >
+                Update Configurations
+              </el-button>
+            </el-col>
+          </el-row>
           <el-tabs v-model="activeTabName" type="card">
             <el-tab-pane label="Categories" name="category">
               <h4>Manage Categories</h4>
+              <el-button @click="importCategoryVisible = true">Import Categories</el-button>
               <el-table
                 v-if="categoryList"
                 :data="categoryList"
-                :height="'calc(100vh - 240px)'"
+                :height="'calc(100vh - 304px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -66,25 +88,27 @@
                 />
                 <el-table-column
                   prop="subtitle"
-                  label="Subtitle"
+                  label="Category subtitle"
                 />
                 <el-table-column
-                  label="Operation"
+                  label="Operations"
                   width="110"
                   align="center"
                 >
-                  <template>
+                  <template slot-scope="scope">
                     <el-button
                       type="warning"
                       icon="el-icon-edit"
                       circle
                       style="line-height: initial;"
+                      @click="openUpdateCategory(scope.row)"
                     />
                     <el-button
                       type="danger"
                       icon="el-icon-delete"
                       circle
                       style="line-height: initial;"
+                      @click="deleteCategoryById(scope.row.id)"
                     />
                   </template>
                 </el-table-column>
@@ -92,10 +116,11 @@
             </el-tab-pane>
             <el-tab-pane label="Services" name="service">
               <h4>Manage Services</h4>
+              <el-button @click="importServiceVisible = true">Import Services</el-button>
               <el-table
                 v-if="serviceList"
                 :data="serviceList"
-                :height="'calc(100vh - 240px)'"
+                :height="'calc(100vh - 304px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -115,22 +140,24 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="Operation"
+                  label="Operations"
                   width="110"
                   align="center"
                 >
-                  <template>
+                  <template slot-scope="scope">
                     <el-button
                       type="warning"
                       icon="el-icon-edit"
                       circle
                       style="line-height: initial;"
+                      @click="openUpdateService(scope.row)"
                     />
                     <el-button
                       type="danger"
                       icon="el-icon-delete"
                       circle
                       style="line-height: initial;"
+                      @click="deleteServiceById(scope.row.id)"
                     />
                   </template>
                 </el-table-column>
@@ -138,10 +165,11 @@
             </el-tab-pane>
             <el-tab-pane label="Counters" name="counter">
               <h4>Manage Counters</h4>
+              <el-button @click="importCounterVisible = true">Import Counters</el-button>
               <el-table
                 v-if="counterList"
                 :data="counterList"
-                :height="'calc(100vh - 240px)'"
+                :height="'calc(100vh - 304px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -154,22 +182,24 @@
                   label="Counter name"
                 />
                 <el-table-column
-                  label="Operation"
+                  label="Operations"
                   width="110"
                   align="center"
                 >
-                  <template>
+                  <template slot-scope="scope">
                     <el-button
                       type="warning"
                       icon="el-icon-edit"
                       circle
                       style="line-height: initial;"
+                      @click="openUpdateCounter(scope.row)"
                     />
                     <el-button
                       type="danger"
                       icon="el-icon-delete"
                       circle
                       style="line-height: initial;"
+                      @click="deleteCounterById(scope.row.id)"
                     />
                   </template>
                 </el-table-column>
@@ -177,10 +207,11 @@
             </el-tab-pane>
             <el-tab-pane label="Shifts" name="shift">
               <h4>Manage Shifts</h4>
+              <el-button @click="importShiftVisible = true">Import Shifts</el-button>
               <el-table
                 v-if="shiftList"
                 :data="shiftList"
-                :height="'calc(100vh - 240px)'"
+                :height="'calc(100vh - 304px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -198,22 +229,24 @@
                   width="150"
                 />
                 <el-table-column
-                  label="Operation"
+                  label="Operations"
                   width="110"
                   align="center"
                 >
-                  <template>
+                  <template slot-scope="scope">
                     <el-button
                       type="warning"
                       icon="el-icon-edit"
                       circle
                       style="line-height: initial;"
+                      @click="openUpdateShift(scope.row)"
                     />
                     <el-button
                       type="danger"
                       icon="el-icon-delete"
                       circle
                       style="line-height: initial;"
+                      @click="deleteShiftById(scope.row.id)"
                     />
                   </template>
                 </el-table-column>
@@ -241,7 +274,7 @@
             style="line-height: 15px; margin-left: 10px"
             @click="addEmployeeVisible = true"
           />
-          <el-button @click="bulkRegisterVisible = true">Bulk Register</el-button>
+          <el-button @click="importEmployeeVisible = true">Import Employees</el-button>
           <el-table
             v-if="filteredEmployeeList"
             :data="filteredEmployeeList"
@@ -284,7 +317,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="Operation"
+              label="Operations"
               width="110"
               align="center"
             >
@@ -309,6 +342,20 @@
         </div>
       </div>
     </div>
+    <el-dialog title="Import Employees" :visible.sync="importEmployeeVisible">
+      <el-upload
+        ref="employeeUploader"
+        style="text-align: center;"
+        drag
+        action="http://api.esms-team.site/employees/bulk-register"
+        :headers="{ Authorization: 'Bearer ' + token }"
+        :show-file-list="false"
+        :on-success="handleImportEmployeesSuccess"
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+      </el-upload>
+    </el-dialog>
     <el-dialog title="Add new Employee" :visible.sync="addEmployeeVisible">
       <el-form ref="addEmpForm" :model="addEmployeeForm" :rules="addEmployeeRules" :label-position="'top'">
         <el-form-item label="Full Name:" prop="fullname">
@@ -324,7 +371,7 @@
         <el-form-item label="Role:" prop="roleId">
           <el-select
             v-model="addEmployeeForm.roleId"
-            placeholder="Select role"
+            placeholder=""
           >
             <el-option
               v-for="item in roleList"
@@ -360,7 +407,7 @@
         <el-form-item label="Role:" prop="roleId">
           <el-select
             v-model="updateEmployeeForm.roleId"
-            placeholder="Select role"
+            placeholder=""
           >
             <el-option
               v-for="item in roleList"
@@ -373,7 +420,7 @@
         <el-form-item v-if="updateEmployeeForm.roleId === 3" label="Counter:" prop="counterId">
           <el-select
             v-model="updateEmployeeForm.counterId"
-            placeholder="Select counter"
+            placeholder=""
           >
             <el-option
               v-for="item in counterList"
@@ -389,24 +436,171 @@
         <el-button type="primary" @click="submitUpdateEmployee()">Confirm</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="Bulk Register" :visible.sync="bulkRegisterVisible">
+    <el-dialog title="Import Categories" :visible.sync="importCategoryVisible">
       <el-upload
-        ref="uploader"
+        ref="categoryUploader"
         style="text-align: center;"
         drag
-        action="http://api.esms-team.site/employees/bulk-register"
+        action="http://api.esms-team.site/categories"
         :headers="{ Authorization: 'Bearer ' + token }"
         :show-file-list="false"
-        :on-success="hanlderBulkRegisterSuccess"
+        :on-success="handleImportCategoriesSuccess"
       >
         <i class="el-icon-upload" />
         <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
       </el-upload>
     </el-dialog>
+    <el-dialog title="Update a Category" :visible.sync="updateCategoryVisible">
+      <el-form ref="updateCatForm" :model="updateCategoryForm" :rules="updateCategoryRules" :label-position="'top'">
+        <el-form-item label="Category Name:" prop="categoryName">
+          <el-input
+            v-model="updateCategoryForm.categoryName"
+          />
+        </el-form-item>
+        <el-form-item label="Subtitle:" prop="subtitle">
+          <el-input
+            v-model="updateCategoryForm.subtitle"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateCategory()">Cancel</el-button>
+        <el-button type="primary" @click="submitUpdateCategory()">Confirm</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="Import Services" :visible.sync="importServiceVisible">
+      <el-upload
+        ref="serviceUploader"
+        style="text-align: center;"
+        drag
+        action="http://api.esms-team.site/services"
+        :headers="{ Authorization: 'Bearer ' + token }"
+        :show-file-list="false"
+        :on-success="handleImportServicesSuccess"
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+      </el-upload>
+    </el-dialog>
+    <el-dialog title="Update a Service" :visible.sync="updateServiceVisible">
+      <el-form ref="updateSerForm" :model="updateServiceForm" :rules="updateServiceRules" :label-position="'top'">
+        <el-form-item label="Service Name:" prop="name">
+          <el-input
+            v-model="updateServiceForm.name"
+          />
+        </el-form-item>
+        <el-form-item label="Service Code:" prop="code">
+          <el-input
+            v-model="updateServiceForm.code"
+          />
+        </el-form-item>
+        <el-form-item label="Category:" prop="categoryId">
+          <el-select
+            v-model="updateServiceForm.categoryId"
+            placeholder=""
+          >
+            <el-option
+              v-for="item in categoryList"
+              :key="item.id"
+              :label="item.categoryName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateService()">Cancel</el-button>
+        <el-button type="primary" @click="submitUpdateService()">Confirm</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="Import Counters" :visible.sync="importCounterVisible">
+      <el-upload
+        ref="counterUploader"
+        style="text-align: center;"
+        drag
+        action="http://api.esms-team.site/counters"
+        :headers="{ Authorization: 'Bearer ' + token }"
+        :show-file-list="false"
+        :on-success="handleImportCountersSuccess"
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+      </el-upload>
+    </el-dialog>
+    <el-dialog title="Update a Counter" :visible.sync="updateCounterVisible">
+      <el-form ref="updateCounForm" :model="updateCounterForm" :rules="updateCounterRules" :label-position="'top'">
+        <el-form-item label="Counter Name:" prop="name">
+          <el-input
+            v-model="updateCounterForm.name"
+          />
+        </el-form-item>
+        <el-form-item label="Counter Number:" prop="number">
+          <el-input
+            v-model="updateCounterForm.number"
+          />
+        </el-form-item>
+        <el-form-item label="Categories:" prop="categoryIds">
+          <el-select
+            v-model="updateCounterForm.categoryIds"
+            multiple
+            placeholder=""
+            style="width: 100%;"
+          >
+            <el-option
+              v-for="item in categoryList"
+              :key="item.id"
+              :label="item.categoryName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateCounter()">Cancel</el-button>
+        <el-button type="primary" @click="submitUpdateCounter()">Confirm</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="Import Shifts" :visible.sync="importShiftVisible">
+      <el-upload
+        ref="shiftUploader"
+        style="text-align: center;"
+        drag
+        action="http://api.esms-team.site/shifts"
+        :headers="{ Authorization: 'Bearer ' + token }"
+        :show-file-list="false"
+        :on-success="handleImportShiftsSuccess"
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+      </el-upload>
+    </el-dialog>
+    <el-dialog title="Update a Shift" :visible.sync="updateShiftVisible">
+      <el-form ref="updateShForm" :model="updateShiftForm" :rules="updateShiftRules" :label-position="'top'">
+        <el-form-item label="Shift Name:" prop="name">
+          <el-input
+            v-model="updateShiftForm.name"
+          />
+        </el-form-item>
+        <el-form-item label="Start Time:" prop="shiftStart">
+          <el-input
+            v-model="updateShiftForm.shiftStart"
+          />
+        </el-form-item>
+        <el-form-item label="End Time:" prop="shiftEnd">
+          <el-input
+            v-model="updateShiftForm.shiftEnd"
+          />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateShift()">Cancel</el-button>
+        <el-button type="primary" @click="submitUpdateShift()">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getEmployees, addEmployee, updateEmployee, deleteEmployee, getCategories, getServices, getCounters, getShifts } from '@/api/employees'
+import { getEmployees, addEmployee, updateEmployee, deleteEmployee, getCategories, updateCategory, deleteCategory, getServices, updateService, deleteService, getCounters, getCounterById, updateCounter, updateCounterCategories, deleteCounter, getShifts, updateShift, deleteShift, getConfigs, updateConfigs } from '@/api/employees'
 import { getRoles } from '@/api/roles'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
@@ -469,8 +663,76 @@ export default {
           { type: 'number', required: true, message: 'Please select a role', trigger: 'change' }
         ]
       },
-      bulkRegisterVisible: false,
-      activeTabName: 'category'
+      updateCategoryVisible: false,
+      updateCategoryForm: {
+        id: null,
+        categoryName: null,
+        subtitle: null
+      },
+      updateCategoryRules: {
+        categoryName: [
+          { type: 'string', required: true, message: 'Please input category name', trigger: 'change' }
+        ],
+        subtitle: [
+          { type: 'string', required: true, message: 'Please input category subtitle', trigger: 'change' }
+        ]
+      },
+      updateServiceVisible: false,
+      updateServiceForm: {
+        name: null,
+        categoryId: null,
+        code: null
+      },
+      updateServiceRules: {
+        name: [
+          { type: 'string', required: true, message: 'Please input service name', trigger: 'change' }
+        ],
+        code: [
+          { type: 'string', required: true, message: 'Please input service code', trigger: 'change' }
+        ]
+      },
+      updateCounterVisible: false,
+      updateCounterForm: {
+        id: null,
+        name: null,
+        number: null,
+        categoryIds: []
+      },
+      updateCounterRules: {
+        name: [
+          { type: 'string', required: true, message: 'Please input counter name', trigger: 'change' }
+        ],
+        number: [
+          { type: 'number', required: true, message: 'Please input counter number', trigger: 'change' }
+        ]
+      },
+      updateShiftVisible: false,
+      updateShiftForm: {
+        id: null,
+        name: null,
+        shiftStart: null,
+        shiftEnd: null
+      },
+      updateShiftRules: {
+        name: [
+          { type: 'string', required: true, message: 'Please input shift name', trigger: 'change' }
+        ],
+        shiftStart: [
+          { type: 'string', required: true, message: 'Please input shift start time', trigger: 'change' }
+        ],
+        shiftEnd: [
+          { type: 'string', required: true, message: 'Please input shift end time', trigger: 'change' }
+        ]
+      },
+      importEmployeeVisible: false,
+      importCategoryVisible: false,
+      importServiceVisible: false,
+      importCounterVisible: false,
+      importShiftVisible: false,
+      activeTabName: 'category',
+      configs: null,
+      acceptable: 0,
+      noFace: 0
     }
   },
   computed: {
@@ -492,6 +754,7 @@ export default {
     if (role === 'Manager') {
       this.$router.push({ path: '/manager', replace: true })
     } else {
+      this.getConfigurations()
       this.getShiftList()
       this.getCounterList()
       this.getServiceList()
@@ -501,14 +764,251 @@ export default {
     }
   },
   methods: {
-    hanlderBulkRegisterSuccess() {
+    formatTooltip(val) {
+      return val + '%'
+    },
+    getConfigurations() {
+      this.isLoading = true
+      getConfigs()
+        .then(res => {
+          const data = res.message
+          this.isLoading = false
+          this.configs = data
+          this.acceptable = this.configs.angry_percent_max * 100
+          this.noFace = this.configs.no_face_detected_max
+        })
+    },
+    updateConfigurations() {
+      this.isLoading = true
+      updateConfigs({
+        config: JSON.stringify({
+          angry_percent_max: (this.acceptable / 100).toFixed(2),
+          no_face_detected_max: this.noFace
+        })
+      }).then(res => {
+        this.isLoading = false
+        this.getConfigurations()
+      })
+    },
+    handleImportEmployeesSuccess() {
       this.getEmployeeList()
-      this.bulkRegisterVisible = false
-      this.$refs.uploader.clearFiles()
+      this.importEmployeeVisible = false
+      this.$refs.employeeUploader.clearFiles()
       this.$message({
         type: 'success',
-        message: 'Bulk registered successful'
+        message: 'Imported employees successful'
       })
+    },
+    handleImportCategoriesSuccess() {
+      this.getCategoryList()
+      this.importCategoryVisible = false
+      this.$refs.categoryUploader.clearFiles()
+      this.$message({
+        type: 'success',
+        message: 'Imported categories successful'
+      })
+    },
+    handleImportServicesSuccess() {
+      this.getServiceList()
+      this.importServiceVisible = false
+      this.$refs.serviceUploader.clearFiles()
+      this.$message({
+        type: 'success',
+        message: 'Imported services successful'
+      })
+    },
+    handleImportCountersSuccess() {
+      this.getCounterList()
+      this.importCounterVisible = false
+      this.$refs.counterUploader.clearFiles()
+      this.$message({
+        type: 'success',
+        message: 'Imported counters successful'
+      })
+    },
+    handleImportShiftsSuccess() {
+      this.getShiftList()
+      this.importShiftVisible = false
+      this.$refs.shiftUploader.clearFiles()
+      this.$message({
+        type: 'success',
+        message: 'Imported shifts successful'
+      })
+    },
+    openUpdateShift(sh) {
+      this.updateShiftForm.id = sh.id
+      this.updateShiftForm.name = sh.name
+      this.updateShiftForm.shiftStart = sh.shiftStart
+      this.updateShiftForm.shiftEnd = sh.shiftEnd
+      this.updateShiftVisible = true
+    },
+    submitUpdateShift() {
+      const form = this.$refs.updateShForm
+      form.validate(valid => {
+        if (valid) {
+          this.isLoading = true
+          const updateData = {
+            id: form.model.id,
+            name: form.model.name,
+            shiftStart: form.model.shiftStart,
+            shiftEnd: form.model.shiftEnd
+          }
+          updateShift({
+            shifts: [
+              updateData
+            ]
+          }).then(response => {
+            this.getShiftList()
+            this.updateShiftVisible = false
+            this.isLoading = false
+            form.resetFields()
+            this.$message({
+              type: 'success',
+              message: 'Updated shift successful'
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    cancelUpdateShift() {
+      const form = this.$refs.updateShForm
+      this.updateShiftVisible = false
+      form.resetFields()
+    },
+    openUpdateCounter(coun) {
+      getCounterById(coun.id)
+        .then(res => {
+          const categories = res.message.counters.Categories
+          const categoryIds = categories.map(e => e.id)
+          console.log('categoryIds', categoryIds)
+          this.updateCounterForm.id = coun.id
+          this.updateCounterForm.name = coun.name
+          this.updateCounterForm.number = coun.number
+          this.updateCounterForm.categoryIds = categoryIds
+          this.updateCounterVisible = true
+        })
+    },
+    submitUpdateCounter() {
+      const form = this.$refs.updateCounForm
+      form.validate(valid => {
+        if (valid) {
+          this.isLoading = true
+          const updateData = {
+            id: form.model.id,
+            name: form.model.name,
+            number: form.model.number
+          }
+          updateCounter({
+            counters: [
+              updateData
+            ]
+          }).then(response => {
+            updateCounterCategories(form.model.id, {
+              categoryIds: form.model.categoryIds
+            }).then(res => {
+              this.getCounterList()
+              this.updateCounterVisible = false
+              this.isLoading = false
+              form.resetFields()
+              this.$message({
+                type: 'success',
+                message: 'Updated counter successful'
+              })
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    cancelUpdateCounter() {
+      const form = this.$refs.updateCounForm
+      this.updateCounterVisible = false
+      form.resetFields()
+    },
+    openUpdateService(ser) {
+      this.updateServiceForm.id = ser.id
+      this.updateServiceForm.name = ser.name
+      this.updateServiceForm.code = ser.code
+      this.updateServiceForm.categoryId = ser.categoryId
+      this.updateServiceVisible = true
+    },
+    submitUpdateService() {
+      const form = this.$refs.updateSerForm
+      form.validate(valid => {
+        if (valid) {
+          this.isLoading = true
+          const updateData = {
+            id: form.model.id,
+            name: form.model.name,
+            code: form.model.code,
+            categoryId: form.model.categoryId
+          }
+          updateService({
+            services: [
+              updateData
+            ]
+          }).then(response => {
+            this.getServiceList()
+            this.updateServiceVisible = false
+            this.isLoading = false
+            form.resetFields()
+            this.$message({
+              type: 'success',
+              message: 'Updated service successful'
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    cancelUpdateService() {
+      const form = this.$refs.updateSerForm
+      this.updateServiceVisible = false
+      form.resetFields()
+    },
+    openUpdateCategory(cat) {
+      this.updateCategoryForm.id = cat.id
+      this.updateCategoryForm.categoryName = cat.categoryName
+      this.updateCategoryForm.subtitle = cat.subtitle
+      this.updateCategoryVisible = true
+    },
+    submitUpdateCategory() {
+      const form = this.$refs.updateCatForm
+      form.validate(valid => {
+        if (valid) {
+          this.isLoading = true
+          const updateData = {
+            id: form.model.id,
+            categoryName: form.model.categoryName,
+            subtitle: form.model.subtitle
+          }
+          updateCategory({
+            categories: [
+              updateData
+            ]
+          }).then(response => {
+            this.getCategoryList()
+            this.updateCategoryVisible = false
+            this.isLoading = false
+            form.resetFields()
+            this.$message({
+              type: 'success',
+              message: 'Updated category successful'
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    cancelUpdateCategory() {
+      const form = this.$refs.updateCatForm
+      this.updateCategoryVisible = false
+      form.resetFields()
     },
     openUpdateEmployee(emp) {
       this.updateEmployeeForm.employeeCode = emp.employeeCode
@@ -547,7 +1047,7 @@ export default {
             form.resetFields()
             this.$message({
               type: 'success',
-              message: 'Updated successful'
+              message: 'Updated employee successful'
             })
           })
         } else {
@@ -592,7 +1092,7 @@ export default {
       form.resetFields()
     },
     deleteEmployeeByCode(empCode) {
-      this.$confirm('Are you sure to permanently delete this Employee?', 'Confirm delete', {
+      this.$confirm('Are you sure to permanently delete this employee?', 'Confirm delete', {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel'
       }).then(() => {
@@ -603,7 +1103,83 @@ export default {
             this.getEmployeeList()
             this.$message({
               type: 'success',
-              message: 'Delete completed'
+              message: 'Deleted employee successful'
+            })
+          })
+      }).catch(() => {})
+    },
+    deleteCategoryById(id) {
+      this.$confirm('Are you sure to permanently delete this category?', 'Confirm delete', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      }).then(() => {
+        this.isLoading = true
+        deleteCategory({
+          ids: [id]
+        })
+          .then(res => {
+            this.isLoading = false
+            this.getCategoryList()
+            this.$message({
+              type: 'success',
+              message: 'Deleted category successful'
+            })
+          })
+      }).catch(() => {})
+    },
+    deleteServiceById(id) {
+      this.$confirm('Are you sure to permanently delete this service?', 'Confirm delete', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      }).then(() => {
+        this.isLoading = true
+        deleteService({
+          ids: [id]
+        })
+          .then(res => {
+            this.isLoading = false
+            this.getServiceList()
+            this.$message({
+              type: 'success',
+              message: 'Deleted service successful'
+            })
+          })
+      }).catch(() => {})
+    },
+    deleteCounterById(id) {
+      this.$confirm('Are you sure to permanently delete this counter?', 'Confirm delete', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      }).then(() => {
+        this.isLoading = true
+        deleteCounter({
+          ids: [id]
+        })
+          .then(res => {
+            this.isLoading = false
+            this.getCounterList()
+            this.$message({
+              type: 'success',
+              message: 'Deleted counter successful'
+            })
+          })
+      }).catch(() => {})
+    },
+    deleteShiftById(id) {
+      this.$confirm('Are you sure to permanently delete this shift?', 'Confirm delete', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      }).then(() => {
+        this.isLoading = true
+        deleteShift({
+          ids: [id]
+        })
+          .then(res => {
+            this.isLoading = false
+            this.getShiftList()
+            this.$message({
+              type: 'success',
+              message: 'Deleted shift successful'
             })
           })
       }).catch(() => {})
