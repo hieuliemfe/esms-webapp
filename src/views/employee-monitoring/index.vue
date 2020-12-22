@@ -238,7 +238,7 @@
               <span class="hello"> Hello, {{ fullname }}</span>
               <span class="tips">Have a nice day!</span>
               <span class="tips">
-                Welcome to Employee Status Monitoring website!
+                Welcome to ESMS for Manager website!
               </span>
             </div>
             <img :src="logo" alt="ESMSLogo" class="greetingLogo">

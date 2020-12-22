@@ -48,7 +48,7 @@ const actions = {
       login({ employeeCode: employeeCode, password: password }).then(response => {
         const data = response
         const role = data.message.roleName
-        if (role !== 'Manager') {
+        if (!['Manager', 'Admin'].includes(role)) {
           Message({
             message: 'Your account do not have permission to access this website',
             type: 'error',
@@ -58,7 +58,7 @@ const actions = {
         } else {
           commit('SET_TOKEN', data.token)
           setToken(data.token)
-          resolve()
+          resolve(role)
         }
       }).catch(error => {
         Message({

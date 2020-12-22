@@ -135,8 +135,8 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('root/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+            .then((role) => {
+              this.$router.push({ path: role === 'Manager' ? '/' : '/admin', query: this.otherQuery })
               this.loading = false
             })
             .catch(() => {

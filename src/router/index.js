@@ -55,16 +55,21 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/employee-monitoring',
+    redirect: '/manager',
     children: [
       {
-        path: 'employee-monitoring',
+        path: '/manager',
         component: () => import('@/views/employee-monitoring/index'),
-        name: 'Warning List',
+        name: 'Manager',
         meta: {
-          affix: true,
-          title: 'Employee Status Monitoring',
-          icon: 'el-icon-warning',
+          roles: ['Manager'] // you can set roles in root nav
+        }
+      },
+      {
+        path: '/admin',
+        component: () => import('@/views/admin/index'),
+        name: 'Admin',
+        meta: {
           roles: ['Manager'] // you can set roles in root nav
         }
       }
