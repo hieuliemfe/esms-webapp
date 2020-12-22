@@ -79,7 +79,7 @@
               <el-table
                 v-if="categoryList"
                 :data="categoryList"
-                :height="'calc(100vh - 304px)'"
+                :height="'calc(100vh - 380px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -120,7 +120,7 @@
               <el-table
                 v-if="serviceList"
                 :data="serviceList"
-                :height="'calc(100vh - 304px)'"
+                :height="'calc(100vh - 380px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -169,7 +169,7 @@
               <el-table
                 v-if="counterList"
                 :data="counterList"
-                :height="'calc(100vh - 304px)'"
+                :height="'calc(100vh - 380px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -211,7 +211,7 @@
               <el-table
                 v-if="shiftList"
                 :data="shiftList"
-                :height="'calc(100vh - 304px)'"
+                :height="'calc(100vh - 380px)'"
                 style="width: 100%"
               >
                 <el-table-column
@@ -278,7 +278,7 @@
           <el-table
             v-if="filteredEmployeeList"
             :data="filteredEmployeeList"
-            :height="'calc(100vh - 210px)'"
+            :height="'calc(100vh - 212px)'"
             style="width: 100%"
           >
             <el-table-column
