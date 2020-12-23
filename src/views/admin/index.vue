@@ -1073,7 +1073,7 @@ export default {
           }
           addEmployee(addData).then(response => {
             const data = response.message
-            this.$alert(`EmployeeCode: ${data.employeeCode} - Password: ${data.password}`, 'New employee information', {
+            this.$alert(`EmployeeCode: ${data.employeeCode} - Password: ${data.password}`, 'New employee account', {
               confirmButtonText: 'OK'
             })
             this.getEmployeeList()
