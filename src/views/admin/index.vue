@@ -53,11 +53,11 @@
           <br>
           <br>
           <el-row>
-            <el-col :span="16">
+            <el-col :span="12">
               <span>Acceptable percentage of warning sessions: (%)</span>
               <el-slider v-model="acceptable" :format-tooltip="formatTooltip" />
             </el-col>
-            <el-col :span="4" style="padding-left: 10px;">
+            <el-col :span="8" style="padding-left: 10px;">
               <span>Acceptable face-absent time: (ms)</span>
               <el-input v-model="noFace" type="number" />
             </el-col>
